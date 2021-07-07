@@ -1,0 +1,5 @@
+/.vs
+library/metaoutput.client/obj
+library/metaoutput.media/obj
+*.user
+*.mp4

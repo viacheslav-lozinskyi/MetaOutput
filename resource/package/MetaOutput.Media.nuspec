@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>MetaOutput.Media</id>
+    <version>1.0.1</version>
+    <title>MetaOutput.Media</title>
+    <authors>Viacheslav Lozinskyi</authors>
+    <owners>Viacheslav Lozinskyi</owners>
+    <description>Default previewers for the most popular media formats</description>
+    <summary></summary>
+    <language>en-US</language>
+    <iconUrl>https://viacheslav-lozinskyi.github.io/MetaOutput/resource/picture/logo/icon.png</iconUrl>
+    <projectUrl>https://viacheslav-lozinskyi.github.io/MetaOutput</projectUrl>
+    <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
+    <license type="expression">MIT</license>
+    <releaseNotes>
+- MetaOutput.Client version is updated
+    </releaseNotes>
+    <copyright>Copyright (c) 2020-2021 by Viacheslav Lozinskyi. All rights reserved.</copyright>
+    <tags>MetaOutput, media, taglib, preview, viewer, native</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+      <group targetFramework="native">
+        <dependency id="MetaPlatform" version="[1.0.8, 2)" />
+      </group>
+    </dependencies>
+    <packageTypes>
+      <packageType name="Dependency" />
+    </packageTypes>
+  </metadata>
+</package>

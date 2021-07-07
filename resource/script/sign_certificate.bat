@@ -1,0 +1,1 @@
+SignTool.exe sign /a /f key.private.pfx test.dll
