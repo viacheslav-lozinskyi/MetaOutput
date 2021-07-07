@@ -16,6 +16,7 @@ Also it contains icons templates.
 
 - MetaOutput.Client - MIT
 - MetaOutput.Media - MIT
+- MetaOutput.Server - Proprietary
 - MetaOutput.Viewer - Proprietary
 
 # Where is possible to get more detailed information?
