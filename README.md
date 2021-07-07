@@ -1,37 +1,24 @@
 # What is MetaOutput?
-*********************
 
-This is plugin for Visual Studio, which allows forget standard output tool.
+MetaOutput is plugin for Visual Studio, which allows forget standard output tool.
 
+# What contains this package?
 
-# Why MetaOutput is created?
-****************************
+It contains two libraries which are necessary for writing of deeply integrated code with MetaOutput.
+Also it contains icons templates.
 
-Development of standard output tool is frozen, but it is too week to be enough.
-Nobody improve it and it is a reason why I decided to solve this problem.
+# Where it can be used?
 
+- For writing of own code using Trace Message Language (TML)
+- For writing of own extensions to MetaOutput
 
-# How to install:
-*****************
+# Which licenses are used for libraries?
 
-From the installer:
-	Just follow the install wizard.
+- MetaOutput.Client - MIT
+- MetaOutput.Media - MIT
+- MetaOutput.Viewer - Proprietary
 
-From the Visual Studio:
-	Just find extension "MetaOutput" in Visual Studio Extension Manager and install it.
+# Where is possible to get more detailed information?
 
-
-# Web sites:
-************
-
-MetaOutput official site:
-	https://bit.ly/metaoutput-home
-
-MetaOutput community:
-	https://bit.ly/metaoutput-community
-
-
-# Author:
-*********
-
-Viacheslav Lozinskyi <viacheslav.lozinskyi@gmail.com>
+- Presentation in PowerPoint is [here](https://github.com/viacheslav-lozinskyi/MetaOutput/tree/main/resource/document/MetaOutput.pptx) 
+- Presentation in PDF is [here](https://github.com/viacheslav-lozinskyi/MetaOutput/tree/main/resource/document/MetaOutput.pdf)
