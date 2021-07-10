@@ -1,9 +1,12 @@
-![Image](https://img.shields.io/github/issues/viacheslav-lozinskyi/MetaOutput?link=https://github.com/viacheslav-lozinskyi/MetaOutput/issues)
-![Image](https://img.shields.io/github/stars/viacheslav-lozinskyi/MetaOutput)
-![Image](https://img.shields.io/badge/VS-2022-blueviolet)
-![Image](https://img.shields.io/badge/VS-2019-blueviolet)
-![Image](https://img.shields.io/badge/VS-2017-blueviolet)
-![Image](https://img.shields.io/badge/VS-2015-blueviolet)
+[![GitHub issues](https://img.shields.io/github/issues/viacheslav-lozinskyi/MetaOutput)](https://github.com/viacheslav-lozinskyi/MetaOutput/issues)
+[![GitHub Repo stars](https://img.shields.io/github/stars/viacheslav-lozinskyi/MetaOutput)](https://github.com/viacheslav-lozinskyi/MetaOutput/stargazers)
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/viacheslav-lozinskyi/MetaOutput)](https://github.com/viacheslav-lozinskyi/MetaOutput)
+[![Nuget](https://img.shields.io/nuget/dt/MetaOutput.Client)](https://www.nuget.org/packages/MetaOutput.Client)
+[![Nuget](https://img.shields.io/nuget/v/MetaOutput.Client)](https://www.nuget.org/packages/MetaOutput.Client)
+[![Image](https://img.shields.io/badge/VS-2022-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022)
+[![Image](https://img.shields.io/badge/VS-2019-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
+[![Image](https://img.shields.io/badge/VS-2017-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
+[![Image](https://img.shields.io/badge/VS-2015-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
 
 ---
 

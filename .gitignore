@@ -1,5 +1,6 @@
 /.vs
 library/metaoutput.client/obj
 library/metaoutput.media/obj
+/packages
 *.user
 *.mp4
