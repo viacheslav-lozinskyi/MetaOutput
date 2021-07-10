@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>MetaOutput.Client</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>MetaOutput.Client</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
@@ -14,16 +14,7 @@
     <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
     <license type="expression">MIT</license>
     <releaseNotes>
-- Proxy file mechanism is improved
-- Preview mechanism is improved
-- Preview command mechanism is implemented
-- Preview filter mechanism is implemented
-- Preview of resources placed in the Internet is implemented
-- Specification of atom::Trace class is improved
-- Specification of extension::AnyExport class is added
-- Specification of extension::AnyImport class is added
-- Specification of extension::AnySource class is added
-- Specification of extension::AnyPreview class is improved
+- Pipes mechanism is improved
     </releaseNotes>
     <copyright>Copyright (c) 2020-2021 by Viacheslav Lozinskyi. All rights reserved.</copyright>
     <tags>MetaOutput, client, preview, viewer, native</tags>

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>MetaOutput.Media</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>MetaOutput.Media</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
@@ -20,9 +20,6 @@
     <tags>MetaOutput, media, taglib, preview, viewer, native</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
-      <group targetFramework="native">
-        <dependency id="MetaPlatform" version="[1.0.8, 2)" />
-      </group>
     </dependencies>
     <packageTypes>
       <packageType name="Dependency" />
