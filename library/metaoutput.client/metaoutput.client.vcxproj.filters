@@ -13,6 +13,9 @@
     <Filter Include="resource\document">
       <UniqueIdentifier>{fcaf95ea-809e-4d8b-81e8-d40754c75ea5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\assembly">
+      <UniqueIdentifier>{4f597a34-31b1-4586-9bdf-3cc6fc512259}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="atom\Trace.cpp">
@@ -29,6 +32,9 @@
     </ClCompile>
     <ClCompile Include="extension\AnySource.cpp">
       <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="resource\assembly\AssemblyInfo.cpp">
+      <Filter>resource\assembly</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

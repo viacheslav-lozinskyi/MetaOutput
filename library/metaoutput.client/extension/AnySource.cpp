@@ -83,16 +83,14 @@ void extension::AnySource::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
         {
             try
             {
-                {
-                    a_Context->m_Extension->_Execute(a_Context->m_Context);
-                }
-                {
-                    MP_THREAD_SLEEP(50);
-                }
+                a_Context->m_Extension->_Execute(a_Context->m_Context);
             }
             catch (MP_PTR(MP_EXCEPTION) ex)
             {
                 MP_TRACE_DEBUG(MP_EXCEPTION_MESSAGE_GET(ex) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+            }
+            {
+                MP_THREAD_SLEEP(50);
             }
         }
     }

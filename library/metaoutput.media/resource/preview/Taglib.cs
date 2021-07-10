@@ -14,8 +14,8 @@ namespace resource
             {
                 if (File.Exists(file))
                 {
-                    var a_Context = TagLib.File.Create(file);
-                    if (a_Context != null)
+                    var a_Context = TagLib.File.Create(file, TagLib.ReadStyle.Average);
+                    if (a_Context?.Properties?.MediaTypes != null)
                     {
                         var a_Size = 4;
                         if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
@@ -42,7 +42,9 @@ namespace resource
                         }
                         for (var i = 0; i < a_Size; i++)
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
+                            context.
+                                SetForeground(NAME.COLOR.TRANSPARENT).
+                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
                         }
                         {
                             var a_Context1 = "[[[Metadata]]]";
@@ -218,7 +220,7 @@ namespace resource
                         {
                             context.
                                 SetComment(a_Context.MediaTypes.ToString(), "[[[Media Types]]]").
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.METADATA, level + 1, a_Context.Description);
+                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FILE, level + 1, a_Context.Description);
                             if (a_Context is TagLib.Mpeg.AudioHeader)
                             {
                                 __Execute(context, tagLib, (TagLib.Mpeg.AudioHeader)a_Context, level + 2);
@@ -330,7 +332,49 @@ namespace resource
             {
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null))
                 {
-                    if (string.IsNullOrEmpty(file))
+                    try
+                    {
+                        if (string.IsNullOrEmpty(file) == false)
+                        {
+                            var a_Context = Image.FromFile(file);
+                            {
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Pixel Format]]]", Native.GetPixelFormat(a_Context));
+                                }
+                            }
+                            {
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Size]]]");
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", a_Context.Width.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", a_Context.Height.ToString());
+                                }
+                            }
+                            {
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Physical Size]]]");
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
+                                }
+                            }
+                            {
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Resolution]]]");
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
+                                }
+                            }
+                            {
+                                Native.Send(context, a_Context.Palette, level, url);
+                            }
+                            return;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
                     {
                         {
                             context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
@@ -345,42 +389,6 @@ namespace resource
                                 context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", node.PhotoWidth.ToString());
                                 context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", node.PhotoHeight.ToString());
                             }
-                        }
-                    }
-                    else
-                    {
-                        var a_Context = Image.FromFile(file);
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
-                            {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Pixel Format]]]", Native.GetPixelFormat(a_Context));
-                            }
-                        }
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Size]]]");
-                            {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", a_Context.Width.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", a_Context.Height.ToString());
-                            }
-                        }
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Physical Size]]]");
-                            {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
-                            }
-                        }
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Resolution]]]");
-                            {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
-                            }
-                        }
-                        {
-                            Native.Send(context, a_Context.Palette, level, url);
                         }
                     }
                 }

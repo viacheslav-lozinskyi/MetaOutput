@@ -57,6 +57,7 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
             m_Size = "";
             m_StackTrace = "";
             m_Time = "";
+            m_Tml = "";
             m_Url = "";
             m_UrlInfo = "";
             m_UrlPipe = "";
@@ -168,6 +169,7 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT l
                     a_Context += m_UrlPreview;
                     a_Context += m_UrlSample;
                     a_Context += m_Value;
+                    a_Context += m_Tml;
                     a_Context += "\n";
                     a_Context += m_StackTrace;
                 }
@@ -281,7 +283,7 @@ MP_PTR(atom::Trace) atom::Trace::SetBackground(MP_INT value)
 {
     if ((this != nullptr) && (value != 0))
     {
-        m_Background = " @@@BACKGROUND #" + MP_CONVERT_STRING_FROM_HEX(value, 8);
+        m_Background = " @@@BACKGROUND " + __GetColor(value);
     }
     return this;
 }
@@ -476,7 +478,7 @@ MP_PTR(atom::Trace) atom::Trace::SetForeground(MP_INT value)
 {
     if ((this != nullptr) && (value != 0))
     {
-        m_Foreground = " @@@FOREGROUND #" + MP_CONVERT_STRING_FROM_HEX(value, 8);
+        m_Foreground = " @@@FOREGROUND " + __GetColor(value);
     }
     return this;
 }
@@ -517,6 +519,15 @@ MP_PTR(atom::Trace) atom::Trace::SetTime(MP_INT hour, MP_INT minute, MP_INT seco
             MP_CONVERT_STRING_FROM_INT(MP_MAX(0, MP_MIN(minute, 60)), 2) + "." +
             MP_CONVERT_STRING_FROM_INT(MP_MAX(0, MP_MIN(second, 60)), 2) + "." +
             MP_CONVERT_STRING_FROM_INT(MP_MAX(0, MP_MIN(miliSecond, 999)), 3);
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetTml(MP_STRING value)
+{
+    if (this != nullptr)
+    {
+        m_Tml = value;
     }
     return this;
 }
@@ -833,6 +844,161 @@ MP_STRING atom::Trace::__GetType(MP_STRING value)
         return " @@@TYPE " + __GetFirstLine(value, false);
     }
     return "";
+}
+
+MP_STRING atom::Trace::__GetColor(MP_INT value)
+{
+    if ((value & 0xFF000000) == 0)
+    {
+        return "TRANSPARENT";
+    }
+    else
+    {
+        auto a_Context = (MP_INT32)((value & 0x00FFFFFF) | 0xFF000000);
+        {
+            if (a_Context == NAME::COLOR::ALICE_BLUE) return "ALICE.BLUE";
+            if (a_Context == NAME::COLOR::ANTIQUE_WHITE) return "ANTIQUE.WHITE";
+            if (a_Context == NAME::COLOR::AQUA) return "AQUA";
+            if (a_Context == NAME::COLOR::AQUAMARINE) return "AQUAMARINE";
+            if (a_Context == NAME::COLOR::AZURE) return "AZURE";
+            if (a_Context == NAME::COLOR::BEIGE) return "BEIGE";
+            if (a_Context == NAME::COLOR::BISQUE) return "BISQUE";
+            if (a_Context == NAME::COLOR::BLACK) return "BLACK";
+            if (a_Context == NAME::COLOR::BLANCHED_ALMOND) return "BLANCHED.ALMOND";
+            if (a_Context == NAME::COLOR::BLUE_VIOLET) return "BLUE.VIOLET";
+            if (a_Context == NAME::COLOR::BLUE) return "BLUE";
+            if (a_Context == NAME::COLOR::BROWN) return "BROWN";
+            if (a_Context == NAME::COLOR::BURLY_WOOD) return "BURLY.WOOD";
+            if (a_Context == NAME::COLOR::CADET_BLUE) return "CADET.BLUE";
+            if (a_Context == NAME::COLOR::CHARTREUSE) return "CHARTREUSE";
+            if (a_Context == NAME::COLOR::CHOCOLATE) return "CHOCOLATE";
+            if (a_Context == NAME::COLOR::CORAL) return "CORAL";
+            if (a_Context == NAME::COLOR::CORNFLOWER_BLUE) return "CORNFLOWER.BLUE";
+            if (a_Context == NAME::COLOR::CORNSILK) return "CORNSILK";
+            if (a_Context == NAME::COLOR::CRIMSON) return "CRIMSON";
+            if (a_Context == NAME::COLOR::CYAN) return "CYAN";
+            if (a_Context == NAME::COLOR::DARK_BLUE) return "DARK.BLUE";
+            if (a_Context == NAME::COLOR::DARK_CYAN) return "DARK.CYAN";
+            if (a_Context == NAME::COLOR::DARK_GOLDENROD) return "DARK.GOLDENROD";
+            if (a_Context == NAME::COLOR::DARK_GRAY) return "DARK.GRAY";
+            if (a_Context == NAME::COLOR::DARK_GREEN) return "DARK.GREEN";
+            if (a_Context == NAME::COLOR::DARK_KHAKI) return "DARK.KHAKI";
+            if (a_Context == NAME::COLOR::DARK_MAGENTA) return "DARK.MAGENTA";
+            if (a_Context == NAME::COLOR::DARK_OLIVE_GREEN) return "DARK.OLIVE.GREEN";
+            if (a_Context == NAME::COLOR::DARK_ORANGE) return "DARK.ORANGE";
+            if (a_Context == NAME::COLOR::DARK_ORCHID) return "DARK.ORCHID";
+            if (a_Context == NAME::COLOR::DARK_RED) return "DARK.RED";
+            if (a_Context == NAME::COLOR::DARK_SALMON) return "DARK.SALMON";
+            if (a_Context == NAME::COLOR::DARK_SEA_GREEN) return "DARK.SEA.GREEN";
+            if (a_Context == NAME::COLOR::DARK_SLATE_BLUE) return "DARK.SLATE.BLUE";
+            if (a_Context == NAME::COLOR::DARK_SLATE_GRAY) return "DARK.SLATE.GRAY";
+            if (a_Context == NAME::COLOR::DARK_TURQUOISE) return "DARK.TURQUOISE";
+            if (a_Context == NAME::COLOR::DARK_VIOLET) return "DARK.VIOLET";
+            if (a_Context == NAME::COLOR::DEEP_PINK) return "DEEP.PINK";
+            if (a_Context == NAME::COLOR::DEEP_SKY_BLUE) return "DEEP.SKY.BLUE";
+            if (a_Context == NAME::COLOR::DIM_GRAY) return "DIM.GRAY";
+            if (a_Context == NAME::COLOR::DODGER_BLUE) return "DODGER.BLUE";
+            if (a_Context == NAME::COLOR::FIREBRICK) return "FIREBRICK";
+            if (a_Context == NAME::COLOR::FLORAL_WHITE) return "FLORAL.WHITE";
+            if (a_Context == NAME::COLOR::FOREST_GREEN) return "FOREST.GREEN";
+            if (a_Context == NAME::COLOR::FUCHSIA) return "FUCHSIA";
+            if (a_Context == NAME::COLOR::GAINSBORO) return "GAINSBORO";
+            if (a_Context == NAME::COLOR::GHOST_WHITE) return "GHOST.WHITE";
+            if (a_Context == NAME::COLOR::GOLD) return "GOLD";
+            if (a_Context == NAME::COLOR::GOLDENROD) return "GOLDENROD";
+            if (a_Context == NAME::COLOR::GRAY) return "GRAY";
+            if (a_Context == NAME::COLOR::GREEN_YELLOW) return "GREEN.YELLOW";
+            if (a_Context == NAME::COLOR::GREEN) return "GREEN";
+            if (a_Context == NAME::COLOR::HONEYDEW) return "HONEYDEW";
+            if (a_Context == NAME::COLOR::HOT_PINK) return "HOT.PINK";
+            if (a_Context == NAME::COLOR::INDIAN_RED) return "INDIAN.RED";
+            if (a_Context == NAME::COLOR::INDIGO) return "INDIGO";
+            if (a_Context == NAME::COLOR::IVORY) return "IVORY";
+            if (a_Context == NAME::COLOR::KHAKI) return "KHAKI";
+            if (a_Context == NAME::COLOR::LAVENDER_BLUSH) return "LAVENDER.BLUSH";
+            if (a_Context == NAME::COLOR::LAVENDER) return "LAVENDER";
+            if (a_Context == NAME::COLOR::LAWN_GREEN) return "LAWN.GREEN";
+            if (a_Context == NAME::COLOR::LEMON_CHIFFON) return "LEMON.CHIFFON";
+            if (a_Context == NAME::COLOR::LIGHT_BLUE) return "LIGHT.BLUE";
+            if (a_Context == NAME::COLOR::LIGHT_CORAL) return "LIGHT.CORAL";
+            if (a_Context == NAME::COLOR::LIGHT_CYAN) return "LIGHT.CYAN";
+            if (a_Context == NAME::COLOR::LIGHT_GOLDENROD_YELLOW) return "LIGHT.GOLDENROD.YELLOW";
+            if (a_Context == NAME::COLOR::LIGHT_GRAY) return "LIGHT.GRAY";
+            if (a_Context == NAME::COLOR::LIGHT_GREEN) return "LIGHT.GREEN";
+            if (a_Context == NAME::COLOR::LIGHT_PINK) return "LIGHT.PINK";
+            if (a_Context == NAME::COLOR::LIGHT_SALMON) return "LIGHT.SALMON";
+            if (a_Context == NAME::COLOR::LIGHT_SEA_GREEN) return "LIGHT.SEA.GREEN";
+            if (a_Context == NAME::COLOR::LIGHT_SKY_BLUE) return "LIGHT.SKY.BLUE";
+            if (a_Context == NAME::COLOR::LIGHT_SLATE_GRAY) return "LIGHT.SLATE.GRAY";
+            if (a_Context == NAME::COLOR::LIGHT_STEEL_BLUE) return "LIGHT.STEEL.BLUE";
+            if (a_Context == NAME::COLOR::LIGHT_YELLOW) return "LIGHT.YELLOW";
+            if (a_Context == NAME::COLOR::LIME_GREEN) return "LIME.GREEN";
+            if (a_Context == NAME::COLOR::LIME) return "LIME";
+            if (a_Context == NAME::COLOR::LINEN) return "LINEN";
+            if (a_Context == NAME::COLOR::MAGENTA) return "MAGENTA";
+            if (a_Context == NAME::COLOR::MAROON) return "MAROON";
+            if (a_Context == NAME::COLOR::MEDIUM_AQUAMARINE) return "MEDIUM.AQUAMARINE";
+            if (a_Context == NAME::COLOR::MEDIUM_BLUE) return "MEDIUM.BLUE";
+            if (a_Context == NAME::COLOR::MEDIUM_ORCHID) return "MEDIUM.ORCHID";
+            if (a_Context == NAME::COLOR::MEDIUM_PURPLE) return "MEDIUM.PURPLE";
+            if (a_Context == NAME::COLOR::MEDIUM_SEA_GREEN) return "MEDIUM.SEA.GREEN";
+            if (a_Context == NAME::COLOR::MEDIUM_SLATE_BLUE) return "MEDIUM.SLATE.BLUE";
+            if (a_Context == NAME::COLOR::MEDIUM_SPRING_GREEN) return "MEDIUM.SPRING.GREEN";
+            if (a_Context == NAME::COLOR::MEDIUM_TURQUOISE) return "MEDIUM.TURQUOISE";
+            if (a_Context == NAME::COLOR::MEDIUM_VIOLET_RED) return "MEDIUM.VIOLET.RED";
+            if (a_Context == NAME::COLOR::MIDNIGHT_BLUE) return "MIDNIGHT.BLUE";
+            if (a_Context == NAME::COLOR::MINT_CREAM) return "MINT.CREAM";
+            if (a_Context == NAME::COLOR::MISTY_ROSE) return "MISTY.ROSE";
+            if (a_Context == NAME::COLOR::MOCCASIN) return "MOCCASIN";
+            if (a_Context == NAME::COLOR::NAVAJO_WHITE) return "NAVAJO.WHITE";
+            if (a_Context == NAME::COLOR::NAVY) return "NAVY";
+            if (a_Context == NAME::COLOR::OLD_LACE) return "OLD.LACE";
+            if (a_Context == NAME::COLOR::OLIVE_DRAB) return "OLIVE.DRAB";
+            if (a_Context == NAME::COLOR::OLIVE) return "OLIVE";
+            if (a_Context == NAME::COLOR::ORANGE_RED) return "ORANGE.RED";
+            if (a_Context == NAME::COLOR::ORANGE) return "ORANGE";
+            if (a_Context == NAME::COLOR::ORCHID) return "ORCHID";
+            if (a_Context == NAME::COLOR::PALE_GOLDENROD) return "PALE.GOLDENROD";
+            if (a_Context == NAME::COLOR::PALE_GREEN) return "PALE.GREEN";
+            if (a_Context == NAME::COLOR::PALE_TURQUOISE) return "PALE.TURQUOISE";
+            if (a_Context == NAME::COLOR::PALE_VIOLET_RED) return "PALE.VIOLET.RED";
+            if (a_Context == NAME::COLOR::PAPAYA_WHIP) return "PAPAYA.WHIP";
+            if (a_Context == NAME::COLOR::PEACH_PUFF) return "PEACH.PUFF";
+            if (a_Context == NAME::COLOR::PERU) return "PERU";
+            if (a_Context == NAME::COLOR::PINK) return "PINK";
+            if (a_Context == NAME::COLOR::PLUM) return "PLUM";
+            if (a_Context == NAME::COLOR::POWDER_BLUE) return "POWDER.BLUE";
+            if (a_Context == NAME::COLOR::PURPLE) return "PURPLE";
+            if (a_Context == NAME::COLOR::RED) return "RED";
+            if (a_Context == NAME::COLOR::ROSY_BROWN) return "ROSY.BROWN";
+            if (a_Context == NAME::COLOR::ROYAL_BLUE) return "ROYAL.BLUE";
+            if (a_Context == NAME::COLOR::SADDLE_BROWN) return "SADDLE.BROWN";
+            if (a_Context == NAME::COLOR::SALMON) return "SALMON";
+            if (a_Context == NAME::COLOR::SANDY_BROWN) return "SANDY.BROWN";
+            if (a_Context == NAME::COLOR::SEA_GREEN) return "SEA.GREEN";
+            if (a_Context == NAME::COLOR::SEA_SHELL) return "SEA.SHELL";
+            if (a_Context == NAME::COLOR::SIENNA) return "SIENNA";
+            if (a_Context == NAME::COLOR::SILVER) return "SILVER";
+            if (a_Context == NAME::COLOR::SKY_BLUE) return "SKY.BLUE";
+            if (a_Context == NAME::COLOR::SLATE_BLUE) return "SLATE.BLUE";
+            if (a_Context == NAME::COLOR::SLATE_GRAY) return "SLATE.GRAY";
+            if (a_Context == NAME::COLOR::SNOW) return "SNOW";
+            if (a_Context == NAME::COLOR::SPRING_GREEN) return "SPRING.GREEN";
+            if (a_Context == NAME::COLOR::STEEL_BLUE) return "STEEL.BLUE";
+            if (a_Context == NAME::COLOR::TAN) return "TAN";
+            if (a_Context == NAME::COLOR::TEAL) return "TEAL";
+            if (a_Context == NAME::COLOR::THISTLE) return "THISTLE";
+            if (a_Context == NAME::COLOR::TOMATO) return "TOMATO";
+            if (a_Context == NAME::COLOR::TURQUOISE) return "TURQUOISE";
+            if (a_Context == NAME::COLOR::VIOLET) return "VIOLET";
+            if (a_Context == NAME::COLOR::WHEAT) return "WHEAT";
+            if (a_Context == NAME::COLOR::WHITE_SMOKE) return "WHITE.SMOKE";
+            if (a_Context == NAME::COLOR::WHITE) return "WHITE";
+            if (a_Context == NAME::COLOR::YELLOW_GREEN) return "YELLOW.GREEN";
+            if (a_Context == NAME::COLOR::YELLOW) return "YELLOW";
+        }
+    }
+    return "#" + MP_CONVERT_STRING_FROM_HEX(value & 0x00FFFFFF, 8);
 }
 
 MP_STRING atom::Trace::__GetLevel(MP_INT value)

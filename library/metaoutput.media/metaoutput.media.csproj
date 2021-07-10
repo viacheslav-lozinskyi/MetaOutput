@@ -12,27 +12,24 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <OutputPath>..\..\output\build\net45\</OutputPath>
-    <IntermediateOutputPath>..\..\output\temp\net45\metaoutput.media\</IntermediateOutputPath>
-    <TargetFrameworkProfile />
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <OutputPath>$(USERPROFILE)\.metaoutput\build\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>$(USERPROFILE)\.metaoutput\build\$(Configuration)\$(AssemblyName)\$(ProjectGuid)</IntermediateOutputPath>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\resource\certificate\key.private.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\resource\certificate\key.private.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -66,10 +63,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>cd $(ProjectDir)
+    <PostBuildEvent>cd /D $(ProjectDir)
 cd ..
 cd ..
 cd resource\script
-make_package.media.bat</PostBuildEvent>
+make_package.media.bat $(Configuration)</PostBuildEvent>
   </PropertyGroup>
 </Project>

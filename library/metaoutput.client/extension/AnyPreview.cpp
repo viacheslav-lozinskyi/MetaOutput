@@ -586,7 +586,16 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
             }
             if (GetState() != NAME::STATE::CANCEL)
             {
-                sender->_Execute(context, level, url, a_Context);
+                try
+                {
+                    sender->_Execute(context, level, url, a_Context);
+                }
+                catch (MP_PTR(MP_EXCEPTION) ex)
+                {
+                    context->
+                        Send(NAME::SOURCE::STATUS, NAME::TYPE::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_TYPE_NAME_OBJECT(ex) + " [" + MP_EXCEPTION_MESSAGE_GET(ex) + "]")->
+                        SendPreview(NAME::TYPE::WARNING, url);
+                }
             }
             if (GetState() == NAME::STATE::CANCEL)
             {

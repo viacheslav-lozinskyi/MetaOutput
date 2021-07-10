@@ -8,7 +8,7 @@ namespace atom
         MP_CLASS CONSTANT
         {
             MP_CONSTANT_STRING(ATTRIBUTE, "@@@");
-            MP_CONSTANT_STRING(COMMENT, "### ");
+            MP_CONSTANT_STRING(COMMENT, "/// ");
             MP_CONSTANT_STRING(GROUP_BEGIN, "<<<");
             MP_CONSTANT_STRING(GROUP_END, ">>>");
             MP_CONSTANT_STRING(NEW_LINE, "|||");
@@ -487,6 +487,25 @@ namespace atom
                 MP_CONSTANT_STRING(UNDERSCORE, "UNDERSCORE");
             };
         public:
+            MP_CLASS METADATA
+            {
+                MP_CONSTANT_STRING(AUTHORS, "AUTHORS");
+                MP_CONSTANT_STRING(COPYRIGHT, "COPYRIGHT");
+                MP_CONSTANT_STRING(DESCRIPTION, "DESCRIPTION");
+                MP_CONSTANT_STRING(ICON, "ICON");
+                MP_CONSTANT_STRING(LICENSE, "LICENSE");
+                MP_CONSTANT_STRING(OWNERS, "OWNERS");
+                MP_CONSTANT_STRING(PATTERNS, "PATTERNS");
+                MP_CONSTANT_STRING(PRODUCT, "PRODUCT");
+                MP_CONSTANT_STRING(README, "README");
+                MP_CONSTANT_STRING(SITE, "SITE");
+                MP_CONSTANT_STRING(SPECIFICATION, "SPECIFICATION");
+                MP_CONSTANT_STRING(TAGS, "TAGS");
+                MP_CONSTANT_STRING(TITLE, "TITLE");
+                MP_CONSTANT_STRING(TRADEMARKS, "TRADEMARKS");
+                MP_CONSTANT_STRING(VERSION, "VERSION");
+            };
+        public:
             MP_CLASS PROGRESS
             {
                 MP_CONSTANT_INTEGER(INFINITE, 101);
@@ -510,6 +529,7 @@ namespace atom
                 MP_CONSTANT_STRING(FIND, "FIND");
                 MP_CONSTANT_STRING(HELP, "HELP");
                 MP_CONSTANT_STRING(LOG, "LOG");
+                MP_CONSTANT_STRING(METADATA, "METADATA");
                 MP_CONSTANT_STRING(NETWORK, "NETWORK");
                 MP_CONSTANT_STRING(NOTIFICATION, "NOTIFICATION");
                 MP_CONSTANT_STRING(PERFORMANCE, "PERFORMANCE");
@@ -523,7 +543,6 @@ namespace atom
                 MP_CONSTANT_STRING(TASK, "TASK");
                 MP_CONSTANT_STRING(TEST, "TEST");
                 MP_CONSTANT_STRING(THREAD, "THREAD");
-                MP_CONSTANT_STRING(TML, "TML");
                 MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
                 MP_CONSTANT_STRING(VARIABLE, "VARIABLE");
             };
@@ -655,7 +674,6 @@ namespace atom
                 MP_CONSTANT_STRING(HINT, "HINT");
                 MP_CONSTANT_STRING(INFO, "INFO");
                 MP_CONSTANT_STRING(MESSAGE, "MESSAGE");
-                MP_CONSTANT_STRING(METADATA, "METADATA");
                 MP_CONSTANT_STRING(OBJECT, "OBJECT");
                 MP_CONSTANT_STRING(PARAMETER, "PARAMETER");
                 MP_CONSTANT_STRING(PREVIEW, "PREVIEW");
@@ -702,6 +720,7 @@ namespace atom
         MP_PTR(Trace) SetProgress(MP_DOUBLE value, MP_STRING hint);
         MP_PTR(Trace) SetSize(MP_INT value);
         MP_PTR(Trace) SetTime(MP_INT hour, MP_INT minute, MP_INT second, MP_INT miliSecond);
+        MP_PTR(Trace) SetTml(MP_STRING value);
         MP_PTR(Trace) SetTransform(MP_STRING name, MP_STRING value);
         MP_PTR(Trace) SetTranslation(MP_STRING culture, MP_STRING value);
         MP_PTR(Trace) SetUrl(MP_STRING value);
@@ -725,6 +744,7 @@ namespace atom
         static MP_STRING __GetMultiLine(MP_STRING value, bool isAnyText);
         static MP_STRING __GetSource(MP_STRING value);
         static MP_STRING __GetType(MP_STRING value);
+        static MP_STRING __GetColor(MP_INT value);
         static MP_STRING __GetLevel(MP_INT value);
         static MP_STRING __GetTml(MP_STRING value, MP_STRING source);
         static MP_STRING __GetText(MP_STRING value);
@@ -753,6 +773,7 @@ namespace atom
         MP_STRING m_Size;
         MP_STRING m_StackTrace;
         MP_STRING m_Time;
+        MP_STRING m_Tml;
         MP_STRING m_Url;
         MP_STRING m_UrlInfo;
         MP_STRING m_UrlPipe;

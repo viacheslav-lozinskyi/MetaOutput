@@ -36,7 +36,9 @@ namespace resource
                                 }
                                 for (var i = 0; i < a_Size; i++)
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
+                                    context.
+                                        SetForeground(NAME.COLOR.TRANSPARENT).
+                                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
                                 }
                             }
                             {
@@ -46,7 +48,7 @@ namespace resource
                                     {
                                         context.
                                             SetComment("[[[Cursor]]]", "[[[Media Type]]]").
-                                            Send(NAME.SOURCE.PREVIEW, NAME.TYPE.METADATA, level + 2, "CUR [[[File]]]");
+                                            Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FILE, level + 2, "CUR [[[File]]]");
                                         {
                                             context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Size]]]");
                                             {
@@ -108,7 +110,7 @@ namespace resource
                                 {
                                     context.
                                         SetComment(GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]", "[[[Media Type]]]").
-                                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.METADATA, level + 2, GetImageFormat(a_Context) + " [[[File]]]");
+                                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FILE, level + 2, GetImageFormat(a_Context) + " [[[File]]]");
                                     {
                                         context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Header]]]");
                                         {

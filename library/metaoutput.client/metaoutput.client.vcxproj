@@ -28,6 +28,7 @@
     <LocalDebuggerCommand>$(DevEnvDir)devenv.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>/rootsuffix Exp</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <Platform>Win32</Platform>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup>
@@ -36,21 +37,21 @@
     <CLRSupport>Safe</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
     <LinkIncremental>false</LinkIncremental>
+    <LinkKeyFile>..\..\resource\certificate\key.private.snk</LinkKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
-    <LinkKeyFile>..\..\resource\certificate\key.private.snk</LinkKeyFile>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup>
-    <OutDir>..\..\output\build\net45\</OutDir>
-    <IntDir>..\..\output\temp\net45\$(MSBuildProjectName)\$(PlatformShortName)\</IntDir>
+    <OutDir>$(USERPROFILE)\.metaoutput\build\$(Configuration)\</OutDir>
+    <IntDir>$(USERPROFILE)\.metaoutput\build\$(Configuration)\$(ProjectName)\$(ProjectGuid)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -59,13 +60,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
+    <Link>
+      <CLRImageType>ForceSafeILImage</CLRImageType>
+    </Link>
     <PostBuildEvent>
       <Command>
-cd $(ProjectDir)
+cd /D $(ProjectDir)
 cd ..
 cd ..
 cd resource\script
-make_package.client.bat
+make_package.client.bat $(Configuration)
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -81,6 +85,7 @@ make_package.client.bat
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="resource\assembly\AssemblyInfo.cpp" />
     <ClCompile Include="atom\Trace.cpp" />
     <ClCompile Include="extension\AnyExport.cpp" />
     <ClCompile Include="extension\AnyImport.cpp" />
