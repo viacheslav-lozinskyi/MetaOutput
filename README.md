@@ -63,5 +63,5 @@ Also it contains icons templates.
 
 - MetaOutput.Client - MIT
 - MetaOutput.Media - MIT
-- MetaOutput.Server - Proprietary
+- MetaOutput.TML - Proprietary
 - MetaOutput.Viewer - Proprietary
