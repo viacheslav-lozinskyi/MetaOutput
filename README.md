@@ -43,6 +43,8 @@
 
 - Download extension for [Visual Studio 2015, 2017, 2019](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
 - Download extension for [Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022)
+- Download NuGet package for [MetaOutput.Client](https://www.nuget.org/packages/MetaOutput.Client)
+- Download NuGet package for [MetaOutput.Media](https://www.nuget.org/packages/MetaOutput.Media)
 
 ---
 
