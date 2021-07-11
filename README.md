@@ -20,9 +20,9 @@
 
 [![MetaOutput - Official presentation](https://img.youtube.com/vi/_BO40nyx0Qw/hqdefault.jpg)](https://www.youtube.com/watch?v=_BO40nyx0Qw?autoplay=1)
 
-- Direct link to this presentation on YouTube is [here](https://www.youtube.com/watch?v=_BO40nyx0Qw?autoplay=1)
-- Direct link to this presentation in PDF is [here](https://github.com/viacheslav-lozinskyi/MetaOutput/blob/main/resource/document/MetaOutput.pdf)
-- Direct link to this presentation in PowerPoint format is [here](https://github.com/viacheslav-lozinskyi/MetaOutput/blob/main/resource/document/MetaOutput.pptx)
+- Direct link to this presentation on [YouTube](https://www.youtube.com/watch?v=_BO40nyx0Qw?autoplay=1)
+- Direct link to this presentation as [PDF](https://github.com/viacheslav-lozinskyi/MetaOutput/blob/main/resource/document/MetaOutput.pdf)
+- Direct link to this presentation as [PowerPoint](https://github.com/viacheslav-lozinskyi/MetaOutput/blob/main/resource/document/MetaOutput.pptx)
 
 ---
 
