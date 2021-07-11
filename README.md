@@ -39,9 +39,8 @@ Direct link to this presentation in PowerPoint format is [here](https://github.c
 
 ## Downloads:
 
-Download extension for [Visual Studio 2015, 2017, 2019](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
-
-Download extension for [Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022)
+- Download extension for [Visual Studio 2015, 2017, 2019](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
+- Download extension for [Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022)
 
 ---
 
