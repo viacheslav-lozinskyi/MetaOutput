@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="extension">
-      <UniqueIdentifier>{876eaf50-ef23-4578-871b-a48356a3a295}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="atom">
-      <UniqueIdentifier>{5bcc6e92-f4d6-46b6-bb6f-546cf1c8cda5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="resource">
       <UniqueIdentifier>{2dbafa6a-d7fd-4325-8c8a-4b06c41d8033}</UniqueIdentifier>
     </Filter>
@@ -16,13 +10,16 @@
     <Filter Include="resource\assembly">
       <UniqueIdentifier>{4f597a34-31b1-4586-9bdf-3cc6fc512259}</UniqueIdentifier>
     </Filter>
+    <Filter Include="atom">
+      <UniqueIdentifier>{37b9e1e8-998a-4ca3-a458-bb553053a6c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extension">
+      <UniqueIdentifier>{8efeb17e-f118-4885-a6c9-a0b3d8cea229}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="atom\Trace.cpp">
-      <Filter>atom</Filter>
-    </ClCompile>
-    <ClCompile Include="extension\AnyPreview.cpp">
-      <Filter>extension</Filter>
+    <ClCompile Include="resource\assembly\AssemblyInfo.cpp">
+      <Filter>resource\assembly</Filter>
     </ClCompile>
     <ClCompile Include="extension\AnyExport.cpp">
       <Filter>extension</Filter>
@@ -30,30 +27,12 @@
     <ClCompile Include="extension\AnyImport.cpp">
       <Filter>extension</Filter>
     </ClCompile>
+    <ClCompile Include="extension\AnyPreview.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
     <ClCompile Include="extension\AnySource.cpp">
       <Filter>extension</Filter>
     </ClCompile>
-    <ClCompile Include="resource\assembly\AssemblyInfo.cpp">
-      <Filter>resource\assembly</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="All.hpp" />
-    <ClInclude Include="atom\Trace.hpp">
-      <Filter>atom</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnyPreview.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnyExport.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnyImport.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnySource.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -68,5 +47,26 @@
     <Text Include="..\..\resource\document\readme.txt">
       <Filter>resource\document</Filter>
     </Text>
+    <Text Include="..\metaoutput.client\atom\Trace.cpp">
+      <Filter>atom</Filter>
+    </Text>
+    <Text Include="..\metaoutput.client\atom\Trace.hpp">
+      <Filter>atom</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="All.hpp" />
+    <ClInclude Include="extension\AnyExport.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="extension\AnyImport.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="extension\AnyPreview.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="extension\AnySource.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

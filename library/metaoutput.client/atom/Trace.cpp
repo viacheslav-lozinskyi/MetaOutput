@@ -33,6 +33,73 @@ MP_PTR(atom::Trace) atom::Trace::GetInstance()
     return nullptr;
 }
 
+MP_STRING atom::Trace::GetUrlFinal(MP_STRING url)
+{
+    if (MP_STRING_EMPTY(url) == false)
+    {
+        auto a_Result = url;
+        {
+            auto a_Index = MP_STRING_LASTINDEXOF(a_Result, "?");
+            if (a_Index > 0)
+            {
+                a_Result = MP_STRING_SUBSTRING(a_Result, 0, a_Index);
+            }
+        }
+        {
+            auto a_Index = MP_STRING_LASTINDEXOF(a_Result, "#");
+            if (a_Index > 0)
+            {
+                a_Result = MP_STRING_SUBSTRING(a_Result, 0, a_Index);
+            }
+        }
+        return MP_STRING_TRIM(a_Result);
+    }
+    return "";
+}
+
+MP_STRING atom::Trace::GetUrlPreview(MP_STRING url)
+{
+    return GetUrlPreview(url, "");
+}
+
+MP_STRING atom::Trace::GetUrlPreview(MP_STRING url, MP_STRING extension)
+{
+    try
+    {
+        if (MP_STRING_EMPTY(url) == false)
+        {
+            auto a_Context = GetUrlFinal(url);
+            {
+                a_Context = MP_STRING_REPLACE(a_Context, "\\", "-");
+                a_Context = MP_STRING_REPLACE(a_Context, "/", "-");
+                a_Context = MP_STRING_REPLACE(a_Context, ":", "-");
+                a_Context = MP_STRING_REPLACE(a_Context, " ", "_");
+                a_Context = MP_STRING_LOWER(a_Context);
+            }
+            {
+                auto a_Context1 = __GetProxyFolder();
+                if (MP_FOLDER_FOUND(a_Context1) == false)
+                {
+                    MP_FOLDER_CREATE(a_Context1);
+                }
+                if (MP_STRING_EMPTY(extension))
+                {
+                    return a_Context1 + "\\" + a_Context;
+                }
+                else
+                {
+                    return a_Context1 + "\\" + a_Context + ((extension[0] != '.') ? "." : "") + MP_STRING_LOWER(extension);
+                }
+            }
+        }
+    }
+    catch (MP_PTR(MP_EXCEPTION) ex)
+    {
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+    }
+    return "";
+}
+
 // Public ##############
 MP_PTR(atom::Trace) atom::Trace::Clear()
 {
@@ -89,7 +156,7 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT l
                 }
                 {
                     auto a_Size = MP_STACKTRACE_FRAME_COUNT_GET(a_Context);
-                    auto a_Count = extension::AnyPreview::GetProperty(extension::AnyPreview::NAME::PROPERTY::DEBUGGING_STACK_SIZE, true);
+                    auto a_Count = extension::AnyPreview::GetProperty(NAME::PROPERTY::DEBUGGING_STACK_SIZE, true);
                     for (auto i = 1; (i < a_Size) && (a_Count > 0); i++)
                     {
                         auto a_Context1 = MP_STACKTRACE_FRAME_GET(a_Context, i);
@@ -254,7 +321,7 @@ MP_PTR(atom::Trace) atom::Trace::SendPreview(MP_STRING type, MP_STRING url)
         if (MP_STRING_EMPTY(m_Foreground))
         {
             this->
-                SetForeground(NAME::COLOR::TEAL);
+                SetForeground(CONSTANT::OUTPUT::PREVIEW_FOREGROUND);
         }
         {
             this->
@@ -365,7 +432,7 @@ MP_PTR(atom::Trace) atom::Trace::SetCondition(MP_STRING name, MP_STRING variable
         auto a_Context = __GetFirstLine(variable, false);
         if ((MP_STRING_EMPTY(a_Name) == false) && (MP_STRING_EMPTY(a_Context) == false))
         {
-            m_Condition += " @@@CONDITION." + a_Name + " " + CONSTANT::VARIABLE_BEGIN + a_Context + CONSTANT::VARIABLE_END;
+            m_Condition += " @@@CONDITION." + a_Name + " " + CONSTANT::TML::VARIABLE_BEGIN + a_Context + CONSTANT::TML::VARIABLE_END;
         }
         if (MP_STRING_EMPTY(value) == false)
         {
@@ -717,7 +784,7 @@ MP_PTR(atom::Trace) atom::Trace::SetValue(MP_PTR(MP_STREAM) value, MP_STRING for
         }
         else
         {
-            m_Value = " @@@VALUE.ZIP " + atom::Trace::CONSTANT::GROUP_BEGIN + format + atom::Trace::CONSTANT::GROUP_END + " " + MP_CONVERT_STREAM_TO_BASE64(a_Context);
+            m_Value = " @@@VALUE.ZIP " + CONSTANT::TML::GROUP_BEGIN + format + CONSTANT::TML::GROUP_END + " " + MP_CONVERT_STREAM_TO_BASE64(a_Context);
         }
     }
     return this;
@@ -746,11 +813,14 @@ MP_PTR(atom::Trace) atom::Trace::__SendTml(MP_STRING value)
             if (s_TraceThread == nullptr)
             {
                 MP_THREAD_INITIALIZE(s_TraceThread, __ThreadExecute);
+                MP_THREAD_NAME_SET(s_TraceThread, "METAOUTPUT.SEND");
+                MP_THREAD_APARTMENT_SET(s_TraceThread, MP_THREAD_APARTMENT_STA);
                 MP_THREAD_START(s_TraceThread, nullptr);
             }
         }
-        catch (MP_PTR(MP_EXCEPTION))
+        catch (MP_PTR(MP_EXCEPTION) ex)
         {
+            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
         }
     }
     return this;
@@ -761,7 +831,7 @@ MP_PTR(MP_THREAD_MUTEX) atom::Trace::__GetMutex()
 {
     if (s_Mutex == nullptr)
     {
-        MP_THREAD_MUTEX_INITIALIZE(s_Mutex, extension::AnyPreview::CONSTANT::OUTPUT_PIPE_MUTEX, false);
+        MP_THREAD_MUTEX_INITIALIZE(s_Mutex, atom::Trace::CONSTANT::PIPE::MUTEX, false);
     }
     return s_Mutex;
 }
@@ -818,9 +888,9 @@ MP_STRING atom::Trace::__GetMultiLine(MP_STRING value, bool isAnyText)
         }
         if (MP_STRING_CONTAINS(a_Result, "\r") || MP_STRING_CONTAINS(a_Result, "\n"))
         {
-            a_Result = MP_STRING_REPLACE(a_Result, "\r\n", CONSTANT::NEW_LINE);
-            a_Result = MP_STRING_REPLACE(a_Result, "\r", CONSTANT::NEW_LINE);
-            a_Result = MP_STRING_REPLACE(a_Result, "\n", CONSTANT::NEW_LINE);
+            a_Result = MP_STRING_REPLACE(a_Result, "\r\n", CONSTANT::TML::NEW_LINE);
+            a_Result = MP_STRING_REPLACE(a_Result, "\r", CONSTANT::TML::NEW_LINE);
+            a_Result = MP_STRING_REPLACE(a_Result, "\n", CONSTANT::TML::NEW_LINE);
             a_Result = MP_STRING_TRIM(a_Result);
         }
         return a_Result;
@@ -1093,51 +1163,79 @@ MP_STRING atom::Trace::__GetTml(MP_STRING value, MP_STRING source)
 
 MP_STRING atom::Trace::__GetText(MP_STRING value)
 {
-    if (MP_STRING_CONTAINS(value, CONSTANT::ATTRIBUTE))
+    if (MP_STRING_CONTAINS(value, CONSTANT::TML::ATTRIBUTE))
     {
-        return MP_STRING_REPLACE(value, CONSTANT::ATTRIBUTE, "@" + CONSTANT::GROUP_BEGIN + "@" + CONSTANT::GROUP_END + "@");
+        return MP_STRING_REPLACE(value, CONSTANT::TML::ATTRIBUTE, "@" + CONSTANT::TML::GROUP_BEGIN + "@" + CONSTANT::TML::GROUP_END + "@");
     }
     return value;
+}
+
+MP_STRING atom::Trace::__GetFileName(MP_STRING url)
+{
+    if (MP_STRING_EMPTY(url) == false)
+    {
+        auto a_Result = GetUrlFinal(url);
+        {
+            auto a_Index = MP_STRING_LASTINDEXOF(MP_STRING_REPLACE(a_Result, "\\", "/"), "/");
+            if (a_Index > 0)
+            {
+                return MP_STRING_SUBSTRING(a_Result, a_Index, MP_STRING_SIZE_GET(a_Result) - a_Index);
+            }
+        }
+    }
+    return "";
+}
+
+MP_STRING atom::Trace::__GetProxyFolder()
+{
+    auto a_Result = MP_FOLDER_SYSTEM_TEMP + ".metaoutput\\";
+    {
+        auto a_Context = MP_TIME_CURRENT;
+        {
+            a_Result += MP_CONVERT_STRING_FROM_INT(MP_TIME_YEAR_GET(&a_Context), 4);
+            a_Result += "-";
+            a_Result += MP_CONVERT_STRING_FROM_INT(MP_TIME_MONTH_GET(&a_Context), 2);
+            a_Result += "-";
+            a_Result += MP_CONVERT_STRING_FROM_INT(MP_TIME_DAY_GET(&a_Context), 2);
+        }
+    }
+    return a_Result;
 }
 
 // Private #############
 void atom::Trace::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
 {
-    auto a_Context = (MP_STRING)"";
+    try
     {
-        MP_UNUSED(sender);
-    }
-    {
-        MP_THREAD_SLEEP(50);
-        MP_THREAD_MUTEX_LOCK(__GetMutex());
-    }
-    {
-        a_Context = s_TraceBuffer;
-        s_TraceBuffer = "";
-    }
-    {
-        MP_THREAD_MUTEX_UNLOCK(__GetMutex());
-    }
-    if (MP_STRING_EMPTY(a_Context) == false)
-    {
-        try
+        while (s_TraceThread != nullptr)
         {
-            if (extension::AnyPreview::Send(a_Context) == false)
+            auto a_Context = (MP_STRING)"";
             {
-                {
-                    MP_THREAD_MUTEX_LOCK(__GetMutex());
-                }
-                {
-                    s_TraceBuffer = a_Context + s_TraceBuffer;
-                }
-                {
-                    MP_THREAD_MUTEX_UNLOCK(__GetMutex());
-                }
+                MP_UNUSED(sender);
+            }
+            {
+                MP_THREAD_SLEEP(50);
+                MP_THREAD_MUTEX_LOCK(__GetMutex());
+            }
+            {
+                a_Context = s_TraceBuffer;
+                s_TraceBuffer = "";
+            }
+            {
+                MP_THREAD_MUTEX_UNLOCK(__GetMutex());
+            }
+            if (MP_STRING_EMPTY(a_Context))
+            {
+                break;
+            }
+            else
+            {
+                extension::AnyPreview::Send(a_Context);
             }
         }
-        catch (MP_PTR(MP_EXCEPTION))
-        {
-        }
+    }
+    catch (MP_PTR(MP_EXCEPTION))
+    {
     }
     {
         s_TraceThread = nullptr;

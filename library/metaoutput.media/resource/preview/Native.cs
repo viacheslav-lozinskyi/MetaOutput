@@ -31,8 +31,8 @@ namespace resource
                             {
                                 var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Size = Math.Min(a_Size, a_Context1.Size.Height / CONSTANT.OUTPUT_PREVIEW_ITEM_HEIGHT);
-                                    a_Size = Math.Max(a_Size, CONSTANT.OUTPUT_PREVIEW_MIN_SIZE);
+                                    a_Size = Math.Min(a_Size, a_Context1.Size.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                    a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
                                 for (var i = 0; i < a_Size; i++)
                                 {
@@ -86,8 +86,8 @@ namespace resource
                         {
                             var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                             {
-                                a_Size = Math.Min(a_Size, a_Context.Height / CONSTANT.OUTPUT_PREVIEW_ITEM_HEIGHT);
-                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT_PREVIEW_MIN_SIZE);
+                                a_Size = Math.Min(a_Size, a_Context.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                             }
                             for (var i = 0; i < a_Size; i++)
                             {
@@ -164,7 +164,7 @@ namespace resource
                     var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_TABLE_SIZE, true);
                     {
                         a_Size = Math.Min(a_Size, palette.Entries.Length);
-                        a_Size = Math.Max(a_Size, CONSTANT.OUTPUT_PREVIEW_MIN_SIZE);
+                        a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                     }
                     {
                         context.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <metaplatform.core/All.hpp>
+
 namespace atom
 {
     MP_CLASS_SHARED Trace
@@ -7,16 +9,38 @@ namespace atom
     public:
         MP_CLASS CONSTANT
         {
-            MP_CONSTANT_STRING(ATTRIBUTE, "@@@");
-            MP_CONSTANT_STRING(COMMENT, "/// ");
-            MP_CONSTANT_STRING(GROUP_BEGIN, "<<<");
-            MP_CONSTANT_STRING(GROUP_END, ">>>");
-            MP_CONSTANT_STRING(NEW_LINE, "|||");
-            MP_CONSTANT_STRING(PARAMETER, "@@");
-            MP_CONSTANT_STRING(TRANSLATE_BEGIN, "[[[");
-            MP_CONSTANT_STRING(TRANSLATE_END, "]]]");
-            MP_CONSTANT_STRING(VARIABLE_BEGIN, "{{{");
-            MP_CONSTANT_STRING(VARIABLE_END, "}}}");
+        public:
+            MP_CLASS OUTPUT
+            {
+                MP_CONSTANT_STRING(MUTEX, "METAOUTPUT.EXECUTE.MUTEX");
+                MP_CONSTANT_INTEGER(PREVIEW_FOREGROUND, Trace::NAME::COLOR::ORCHID);
+                MP_CONSTANT_INTEGER(PREVIEW_ITEM_HEIGHT, 19);
+                MP_CONSTANT_INTEGER(PREVIEW_MIN_SIZE, 2);
+                MP_CONSTANT_INTEGER(PREVIEW_MIN_WIDTH, 200);
+                MP_CONSTANT_INTEGER(PREVIEW_PAGE_INDENT, 10);
+                MP_CONSTANT_INTEGER(PREVIEW_PAGE_BREAK, 7);
+            };
+            MP_CLASS PIPE
+            {
+                MP_CONSTANT_STRING(MUTEX, "METAOUTPUT.PIPE.MUTEX");
+                MP_CONSTANT_STRING(NAME, "METAOUTPUT.PIPE");
+                MP_CONSTANT_STRING(TERMINATE_REQUEST, "<<<METAOUTPUT.PIPE.TERMINATE>>>");
+                MP_CONSTANT_INTEGER(BUFFER_SIZE, 256 * 1024);
+                MP_CONSTANT_INTEGER(TIMEOUT, 500);
+            };
+            MP_CLASS TML
+            {
+                MP_CONSTANT_STRING(ATTRIBUTE, "@@@");
+                MP_CONSTANT_STRING(COMMENT, "/// ");
+                MP_CONSTANT_STRING(GROUP_BEGIN, "<<<");
+                MP_CONSTANT_STRING(GROUP_END, ">>>");
+                MP_CONSTANT_STRING(NEW_LINE, "|||");
+                MP_CONSTANT_STRING(PARAMETER, "@@");
+                MP_CONSTANT_STRING(TRANSLATE_BEGIN, "[[[");
+                MP_CONSTANT_STRING(TRANSLATE_END, "]]]");
+                MP_CONSTANT_STRING(VARIABLE_BEGIN, "{{{");
+                MP_CONSTANT_STRING(VARIABLE_END, "}}}");
+            };
         };
     public:
         MP_CLASS NAME
@@ -181,6 +205,7 @@ namespace atom
             MP_CLASS COMMAND
             {
                 MP_CONSTANT_STRING(IMPORT, "IMPORT");
+                MP_CONSTANT_STRING(MESSAGE_APPEND, "MESSAGE.APPEND");
                 MP_CONSTANT_STRING(MESSAGE_BEEP, "MESSAGE.BEEP");
                 MP_CONSTANT_STRING(MESSAGE_CLEAR, "MESSAGE.CLEAR");
                 MP_CONSTANT_STRING(MESSAGE_COLLAPSE, "MESSAGE.COLLAPSE");
@@ -512,6 +537,21 @@ namespace atom
                 MP_CONSTANT_INTEGER(REMOVE, -1);
             };
         public:
+            MP_CLASS PROPERTY
+            {
+                MP_CONSTANT_STRING(DEBUGGING_DATA_NESTING, "METAOUTPUT/DEBUGGING/DATA.NESTING");
+                MP_CONSTANT_STRING(DEBUGGING_DATA_TIMEOUT, "METAOUTPUT/DEBUGGING/DATA.TIMEOUT");
+                MP_CONSTANT_STRING(DEBUGGING_ITEM_COUNT, "METAOUTPUT/DEBUGGING/ITEM.COUNT");
+                MP_CONSTANT_STRING(DEBUGGING_SHOW_PRIVATE, "METAOUTPUT/DEBUGGING/SHOW.PRIVATE");
+                MP_CONSTANT_STRING(DEBUGGING_STACK_SIZE, "METAOUTPUT/DEBUGGING/STACK.SIZE");
+                MP_CONSTANT_STRING(DEBUGGING_STRING_SIZE, "METAOUTPUT/DEBUGGING/STRING.SIZE");
+                MP_CONSTANT_STRING(PREVIEW_DOCUMENT_SIZE, "METAOUTPUT/PREVIEW/DOCUMENT.SIZE");
+                MP_CONSTANT_STRING(PREVIEW_MEDIA_SIZE, "METAOUTPUT/PREVIEW/MEDIA.SIZE");
+                MP_CONSTANT_STRING(PREVIEW_STATUS, "METAOUTPUT/PREVIEW/STATUS");
+                MP_CONSTANT_STRING(PREVIEW_TABLE_SIZE, "METAOUTPUT/PREVIEW/TABLE.SIZE");
+                MP_CONSTANT_STRING(PREVIEW_WIDTH, "METAOUTPUT/PREVIEW/WIDTH");
+            };
+        public:
             MP_CLASS SOURCE
             {
                 MP_CONSTANT_STRING(ADVERTISEMENT, "ADVERTISEMENT");
@@ -692,6 +732,9 @@ namespace atom
         Trace();
     public:
         static MP_PTR(Trace) GetInstance();
+        static MP_STRING GetUrlFinal(MP_STRING url);
+        static MP_STRING GetUrlPreview(MP_STRING url);
+        static MP_STRING GetUrlPreview(MP_STRING url, MP_STRING extension);
     public:
         MP_PTR(Trace) Clear();
         MP_PTR(Trace) Send(MP_STRING source, MP_STRING type, MP_INT level);
@@ -748,6 +791,8 @@ namespace atom
         static MP_STRING __GetLevel(MP_INT value);
         static MP_STRING __GetTml(MP_STRING value, MP_STRING source);
         static MP_STRING __GetText(MP_STRING value);
+        static MP_STRING __GetFileName(MP_STRING url);
+        static MP_STRING __GetProxyFolder();
     private:
         static void MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender);
     private:

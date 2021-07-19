@@ -85,20 +85,12 @@ make_package.client.bat $(Configuration)
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="resource\assembly\AssemblyInfo.cpp" />
     <ClCompile Include="atom\Trace.cpp" />
     <ClCompile Include="extension\AnyExport.cpp" />
     <ClCompile Include="extension\AnyImport.cpp" />
     <ClCompile Include="extension\AnyPreview.cpp" />
     <ClCompile Include="extension\AnySource.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="All.hpp" />
-    <ClInclude Include="atom\Trace.hpp" />
-    <ClInclude Include="extension\AnyExport.hpp" />
-    <ClInclude Include="extension\AnyImport.hpp" />
-    <ClInclude Include="extension\AnyPreview.hpp" />
-    <ClInclude Include="extension\AnySource.hpp" />
+    <ClCompile Include="resource\assembly\AssemblyInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -115,14 +107,22 @@ make_package.client.bat $(Configuration)
     <Text Include="..\..\resource\document\license.txt" />
     <Text Include="..\..\resource\document\readme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="All.hpp" />
+    <ClCompile Include="atom\Trace.hpp" />
+    <ClInclude Include="extension\AnyExport.hpp" />
+    <ClInclude Include="extension\AnyImport.hpp" />
+    <ClInclude Include="extension\AnyPreview.hpp" />
+    <ClInclude Include="extension\AnySource.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(SolutionDir)\packages\MetaPlatform.1.0.8\build\MetaPlatform.targets" Condition="Exists('$(SolutionDir)\packages\MetaPlatform.1.0.8\build\MetaPlatform.targets')" />
+    <Import Project="$(SolutionDir)\packages\MetaPlatform.1.0.9\build\MetaPlatform.targets" Condition="Exists('$(SolutionDir)\packages\MetaPlatform.1.0.9\build\MetaPlatform.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\packages\MetaPlatform.1.0.8\build\MetaPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\MetaPlatform.1.0.8\build\MetaPlatform.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\MetaPlatform.1.0.9\build\MetaPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\MetaPlatform.1.0.9\build\MetaPlatform.targets'))" />
   </Target>
 </Project>

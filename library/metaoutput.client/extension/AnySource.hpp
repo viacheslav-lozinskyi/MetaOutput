@@ -4,7 +4,11 @@ namespace extension
 {
     MP_CLASS_SHARED AnySource
     {
-    public:
+    protected:
+        MP_CLASS CONSTANT : public atom::Trace::CONSTANT
+        {
+        };
+    protected:
         MP_CLASS NAME : public atom::Trace::NAME
         {
         };
