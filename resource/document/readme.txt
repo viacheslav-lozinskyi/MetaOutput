@@ -1,14 +1,14 @@
 # What is MetaOutput?
 *********************
 
-This is plugin for Visual Studio, which allows forget standard output tool.
+This is plugin for Visual Studio, which allows to ignore standard output tool.
 
 
-# Why MetaOutput is created?
+# Why MetaOutput was created?
 ****************************
 
-Development of standard output tool is frozen, but it is too week to be enough.
-Nobody improve it and it is a reason why I decided to solve this problem.
+Development of standard output tool is frozen and its current functionality is pretty limited.
+Lack of improvements is reason why I decided to solve this problem.
 
 
 # How to install:
