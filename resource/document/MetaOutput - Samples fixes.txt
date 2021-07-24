@@ -1,0 +1,8 @@
+2
+All of them are open-source and therefore is possible to see the source code
+
+4
+MetaOutput provide the simplest mechanism for writing own extensions
+For example, C# source code for visualization of such formats have such complexity
+
+

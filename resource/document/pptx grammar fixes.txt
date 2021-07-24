@@ -1,0 +1,72 @@
+General comments:
+
+replace 'by desire of user' to 'by user'
+replace 'substring' as 'search string'
+replace 'deep' with 'depth'
+your reddit links don't work
+
+
+
+
+I will refer to slide number and make corrected text
+
+1
+2.0.2
+
+2
+Functionality of all these tools is moved to a single tool.
+Result became simpler, smaller, faster and more functional than existing solution
+
+3
+Development of standard output tool is frozen, but it’s too weak to be enough.
+Nobody improves it and it was a reason why MetaOutput was created.
+
+11
+Everything that requires special attention should have option to be played as audio
+
+12
+Any trace message should be possible to find by text search
+
+14
+Everything that have special interest can be highlighted by user.
+
+25
+Trace messages can be represented as hierarchical data with unlimited depth
+
+41
+Any trace message can be hidden by user
+By pressing close button all similar messages will be hidden 
+You can toggle visibility of hidden messages
+
+42
+Any trace message can be played as audio by user
+
+44
+Filtering is mechanism which simplifies analyzing of incoming data
+
+46
+Highlighting of all messages which have required search string in content
+
+48
+User can show or hide any data source with one click
+
+57
+Amount of data can be restricted by timeout and depth of extracted data
+
+94
+MetaOutput has proprietary license which provide the following user rights
+
+99
+All found bugs will be fixed (often in the next release)
+
+100
+Primary place for reporting any bugs and requesting new features is
+
+
+
+
+
+
+
+
+

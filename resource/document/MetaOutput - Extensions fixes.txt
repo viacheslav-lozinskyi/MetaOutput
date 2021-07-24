@@ -1,0 +1,6 @@
+2
+These functionality is implemented as standard extension for specific IDE and can be installed by standard distribution mechanism
+
+4
+It is possible to install directly from IDE
+
