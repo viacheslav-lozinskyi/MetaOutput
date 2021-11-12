@@ -25,10 +25,10 @@ From the Visual Studio:
 ************
 
 MetaOutput official site:
-	https://bit.ly/metaoutput-home
+	https://www.metaoutput.net
 
 MetaOutput community:
-	https://bit.ly/metaoutput-community
+	https://www.metaoutput.net/community
 
 
 # Author:
