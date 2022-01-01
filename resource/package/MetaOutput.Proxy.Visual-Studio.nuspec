@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
-    <id>MetaOutput.Media</id>
-    <version>1.0.3</version>
-    <title>MetaOutput.Media</title>
+    <id>MetaOutput.Proxy.Visual-Studio</id>
+    <version>1.0.1</version>
+    <title>MetaOutput.Proxy.Visual-Studio</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
-    <description>Default previewers for the most popular media formats</description>
+    <description>Proxy module to Visual Studio IDE</description>
     <summary></summary>
     <language>en-US</language>
     <iconUrl>https://viacheslav-lozinskyi.github.io/MetaOutput/resource/picture/logo/icon.png</iconUrl>
@@ -14,10 +14,10 @@
     <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
     <license type="expression">MIT</license>
     <releaseNotes>
-- MetaOutput.Client version is updated
+- Initial release
     </releaseNotes>
     <copyright>Copyright (c) 2020-2021 by Viacheslav Lozinskyi. All rights reserved.</copyright>
-    <tags>MetaOutput, media, taglib, preview, viewer, native</tags>
+    <tags>MetaOutput, proxy, Visual Studio</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
     </dependencies>

@@ -33,6 +33,15 @@
     <ClCompile Include="extension\AnySource.cpp">
       <Filter>extension</Filter>
     </ClCompile>
+    <ClCompile Include="extension\AnyProxy.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="atom\Trace.cpp">
+      <Filter>atom</Filter>
+    </ClCompile>
+    <ClCompile Include="atom\Trace.hpp">
+      <Filter>atom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -47,12 +56,6 @@
     <Text Include="..\..\resource\document\readme.txt">
       <Filter>resource\document</Filter>
     </Text>
-    <Text Include="..\metaoutput.client\atom\Trace.cpp">
-      <Filter>atom</Filter>
-    </Text>
-    <Text Include="..\metaoutput.client\atom\Trace.hpp">
-      <Filter>atom</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="All.hpp" />
@@ -66,6 +69,9 @@
       <Filter>extension</Filter>
     </ClInclude>
     <ClInclude Include="extension\AnySource.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="extension\AnyProxy.hpp">
       <Filter>extension</Filter>
     </ClInclude>
   </ItemGroup>

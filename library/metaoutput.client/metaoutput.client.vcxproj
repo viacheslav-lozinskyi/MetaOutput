@@ -37,7 +37,7 @@
     <CLRSupport>Safe</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
     <LinkIncremental>false</LinkIncremental>
-    <LinkKeyFile>..\..\resource\certificate\key.private.snk</LinkKeyFile>
+    <LinkKeyFile Condition="Exists('..\..\resource\certificate\key.private.snk')">..\..\resource\certificate\key.private.snk</LinkKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -89,6 +89,7 @@ make_package.client.bat $(Configuration)
     <ClCompile Include="extension\AnyExport.cpp" />
     <ClCompile Include="extension\AnyImport.cpp" />
     <ClCompile Include="extension\AnyPreview.cpp" />
+    <ClCompile Include="extension\AnyProxy.cpp" />
     <ClCompile Include="extension\AnySource.cpp" />
     <ClCompile Include="resource\assembly\AssemblyInfo.cpp" />
   </ItemGroup>
@@ -113,6 +114,7 @@ make_package.client.bat $(Configuration)
     <ClInclude Include="extension\AnyExport.hpp" />
     <ClInclude Include="extension\AnyImport.hpp" />
     <ClInclude Include="extension\AnyPreview.hpp" />
+    <ClInclude Include="extension\AnyProxy.hpp" />
     <ClInclude Include="extension\AnySource.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -33,6 +33,40 @@ MP_PTR(atom::Trace) atom::Trace::GetInstance()
     return nullptr;
 }
 
+MP_STRING atom::Trace::GetFailState(MP_STRING applicationName)
+{
+    auto a_Result = (MP_STRING)"";
+    auto a_Name = applicationName;
+    try
+    {
+        if (MP_STRING_EMPTY(a_Name) == false)
+        {
+            a_Name = MP_STRING_TRIM(a_Name);
+            a_Name = MP_STRING_LOWER(a_Name);
+            a_Name = MP_STRING_REPLACE(a_Name, " ", "-");
+        }
+        if (MP_STRING_EMPTY(a_Name) == false)
+        {
+            MP_REGISTRY a_Context;
+            {
+                MP_REGISTRY_INITIALIZE(a_Context, MP_REGISTRY_ROOT_CURRENT_USER, "Software\\MetaPlatform\\APPLICATION\\", false);
+            }
+            if (MP_STRING_EMPTY(MP_REGISTRY_GET(a_Context, "USER.ID", "")))
+            {
+                a_Result = "https://www.metaoutput.net/download/?utm_source=application&utm_medium=(direct)&utm_campaign=install-extension&utm_term=2021-11-21&utm_content=" + a_Name;
+            }
+            {
+                MP_REGISTRY_FINALIZE(a_Context);
+            }
+        }
+    }
+    catch (MP_PTR(MP_EXCEPTION) ex)
+    {
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+    }
+    return a_Result;
+}
+
 MP_STRING atom::Trace::GetUrlFinal(MP_STRING url)
 {
     if (MP_STRING_EMPTY(url) == false)

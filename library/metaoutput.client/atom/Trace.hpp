@@ -732,6 +732,7 @@ namespace atom
         Trace();
     public:
         static MP_PTR(Trace) GetInstance();
+        static MP_STRING GetFailState(MP_STRING applicationName);
         static MP_STRING GetUrlFinal(MP_STRING url);
         static MP_STRING GetUrlPreview(MP_STRING url);
         static MP_STRING GetUrlPreview(MP_STRING url, MP_STRING extension);

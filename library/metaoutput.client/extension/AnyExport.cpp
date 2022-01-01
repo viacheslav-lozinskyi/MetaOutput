@@ -124,7 +124,6 @@ MP_PTR(MP_THREAD_MUTEX) extension::AnyExport::__GetMutex()
     return s_Mutex;
 }
 
-
 // Private #############
 void extension::AnyExport::__Execute(MP_PTR(AnyExport) sender, MP_PTR(atom::Trace) context, MP_STRING url, MP_STRING from)
 {

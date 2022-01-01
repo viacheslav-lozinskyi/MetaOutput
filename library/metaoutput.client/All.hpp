@@ -10,5 +10,6 @@
 #include "extension/AnyExport.hpp"
 #include "extension/AnyImport.hpp"
 #include "extension/AnyPreview.hpp"
+#include "extension/AnyProxy.hpp"
 #include "extension/AnySource.hpp"
 #endif

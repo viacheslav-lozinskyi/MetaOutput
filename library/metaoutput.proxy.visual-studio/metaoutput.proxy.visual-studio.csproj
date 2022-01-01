@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8417CE9E-A15A-486D-B37B-69020A1D2E5F}</ProjectGuid>
+    <ProjectGuid>{CF394585-F421-49C9-AD21-BBDCA2133424}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>resource</RootNamespace>
-    <AssemblyName>metaoutput.media</AssemblyName>
+    <AssemblyName>metaoutput.proxy.visual-studio</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -34,13 +34,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="resource\preview\Native.cs" />
-    <Compile Include="resource\preview\Taglib.cs" />
+    <Compile Include="resource\proxy\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\resource\document\license.txt">
@@ -49,11 +46,15 @@
     <Content Include="..\..\resource\document\readme.txt">
       <Link>resource\document\readme.txt</Link>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="TagLibSharp">
-      <Version>2.2.0</Version>
-    </PackageReference>
+    <Content Include="resource\library\2017\Microsoft.VisualStudio.ExtensionEngine.dll" />
+    <Content Include="resource\library\2017\Microsoft.VisualStudio.ExtensionManager.dll" />
+    <Content Include="resource\library\2017\Microsoft.VisualStudio.ExtensionsExplorer.dll" />
+    <Content Include="resource\library\2019\Microsoft.VisualStudio.ExtensionEngine.dll" />
+    <Content Include="resource\library\2019\Microsoft.VisualStudio.ExtensionManager.dll" />
+    <Content Include="resource\library\2019\Microsoft.VisualStudio.ExtensionsExplorer.dll" />
+    <Content Include="resource\library\2022\Microsoft.VisualStudio.ExtensionEngine.dll" />
+    <Content Include="resource\library\2022\Microsoft.VisualStudio.ExtensionManager.dll" />
+    <Content Include="resource\library\2022\Microsoft.VisualStudio.ExtensionsExplorer.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\metaoutput.client\metaoutput.client.vcxproj">
@@ -67,6 +68,6 @@
 cd ..
 cd ..
 cd resource\script
-make_package.media.bat $(Configuration)</PostBuildEvent>
+make_package.proxy.visual-studio.bat $(Configuration)</PostBuildEvent>
   </PropertyGroup>
 </Project>
