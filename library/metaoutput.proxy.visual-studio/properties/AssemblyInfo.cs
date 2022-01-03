@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Proxy module to Visual Studio IDE")]
 [assembly: AssemblyCompany("Viacheslav Lozinskyi")]
 [assembly: AssemblyProduct("MetaOutput")]
-[assembly: AssemblyCopyright("Copyright (c) 2020-2021 by Viacheslav Lozinskyi")]
+[assembly: AssemblyCopyright("Copyright (c) 2020-2022 by Viacheslav Lozinskyi")]
 [assembly: AssemblyTrademark("MetaOutput")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.0.1")]

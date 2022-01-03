@@ -22,7 +22,7 @@
     <ProjectGuid>{E8E15705-7808-426B-922D-39DDC6DDF9B3}</ProjectGuid>
     <RootNamespace>metaoutput</RootNamespace>
     <ProjectName>metaoutput.client</ProjectName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <LocalDebuggerCommand>$(DevEnvDir)devenv.exe</LocalDebuggerCommand>
@@ -37,15 +37,18 @@
     <CLRSupport>Safe</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
     <LinkIncremental>false</LinkIncremental>
-    <LinkKeyFile Condition="Exists('..\..\resource\certificate\key.private.snk')">..\..\resource\certificate\key.private.snk</LinkKeyFile>
+    <LinkKeyFile Condition="'$(Configuration)' != 'Debug'">..\..\resource\certificate\key.private.snk</LinkKeyFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="Shared">
+    <Import Project="metaoutput.client.shared.vcxitems" Label="Shared" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -85,15 +88,6 @@ make_package.client.bat $(Configuration)
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="atom\Trace.cpp" />
-    <ClCompile Include="extension\AnyExport.cpp" />
-    <ClCompile Include="extension\AnyImport.cpp" />
-    <ClCompile Include="extension\AnyPreview.cpp" />
-    <ClCompile Include="extension\AnyProxy.cpp" />
-    <ClCompile Include="extension\AnySource.cpp" />
-    <ClCompile Include="resource\assembly\AssemblyInfo.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="WindowsBase" />
@@ -109,13 +103,10 @@ make_package.client.bat $(Configuration)
     <Text Include="..\..\resource\document\readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="resource\assembly\AssemblyInfo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="All.hpp" />
-    <ClCompile Include="atom\Trace.hpp" />
-    <ClInclude Include="extension\AnyExport.hpp" />
-    <ClInclude Include="extension\AnyImport.hpp" />
-    <ClInclude Include="extension\AnyPreview.hpp" />
-    <ClInclude Include="extension\AnyProxy.hpp" />
-    <ClInclude Include="extension\AnySource.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

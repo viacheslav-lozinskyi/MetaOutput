@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>resource</RootNamespace>
     <AssemblyName>metaoutput.proxy.visual-studio</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <ErrorReport>prompt</ErrorReport>
@@ -18,7 +18,7 @@
     <OutputPath>$(USERPROFILE)\.metaoutput\build\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>$(USERPROFILE)\.metaoutput\build\$(Configuration)\$(AssemblyName)\$(ProjectGuid)</IntermediateOutputPath>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile Condition="Exists('..\..\resource\certificate\key.private.snk')">..\..\resource\certificate\key.private.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile Condition="'$(Configuration)' != 'Debug'">..\..\resource\certificate\key.private.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

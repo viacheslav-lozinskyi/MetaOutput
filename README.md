@@ -6,6 +6,7 @@
 [![Image](https://img.shields.io/badge/VS-2022-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022)
 [![Image](https://img.shields.io/badge/VS-2019-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
 [![Image](https://img.shields.io/badge/VS-2017-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
+[![Image](https://img.shields.io/badge/VS-2015-blueviolet)](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019)
 
 ---
 

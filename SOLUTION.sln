@@ -9,7 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "metaoutput.media", "library
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "metaoutput.proxy.visual-studio", "library\metaoutput.proxy.visual-studio\metaoutput.proxy.visual-studio.csproj", "{CF394585-F421-49C9-AD21-BBDCA2133424}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metaoutput.client.shared", "library\metaoutput.client\metaoutput.client.shared.vcxitems", "{BFA34B08-D3AB-439A-830F-87D6F6A34E3E}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		library\metaoutput.client\metaoutput.client.shared.vcxitems*{bfa34b08-d3ab-439a-830f-87d6f6a34e3e}*SharedItemsImports = 9
+		library\metaoutput.client\metaoutput.client.shared.vcxitems*{e8e15705-7808-426b-922d-39ddc6ddf9b3}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64

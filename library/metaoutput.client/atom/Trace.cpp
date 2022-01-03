@@ -53,7 +53,7 @@ MP_STRING atom::Trace::GetFailState(MP_STRING applicationName)
             }
             if (MP_STRING_EMPTY(MP_REGISTRY_GET(a_Context, "USER.ID", "")))
             {
-                a_Result = "https://www.metaoutput.net/download/?utm_source=application&utm_medium=(direct)&utm_campaign=install-extension&utm_term=2021-11-21&utm_content=" + a_Name;
+                a_Result = "https://www.metaoutput.net/download/?utm_source=application&utm_medium=(direct)&utm_campaign=install-extension&utm_term=2022-01-03&utm_content=" + a_Name;
             }
             {
                 MP_REGISTRY_FINALIZE(a_Context);

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{BFA34B08-D3AB-439A-830F-87D6F6A34E3E}</ItemsProjectGuid>
+    <ItemsRootNamespace>metaoutput</ItemsRootNamespace>
+    <ItemsProjectName>metaoutput.client.shared</ItemsProjectName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)atom\Trace.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyExport.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyImport.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPreview.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyProxy.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnySource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyExport.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyImport.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPreview.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyProxy.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp" />
+  </ItemGroup>
+</Project>

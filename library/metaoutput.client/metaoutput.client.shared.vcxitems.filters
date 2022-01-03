@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="atom">
+      <UniqueIdentifier>{d128aa7f-dae3-4c2d-bc26-00bae6442f09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extension">
+      <UniqueIdentifier>{c03a6e65-8459-4b03-9fff-53db07bd38d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)atom\Trace.cpp">
+      <Filter>atom</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyExport.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyImport.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPreview.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyProxy.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnySource.cpp">
+      <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)atom\Trace.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyExport.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyImport.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPreview.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyProxy.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp">
+      <Filter>extension</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

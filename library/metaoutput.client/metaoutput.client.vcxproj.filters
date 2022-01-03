@@ -1,53 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="resource">
-      <UniqueIdentifier>{2dbafa6a-d7fd-4325-8c8a-4b06c41d8033}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\document">
-      <UniqueIdentifier>{fcaf95ea-809e-4d8b-81e8-d40754c75ea5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\assembly">
-      <UniqueIdentifier>{4f597a34-31b1-4586-9bdf-3cc6fc512259}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="atom">
-      <UniqueIdentifier>{37b9e1e8-998a-4ca3-a458-bb553053a6c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="extension">
-      <UniqueIdentifier>{8efeb17e-f118-4885-a6c9-a0b3d8cea229}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="resource\assembly\AssemblyInfo.cpp">
-      <Filter>resource\assembly</Filter>
-    </ClCompile>
-    <ClCompile Include="extension\AnyExport.cpp">
-      <Filter>extension</Filter>
-    </ClCompile>
-    <ClCompile Include="extension\AnyImport.cpp">
-      <Filter>extension</Filter>
-    </ClCompile>
-    <ClCompile Include="extension\AnyPreview.cpp">
-      <Filter>extension</Filter>
-    </ClCompile>
-    <ClCompile Include="extension\AnySource.cpp">
-      <Filter>extension</Filter>
-    </ClCompile>
-    <ClCompile Include="extension\AnyProxy.cpp">
-      <Filter>extension</Filter>
-    </ClCompile>
-    <ClCompile Include="atom\Trace.cpp">
-      <Filter>atom</Filter>
-    </ClCompile>
-    <ClCompile Include="atom\Trace.hpp">
-      <Filter>atom</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="resource">
+      <UniqueIdentifier>{1f18a076-ac1d-404d-89d7-c531f02dcc08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\document">
+      <UniqueIdentifier>{6d4d6968-e7e0-4909-9cda-59f0117ff002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\assembly">
+      <UniqueIdentifier>{03d59bb7-95ba-4f3c-9c3e-0e70fed5e94d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\resource\document\license.txt">
@@ -58,21 +26,11 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="resource\assembly\AssemblyInfo.cpp">
+      <Filter>resource\assembly</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="All.hpp" />
-    <ClInclude Include="extension\AnyExport.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnyImport.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnyPreview.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnySource.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="extension\AnyProxy.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
