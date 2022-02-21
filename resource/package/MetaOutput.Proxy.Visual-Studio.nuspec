@@ -9,7 +9,7 @@
     <description>Proxy module to Visual Studio IDE</description>
     <summary></summary>
     <language>en-US</language>
-    <iconUrl>https://www.metaoutput.net/_functions/watch?source=NUGET&project=nuget.org&action=VIEW&size=128x128&url=https://www.metaoutput.net/</iconUrl>
+    <iconUrl>https://www.metaoutput.net/_functions/watch?source=NUGET&amp;project=nuget.org&amp;action=VIEW&amp;size=128x128&amp;url=https://www.metaoutput.net/</iconUrl>
     <projectUrl>https://www.metaoutput.net/</projectUrl>
     <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
     <license type="expression">MIT</license>
