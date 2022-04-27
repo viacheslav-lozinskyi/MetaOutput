@@ -72,8 +72,8 @@ BEGIN
     SET @_isFound = EXISTS(SELECT _id FROM net_sessions WHERE netAddress = _netAddress);
 
     IF (NOT @_isFound) THEN
-        INSERT INTO net_sessions (netAddress, country, city, coordinates, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent, sessionCount)
-        VALUE (_netAddress, _country, _city, _coordinates, _browser, _os, _resolution, _language, _ref, LOWER(_campaignName), LOWER(_campaignSource), LOWER(_campaignMedium), LOWER(_campaignTerm), LOWER(_campaignContent), _sessionCount);
+        INSERT INTO net_sessions (netAddress, country, city, coordinates, browser, os, resolution, language, ref, sessionCount)
+        VALUE (_netAddress, _country, _city, _coordinates, _browser, _os, _resolution, _language, _ref, _sessionCount);
     END IF;
 
     IF (@_isFound AND NOT ISNULL(_country)) THEN
@@ -108,23 +108,23 @@ BEGIN
         UPDATE net_sessions SET ref = _ref WHERE (netAddress = _netAddress) AND ISNULL(ref);
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(_campaignSource)) THEN
+    IF (NOT ISNULL(_campaignSource)) THEN
         UPDATE net_sessions SET campaignSource = LOWER(_campaignSource) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignSource);
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(_campaignMedium)) THEN
+    IF (NOT ISNULL(_campaignMedium)) THEN
         UPDATE net_sessions SET campaignMedium = LOWER(_campaignMedium) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignMedium);
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(_campaignTerm)) THEN
+    IF (NOT ISNULL(_campaignTerm)) THEN
         UPDATE net_sessions SET campaignTerm = LOWER(_campaignTerm) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignTerm);
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(_campaignContent)) THEN
+    IF (NOT ISNULL(_campaignContent)) THEN
         UPDATE net_sessions SET campaignContent = LOWER(_campaignContent) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignContent);
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(_campaignName)) THEN
+    IF (NOT ISNULL(_campaignName)) THEN
         UPDATE net_sessions SET campaignName = LOWER(_campaignName) WHERE (netAddress = _netAddress) AND ISNULL(campaignName);
     END IF;
 
@@ -396,6 +396,8 @@ SELECT * FROM watch_sessions LIMIT 50000;
 SELECT * FROM watch_sessions_view LIMIT 50000;
 SELECT * FROM github_sessions LIMIT 50000;
 SELECT * FROM github_projects LIMIT 50000;
+#SELECT netAddress FROM net_sessions WHERE (netAddress = "20.112.58.90") AND NOT ISNULL(country) LIMIT 1;
+#SELECT netAddress FROM net_sessions WHERE (netAddress = "148.66.201.164") AND NOT ISNULL(country) LIMIT 1;
 
 SET PROFILING = 0;
 #SET GLOBAL MAX_CONNECTIONS = 200;
