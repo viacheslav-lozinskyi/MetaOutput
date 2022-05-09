@@ -175,14 +175,16 @@ CREATE PROCEDURE app_session_register(
 BEGIN
     SET @_action = "START";
 
-    IF (EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId))) THEN
-        IF (EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project != _project)) THEN
+    IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId)) THEN
+        IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = _project)) THEN
             SET @_action = "UPDATE";
         END IF;
     ELSE
         IF (_sessions <= 1) THEN
             SET @_action = "INSTALL";
             SET _sessions = 0;
+		ELSE
+			SET @_action = "UPDATE";
         END IF;
     END IF;
 
@@ -396,8 +398,6 @@ SELECT * FROM watch_sessions LIMIT 50000;
 SELECT * FROM watch_sessions_view LIMIT 50000;
 SELECT * FROM github_sessions LIMIT 50000;
 SELECT * FROM github_projects LIMIT 50000;
-#SELECT netAddress FROM net_sessions WHERE (netAddress = "20.112.58.90") AND NOT ISNULL(country) LIMIT 1;
-#SELECT netAddress FROM net_sessions WHERE (netAddress = "148.66.201.164") AND NOT ISNULL(country) LIMIT 1;
 
 SET PROFILING = 0;
 #SET GLOBAL MAX_CONNECTIONS = 200;
@@ -408,6 +408,27 @@ SHOW PROFILES;
 SHOW VARIABLES LIKE "max_connections";
 SHOW VARIABLES LIKE "interactive_timeout";
 SHOW FULL PROCESSLIST;
+# #############################################################################
+# #############################################################################
+
+
+# #############################################################################
+# QUERIES #####################################################################
+
+SET SQL_SAFE_UPDATES = 0;
+#UPDATE net_sessions SET sessionCount = 3 WHERE country = "-unknown-";
+#UPDATE net_sessions SET ref = null WHERE ref = "";
+#UPDATE net_sessions SET country = null WHERE country = "-unknown-";
+#UPDATE net_sessions SET country = null WHERE ISNULL(coordinates);
+#SELECT DISTINCT country FROM net_sessions WHERE NOT ISNULL(country);
+#SELECT DISTINCT netAddress FROM net_sessions WHERE country = "-unknown-";
+#SELECT * FROM net_sessions WHERE country = null;
+#SELECT * FROM app_sessions_view WHERE ISNULL(country);
+#SELECT * FROM net_realtime_view;
+#SELECT * FROM net_sessions WHERE ISNULL(country) LIMIT 20000;
+#SELECT DISTINCT userId FROM net_sessions LIMIT 20000;
+#SELECT * FROM net_sessions WHERE country = "(unknown)";
+SET SQL_SAFE_UPDATES = 1;
 
 # #############################################################################
 # #############################################################################

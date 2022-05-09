@@ -23,19 +23,19 @@ SET character_set_results = "UTF8MB4";
 
 # #############################################################################
 # DROPPING TABLES #############################################################
-DROP TABLE IF EXISTS net_filters;
-DROP TABLE IF EXISTS net_sessions;
-DROP TABLE IF EXISTS net_traces;
-DROP TABLE IF EXISTS net_realtime;
-DROP TABLE IF EXISTS app_sessions;
-DROP TABLE IF EXISTS github_sessions;
-DROP TABLE IF EXISTS github_projects;
-DROP TABLE IF EXISTS watch_sessions;
+#DROP TABLE IF EXISTS net_filters;
+#DROP TABLE IF EXISTS net_sessions;
+#DROP TABLE IF EXISTS net_traces;
+#DROP TABLE IF EXISTS net_realtime;
+#DROP TABLE IF EXISTS app_sessions;
+#DROP TABLE IF EXISTS github_sessions;
+#DROP TABLE IF EXISTS github_projects;
+#DROP TABLE IF EXISTS watch_sessions;
 
-DROP VIEW IF EXISTS net_traces_view;
-DROP VIEW IF EXISTS net_realtime_view;
-DROP VIEW IF EXISTS app_sessions_view;
-DROP VIEW IF EXISTS watch_sessions_view;
+#DROP VIEW IF EXISTS net_traces_view;
+#DROP VIEW IF EXISTS net_realtime_view;
+#DROP VIEW IF EXISTS app_sessions_view;
+#DROP VIEW IF EXISTS watch_sessions_view;
 # #############################################################################
 # #############################################################################
 
