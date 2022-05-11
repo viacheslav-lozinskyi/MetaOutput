@@ -53,10 +53,12 @@ DROP PROCEDURE IF EXISTS net_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE net_session_register(
+	IN _time TIMESTAMP,
     IN _netAddress VARCHAR(16),
     IN _country VARCHAR(64),
     IN _city VARCHAR(64),
     IN _coordinates VARCHAR(32),
+    IN _organization VARCHAR(128),
     IN _browser VARCHAR(64),
     IN _os VARCHAR(64),
     IN _resolution VARCHAR(64),
@@ -72,8 +74,12 @@ BEGIN
     SET @_isFound = EXISTS(SELECT _id FROM net_sessions WHERE netAddress = _netAddress);
 
     IF (NOT @_isFound) THEN
-        INSERT INTO net_sessions (netAddress, country, city, coordinates, browser, os, resolution, language, ref, sessionCount)
-        VALUE (_netAddress, _country, _city, _coordinates, _browser, _os, _resolution, _language, _ref, _sessionCount);
+        INSERT INTO net_sessions (netAddress, country, city, coordinates, organization, browser, os, resolution, language, ref, sessionCount)
+        VALUE (_netAddress, _country, _city, _coordinates, _organization, _browser, _os, _resolution, _language, _ref, _sessionCount);
+    END IF;
+    
+    IF (@_isFound AND NOT ISNULL(_time)) THEN
+        UPDATE net_sessions SET time = _time WHERE netAddress = _netAddress;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(_country)) THEN
@@ -86,6 +92,10 @@ BEGIN
 
     IF (@_isFound AND NOT ISNULL(_coordinates)) THEN
         UPDATE net_sessions SET coordinates = _coordinates WHERE netAddress = _netAddress;
+    END IF;
+    
+    IF (@_isFound AND NOT ISNULL(_organization)) THEN
+        UPDATE net_sessions SET organization = _organization WHERE netAddress = _netAddress;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(_browser)) THEN
@@ -309,7 +319,7 @@ BEGIN
 
     IF (@isFound) THEN
         IF (ISNULL(_source)) THEN
-            SET _source = "WEB";
+            SET _source = "WEB-SITE";
         END IF;
         IF (ISNULL(_action)) THEN
             SET _action = "VIEW";
@@ -416,16 +426,20 @@ SHOW FULL PROCESSLIST;
 # QUERIES #####################################################################
 
 SET SQL_SAFE_UPDATES = 0;
+#DELETE FROM watch_sessions WHERE project = "sandbox";
 #UPDATE net_sessions SET sessionCount = 3 WHERE country = "-unknown-";
+#UPDATE net_sessions SET language = "TR-TR" WHERE language = "TR";
+#UPDATE net_sessions SET os = null WHERE os = "Windows 10.0";
 #UPDATE net_sessions SET ref = null WHERE ref = "";
+#UPDATE net_sessions SET ref = null WHERE ref = "https://www.metaoutput.net/download";
 #UPDATE net_sessions SET country = null WHERE country = "-unknown-";
-#UPDATE net_sessions SET country = null WHERE ISNULL(coordinates);
+#UPDATE net_sessions SET country = null WHERE ISNULL(organization);
 #SELECT DISTINCT country FROM net_sessions WHERE NOT ISNULL(country);
 #SELECT DISTINCT netAddress FROM net_sessions WHERE country = "-unknown-";
 #SELECT * FROM net_sessions WHERE country = null;
 #SELECT * FROM app_sessions_view WHERE ISNULL(country);
 #SELECT * FROM net_realtime_view;
-#SELECT * FROM net_sessions WHERE ISNULL(country) LIMIT 20000;
+SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 20000;
 #SELECT DISTINCT userId FROM net_sessions LIMIT 20000;
 #SELECT * FROM net_sessions WHERE country = "(unknown)";
 SET SQL_SAFE_UPDATES = 1;
