@@ -68,14 +68,13 @@ CREATE PROCEDURE net_session_register(
     IN _campaignSource VARCHAR(64),
     IN _campaignMedium VARCHAR(64),
     IN _campaignTerm VARCHAR(128),
-    IN _campaignContent VARCHAR(128),
-    IN _sessionCount INTEGER)
+    IN _campaignContent VARCHAR(128))
 BEGIN
     SET @_isFound = EXISTS(SELECT _id FROM net_sessions WHERE netAddress = _netAddress);
 
     IF (NOT @_isFound) THEN
-        INSERT INTO net_sessions (netAddress, country, city, coordinates, organization, browser, os, resolution, language, ref, sessionCount)
-        VALUE (_netAddress, _country, _city, _coordinates, _organization, _browser, _os, _resolution, _language, _ref, _sessionCount);
+        INSERT INTO net_sessions (netAddress, country, city, coordinates, organization, browser, os, resolution, language, ref)
+        VALUE (_netAddress, _country, _city, _coordinates, _organization, _browser, _os, _resolution, _language, _ref);
     END IF;
     
     IF (@_isFound AND NOT ISNULL(_time)) THEN
@@ -137,14 +136,6 @@ BEGIN
     IF (NOT ISNULL(_campaignName)) THEN
         UPDATE net_sessions SET campaignName = LOWER(_campaignName) WHERE (netAddress = _netAddress) AND ISNULL(campaignName);
     END IF;
-
-    IF (@_isFound AND NOT ISNULL(_sessionCount)) THEN
-        IF ((_sessionCount > 1) AND EXISTS(SELECT _id FROM net_sessions WHERE (netAddress = _netAddress) AND (sessionCount >= _sessionCount))) THEN
-            UPDATE net_sessions SET sessionCount = sessionCount + 1 WHERE netAddress = _netAddress;
-        ELSE
-            UPDATE net_sessions SET sessionCount = _sessionCount WHERE netAddress = _netAddress;
-        END IF;
-    END IF;
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -180,7 +171,7 @@ CREATE PROCEDURE app_session_register(
     IN _userId VARCHAR(64),
     IN _source VARCHAR(128),
     IN _project VARCHAR(128),
-    IN _sessions INTEGER,
+    IN _sessionCount INTEGER,
     IN _isDebug BOOLEAN)
 BEGIN
     SET @_action = "START";
@@ -190,9 +181,8 @@ BEGIN
             SET @_action = "UPDATE";
         END IF;
     ELSE
-        IF (_sessions <= 1) THEN
+        IF (_sessionCount <= 1) THEN
             SET @_action = "INSTALL";
-            SET _sessions = 0;
 		ELSE
 			SET @_action = "UPDATE";
         END IF;
@@ -206,6 +196,15 @@ BEGIN
     END IF;
 
     UPDATE net_sessions SET userId = _userId WHERE netAddress = _netAddress;
+
+    IF (NOT ISNULL(_sessionCount) AND NOT ISNULL(_userId)) THEN
+		SET @_maxSession = 0;
+        SELECT MAX(sessionCount) FROM net_sessions WHERE userId = _userId INTO @_maxSession;
+        IF (_sessionCount <= @_maxSession) THEN
+			SET _sessionCount = @_maxSession + 1;
+        END IF;
+        UPDATE net_sessions SET sessionCount = _sessionCount WHERE userId = _userId;
+    END IF;
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -432,14 +431,23 @@ SET SQL_SAFE_UPDATES = 0;
 #UPDATE net_sessions SET os = null WHERE os = "Windows 10.0";
 #UPDATE net_sessions SET ref = null WHERE ref = "";
 #UPDATE net_sessions SET ref = null WHERE ref = "https://www.metaoutput.net/download";
-#UPDATE net_sessions SET country = null WHERE country = "-unknown-";
+#UPDATE net_sessions SET country = null WHERE country = "Kenya";
+#UPDATE net_sessions SET country = null WHERE organization LIKE "%''%";
+#UPDATE net_sessions SET organization = null WHERE organization = "";
+#UPDATE net_sessions SET country = null WHERE organization LIKE "%.";
 #UPDATE net_sessions SET country = null WHERE ISNULL(organization);
 #SELECT DISTINCT country FROM net_sessions WHERE NOT ISNULL(country);
 #SELECT DISTINCT netAddress FROM net_sessions WHERE country = "-unknown-";
 #SELECT * FROM net_sessions WHERE country = null;
 #SELECT * FROM app_sessions_view WHERE ISNULL(country);
 #SELECT * FROM net_realtime_view;
+SELECT STR_TO_DATE("1973-12-26 23:59", "%Y-%m-%d %H:%i");
 SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 20000;
+#SELECT * FROM net_sessions WHERE userId = "USER-B6A247EA-8902-41DB-A52E-ED05769D1873";
+
+#SELECT * FROM watch_sessions WHERE ISNULL(url) ORDER BY _id DESC LIMIT 20000;
+#SELECT * FROM net_sessions WHERE (organization LIKE "%.") ORDER BY _id DESC LIMIT 20000;
+#SELECT * FROM net_sessions WHERE organization LIKE '%"%' ORDER BY _id DESC LIMIT 20000;
 #SELECT DISTINCT userId FROM net_sessions LIMIT 20000;
 #SELECT * FROM net_sessions WHERE country = "(unknown)";
 SET SQL_SAFE_UPDATES = 1;
