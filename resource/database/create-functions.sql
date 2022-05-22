@@ -176,7 +176,7 @@ CREATE PROCEDURE app_session_register(
 BEGIN
     SET @_action = "START";
 
-    IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId)) THEN
+    IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId LIMIT 1)) THEN
         IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = _project)) THEN
             SET @_action = "UPDATE";
         END IF;
