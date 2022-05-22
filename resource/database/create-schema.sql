@@ -23,7 +23,6 @@ SET character_set_results = "UTF8MB4";
 
 # #############################################################################
 # DROPPING TABLES #############################################################
-#DROP TABLE IF EXISTS net_backup;
 #DROP TABLE IF EXISTS net_filters;
 #DROP TABLE IF EXISTS net_sessions;
 #DROP TABLE IF EXISTS net_traces;
@@ -54,30 +53,6 @@ CREATE TABLE net_filters(
 
 CREATE INDEX metaoutput_net_filters ON net_filters(type, value);
 
-CREATE TABLE net_backup(
-    _id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    netAddress VARCHAR(16) NOT NULL,
-    userId VARCHAR(64),
-    country VARCHAR(64),
-    city VARCHAR(64),
-    coordinates VARCHAR(32),
-    organization VARCHAR(128),
-    browser VARCHAR(64),
-    os VARCHAR(64),
-    resolution VARCHAR(64),
-    language VARCHAR(8),
-    ref VARCHAR(256),
-    campaignName VARCHAR(64),
-    campaignSource VARCHAR(64),
-    campaignMedium VARCHAR(64),
-    campaignTerm VARCHAR(128),
-    campaignContent VARCHAR(128),
-    source VARCHAR(128),
-    project VARCHAR(128),
-    sessionCount INTEGER
-);
-
 CREATE TABLE net_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -100,7 +75,7 @@ CREATE TABLE net_sessions(
     sessionCount INTEGER
 );
 
-CREATE INDEX metaoutput_net_sessions ON net_sessions(netAddress);
+CREATE INDEX metaoutput_net_sessions ON net_sessions(netAddress, userId);
 
 CREATE TABLE net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
