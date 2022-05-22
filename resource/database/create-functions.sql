@@ -195,9 +195,11 @@ BEGIN
         CALL net_realtime_register(_netAddress, "APPLICATION", _source, _project, NULL);
     END IF;
 
-    UPDATE net_sessions SET userId = _userId WHERE netAddress = _netAddress;
+	IF (NOT ISNULL(_userId)) THEN
+		UPDATE net_sessions SET userId = _userId WHERE netAddress = _netAddress;
+	END IF;
 
-    IF (NOT ISNULL(_sessionCount) AND NOT ISNULL(_userId)) THEN
+    IF (NOT ISNULL(_userId) AND NOT ISNULL(_sessionCount)) THEN
 		SET @_maxSession = 0;
         SELECT MAX(sessionCount) FROM net_sessions WHERE userId = _userId INTO @_maxSession;
         IF (_sessionCount <= @_maxSession) THEN
