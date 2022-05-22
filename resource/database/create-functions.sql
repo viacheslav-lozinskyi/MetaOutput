@@ -202,7 +202,7 @@ BEGIN
     IF (NOT ISNULL(_userId) AND NOT ISNULL(_sessionCount)) THEN
 		SET @_maxSession = 0;
         SELECT MAX(sessionCount) FROM net_sessions WHERE userId = _userId INTO @_maxSession;
-        IF (_sessionCount <= @_maxSession) THEN
+        IF (_sessionCount < @_maxSession) THEN
 			SET _sessionCount = @_maxSession + 1;
         END IF;
         UPDATE net_sessions SET sessionCount = _sessionCount WHERE userId = _userId;
