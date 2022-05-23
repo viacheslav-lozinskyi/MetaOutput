@@ -174,38 +174,42 @@ CREATE PROCEDURE app_session_register(
     IN _sessionCount INTEGER,
     IN _isDebug BOOLEAN)
 BEGIN
-    SET @_action = "START";
-
-    IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId LIMIT 1)) THEN
-        IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = _project)) THEN
-            SET @_action = "UPDATE";
-        END IF;
-    ELSE
-        IF (_sessionCount <= 1) THEN
-            SET @_action = "INSTALL";
-		ELSE
-			SET @_action = "UPDATE";
-        END IF;
-    END IF;
-
-    IF ((@_action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
-        INSERT INTO app_sessions (netAddress, userId, action, source, project, isDebug)
-        VALUE (_netAddress, _userId, UPPER(@_action), _source, _project, _isDebug);
-
-        CALL net_realtime_register(_netAddress, "APPLICATION", _source, _project, NULL);
-    END IF;
-
 	IF (NOT ISNULL(_userId)) THEN
-		UPDATE net_sessions SET userId = _userId WHERE netAddress = _netAddress;
-	END IF;
+		SET @_action = "START";
+        SET @_maxSession = 0;
+        
+        IF (ISNULL(_sessionCount)) THEN
+			SET _sessionCount = 1;
+		END IF;
 
-    IF (NOT ISNULL(_userId) AND NOT ISNULL(_sessionCount)) THEN
-		SET @_maxSession = 0;
-        SELECT MAX(sessionCount) FROM net_sessions WHERE userId = _userId INTO @_maxSession;
+		IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId LIMIT 1)) THEN
+			IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = _project)) THEN
+				SET @_action = "UPDATE";
+			END IF;
+		ELSE
+			IF (_sessionCount <= 1) THEN
+				SET @_action = "INSTALL";
+			ELSE
+				SET @_action = "UPDATE";
+			END IF;
+		END IF;
+
+		IF ((@_action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
+			INSERT INTO app_sessions (netAddress, userId, action, source, project, isDebug)
+			VALUE (_netAddress, _userId, @_action, _source, _project, _isDebug);
+
+			CALL net_realtime_register(_netAddress, "APPLICATION", _source, _project, NULL);
+		END IF;
+    
+        SELECT MAX(sessionCount) FROM net_sessions WHERE (netAddress = _netAddress) OR (userId = _userId) INTO @_maxSession;
+        IF (ISNULL(@_maxSession)) THEN
+			SET @_maxSession = 1;
+		END IF;
         IF (_sessionCount < @_maxSession) THEN
 			SET _sessionCount = @_maxSession + 1;
         END IF;
-        UPDATE net_sessions SET sessionCount = _sessionCount WHERE userId = _userId;
+        UPDATE net_sessions SET userId = _userId WHERE netAddress = _netAddress;
+        UPDATE net_sessions SET sessionCount = _sessionCount WHERE (netAddress = _netAddress) OR (userId = _userId);
     END IF;
 END;%%
 DELIMITER ;
@@ -298,7 +302,7 @@ CREATE PROCEDURE watch_session_register(
     IN _isDebug BOOLEAN)
 BEGIN
     SET @isFound =
-		(NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netAddress = _netAddress) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND (_url = url) LIMIT 1)) AND
+		(NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netAddress = _netAddress) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(_url) AND (project = _project)) OR (NOT ISNULL(_url) AND (url = _url))) LIMIT 1)) AND
 		(NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (_url LIKE value) LIMIT 1));
 
     IF (@isFound AND ISNULL(_project)) THEN
@@ -444,7 +448,10 @@ SET SQL_SAFE_UPDATES = 0;
 #SELECT * FROM app_sessions_view WHERE ISNULL(country);
 #SELECT * FROM net_realtime_view;
 SELECT STR_TO_DATE("1973-12-26 23:59", "%Y-%m-%d %H:%i");
-SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 20000;
+SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 50000;
+#SELECT * FROM app_sessions LIMIT 200000;
+#SELECT * FROM net_sessions a1, app_sessions a2 WHERE ISNULL(a1.sessionCount) AND (a1.netAddress = a2.netAddress) LIMIT 20000;
+#UPDATE net_sessions a1, app_sessions a2 SET a1.sessionCount = 2 WHERE ISNULL(a1.sessionCount) AND (a1.netAddress = a2.netAddress);
 #SELECT * FROM net_sessions WHERE userId = "USER-B6A247EA-8902-41DB-A52E-ED05769D1873";
 
 #SELECT * FROM watch_sessions WHERE ISNULL(url) ORDER BY _id DESC LIMIT 20000;
