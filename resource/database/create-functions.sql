@@ -185,11 +185,7 @@ BEGIN
 				SET @_action = "UPDATE";
 			END IF;
 		ELSE
-			IF (_sessionCount <= 1) THEN
-				SET @_action = "INSTALL";
-			ELSE
-				SET @_action = "UPDATE";
-			END IF;
+			SET @_action = "INSTALL";
 		END IF;
 
 		IF ((@_action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
