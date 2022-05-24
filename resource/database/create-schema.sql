@@ -84,8 +84,7 @@ CREATE TABLE net_traces(
     source VARCHAR(128),
     project VARCHAR(128),
     action VARCHAR(32),
-    message VARCHAR(1024),
-    isDebug BOOLEAN
+    message VARCHAR(1024)
 );
 
 CREATE VIEW net_traces_view AS
@@ -97,7 +96,6 @@ SELECT
     net_traces.project,
     net_traces.action,
     net_traces.message,
-    net_traces.isDebug,
     net_sessions.userId,
     net_sessions.country,
     net_sessions.city,
@@ -155,8 +153,7 @@ CREATE TABLE app_sessions(
     userId VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     source VARCHAR(128) NOT NULL,
-    project VARCHAR(128) NOT NULL,
-    isDebug BOOLEAN
+    project VARCHAR(128) NOT NULL
 );
 
 CREATE INDEX metaoutput_app_sessions ON app_sessions(netAddress, userId);
@@ -170,7 +167,6 @@ SELECT
     app_sessions.action,
     app_sessions.source,
     app_sessions.project,
-    app_sessions.isDebug,
     net_sessions.country,
     net_sessions.city,
     net_sessions.coordinates,
@@ -199,8 +195,7 @@ CREATE TABLE github_sessions(
     user VARCHAR(128) NOT NULL,
     avatar VARCHAR(256),
     url VARCHAR(256),
-    message VARCHAR(1024),
-    isDebug BOOLEAN
+    message VARCHAR(1024)
 );
 
 CREATE INDEX metaoutput_github_sessions ON github_sessions(project);
@@ -213,8 +208,7 @@ CREATE TABLE github_projects(
     starCount INTEGER,
     watchCount INTEGER,
     forkCount INTEGER,
-    issueCount INTEGER,
-    isDebug BOOLEAN
+    issueCount INTEGER
 );
 
 CREATE INDEX metaoutput_github_projects ON github_projects(project);
@@ -228,8 +222,7 @@ CREATE TABLE watch_sessions(
     project VARCHAR(128),
     user VARCHAR(128),
     url VARCHAR(256),
-    message VARCHAR(256),
-    isDebug BOOLEAN
+    message VARCHAR(256)
 );
 
 CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netAddress, source);
@@ -245,7 +238,6 @@ SELECT
     watch_sessions.user,
     watch_sessions.url,
     watch_sessions.message,
-    watch_sessions.isDebug,
     net_sessions.userId,
     net_sessions.country,
     net_sessions.city,

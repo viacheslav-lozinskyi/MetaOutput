@@ -152,12 +152,10 @@ CREATE PROCEDURE net_trace_register(
     IN _message VARCHAR(1024),
     IN _isDebug BOOLEAN)
 BEGIN
-    INSERT INTO net_traces (netAddress, source, project, action, message, isDebug)
-    VALUE (_netAddress, _source, _project, UPPER(_action), _message, _isDebug);
+    INSERT INTO net_traces (netAddress, source, project, action, message)
+    VALUE (_netAddress, _source, _project, UPPER(_action), _message);
 
-	IF _isDebug != 1 THEN
-		CALL net_realtime_register(_netAddress, "TRACE", _source, _project, _action);
-    END IF;
+	CALL net_realtime_register(_netAddress, "TRACE", _source, _project, _action);
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -178,7 +176,7 @@ BEGIN
 		SET @_action = "START";
         SET @_maxSession = 0;
         
-        IF (ISNULL(_sessionCount)) THEN
+        IF (ISNULL(_sessionCount) OR (_sessionCount = 0)) THEN
 			SET _sessionCount = 1;
 		END IF;
 
@@ -195,8 +193,8 @@ BEGIN
 		END IF;
 
 		IF ((@_action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
-			INSERT INTO app_sessions (netAddress, userId, action, source, project, isDebug)
-			VALUE (_netAddress, _userId, @_action, _source, _project, _isDebug);
+			INSERT INTO app_sessions (netAddress, userId, action, source, project)
+			VALUE (_netAddress, _userId, @_action, _source, _project);
 
 			CALL net_realtime_register(_netAddress, "APPLICATION", _source, _project, NULL);
 		END IF;
@@ -232,8 +230,8 @@ CREATE PROCEDURE github_session_register(
     IN _message VARCHAR(1024),
     IN _isDebug BOOLEAN)
 BEGIN
-    INSERT INTO github_sessions (country, city, event, action, project, branch, user, avatar, url, message, isDebug)
-    VALUE (_country, _city, UPPER(_event), UPPER(_action), _project, _branch, _user, _avatar, _url, _message, _isDebug);
+    INSERT INTO github_sessions (country, city, event, action, project, branch, user, avatar, url, message)
+    VALUE (_country, _city, UPPER(_event), UPPER(_action), _project, _branch, _user, _avatar, _url, _message);
 
     CALL net_realtime_register(NULL, "GITHUB", _event, _action, _project);
 END;%%
@@ -257,8 +255,8 @@ BEGIN
     SET @_isFound = EXISTS(SELECT _id FROM github_projects WHERE project = _project);
 
     IF (NOT @_isFound) THEN
-        INSERT INTO github_projects (project, owner, url, starCount, watchCount, forkCount, issueCount, isDebug)
-        VALUE (_project, _owner, _url, _starCount, _watchCount, _forkCount, _issueCount, _isDebug);
+        INSERT INTO github_projects (project, owner, url, starCount, watchCount, forkCount, issueCount)
+        VALUE (_project, _owner, _url, _starCount, _watchCount, _forkCount, _issueCount);
     END IF;
 
     IF (@_isFound AND NOT ISNULL(_owner)) THEN
@@ -333,8 +331,8 @@ BEGIN
         SET _source = UPPER(_source);
         SET _action = UPPER(_action);
 
-        INSERT INTO watch_sessions (netAddress, source, project, action, user, url, message, isDebug)
-        VALUE (_netAddress, _source, _project, _action, _user, _url, _message, _isDebug);
+        INSERT INTO watch_sessions (netAddress, source, project, action, user, url, message)
+        VALUE (_netAddress, _source, _project, _action, _user, _url, _message);
 
         CALL net_realtime_register(_netAddress, "WATCH", _source, _project, _action);
     END IF;
@@ -350,18 +348,18 @@ CREATE PROCEDURE service_cleanup_debug(
 	IN _daysIgnore INTEGER)
 BEGIN
 	SET SQL_SAFE_UPDATES = 0;
-    IF ISNULL(_daysIgnore) THEN
-		DELETE FROM app_sessions WHERE (isDebug = 1);
-		DELETE FROM net_traces WHERE (isDebug = 1);
-		DELETE FROM watch_sessions WHERE (isDebug = 1);
-		DELETE FROM github_sessions WHERE (isDebug = 1);
-		DELETE FROM github_projects WHERE (isDebug = 1);
-    ELSE
-		DELETE FROM app_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-		DELETE FROM net_traces WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-		DELETE FROM watch_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-		DELETE FROM github_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-    END IF;
+    #IF ISNULL(_daysIgnore) THEN
+	#	DELETE FROM app_sessions WHERE (isDebug = 1);
+	#	DELETE FROM net_traces WHERE (isDebug = 1);
+	#	DELETE FROM watch_sessions WHERE (isDebug = 1);
+	#	DELETE FROM github_sessions WHERE (isDebug = 1);
+	#	DELETE FROM github_projects WHERE (isDebug = 1);
+    #ELSE
+	#	DELETE FROM app_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+	#	DELETE FROM net_traces WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+	#	DELETE FROM watch_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+	#	DELETE FROM github_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+    #END IF;
     
     #DELETE FROM web_sessions WHERE action = "TEST";
     #DELETE FROM watch_sessions WHERE project = "unknown";
@@ -449,7 +447,6 @@ SET SQL_SAFE_UPDATES = 0;
 #SELECT * FROM net_realtime_view;
 SELECT STR_TO_DATE("1973-12-26 23:59", "%Y-%m-%d %H:%i");
 SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 50000;
-#SELECT * FROM app_sessions LIMIT 200000;
 #SELECT * FROM net_sessions a1, app_sessions a2 WHERE ISNULL(a1.sessionCount) AND (a1.netAddress = a2.netAddress) LIMIT 20000;
 #UPDATE net_sessions a1, app_sessions a2 SET a1.sessionCount = 2 WHERE ISNULL(a1.sessionCount) AND (a1.netAddress = a2.netAddress);
 #SELECT * FROM net_sessions WHERE userId = "USER-B6A247EA-8902-41DB-A52E-ED05769D1873";
