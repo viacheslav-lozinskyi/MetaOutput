@@ -25,6 +25,7 @@ SET character_set_results = "UTF8MB4";
 # DROPPING TABLES #############################################################
 #DROP TABLE IF EXISTS net_filters;
 #DROP TABLE IF EXISTS net_sessions;
+#DROP TABLE IF EXISTS review_sessions;
 #DROP TABLE IF EXISTS net_traces;
 #DROP TABLE IF EXISTS net_realtime;
 #DROP TABLE IF EXISTS app_sessions;
@@ -76,6 +77,22 @@ CREATE TABLE net_sessions(
 );
 
 CREATE INDEX metaoutput_net_sessions ON net_sessions(netAddress, userId);
+
+CREATE TABLE review_sessions(
+    _id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    netId VARCHAR(16) NOT NULL,
+    source VARCHAR(128),
+    project VARCHAR(128),
+    user VARCHAR(256),
+    avatar VARCHAR(256),
+    email VARCHAR(256),
+    url VARCHAR(256),
+    rating FLOAT,
+    message VARCHAR(1024)
+);
+
+CREATE INDEX metaoutput_review_sessions ON review_sessions(netId);
 
 CREATE TABLE net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,

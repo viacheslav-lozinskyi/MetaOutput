@@ -149,8 +149,7 @@ CREATE PROCEDURE net_trace_register(
     IN _source VARCHAR(128),
     IN _project VARCHAR(128),
     IN _action VARCHAR(32),
-    IN _message VARCHAR(1024),
-    IN _isDebug BOOLEAN)
+    IN _message VARCHAR(1024))
 BEGIN
     INSERT INTO net_traces (netAddress, source, project, action, message)
     VALUE (_netAddress, _source, _project, UPPER(_action), _message);
@@ -169,8 +168,7 @@ CREATE PROCEDURE app_session_register(
     IN _userId VARCHAR(64),
     IN _source VARCHAR(128),
     IN _project VARCHAR(128),
-    IN _sessionCount INTEGER,
-    IN _isDebug BOOLEAN)
+    IN _sessionCount INTEGER)
 BEGIN
 	IF (NOT ISNULL(_userId)) THEN
 		SET @_action = "START";
@@ -210,6 +208,33 @@ DELIMITER ;
 # #############################################################################
 
 # #############################################################################
+DROP PROCEDURE IF EXISTS review_session_register;
+
+DELIMITER %%
+CREATE PROCEDURE review_session_register(
+    IN _netId VARCHAR(16),
+    IN _user VARCHAR(256),
+    IN _source VARCHAR(128),
+    IN _project VARCHAR(128),
+    IN _avatar VARCHAR(256),
+    IN _email VARCHAR(256),
+    IN _url VARCHAR(256),
+    IN _rating FLOAT,
+    IN _message VARCHAR(1024))
+BEGIN
+	IF (NOT ISNULL(_user) AND NOT ISNULL(_source) AND NOT ISNULL(_project)) THEN
+		IF (NOT EXISTS(SELECT _id FROM review_sessions WHERE (user = _user) AND (source = _source) AND (message = _message) AND (rating = _rating) AND (project = _project) LIMIT 1)) THEN
+			INSERT INTO review_sessions (netId, user, source, project, avatar, email, url, rating, message)
+			VALUE (_netId, _user, _source, _project, _avatar, _email, _url, _rating, _message);
+
+			CALL net_realtime_register(_netId, "REVIEW", _source, _project, _rating);
+		END IF;
+    END IF;
+END;%%
+DELIMITER ;
+# #############################################################################
+
+# #############################################################################
 DROP PROCEDURE IF EXISTS github_session_register;
 
 DELIMITER %%
@@ -223,8 +248,7 @@ CREATE PROCEDURE github_session_register(
     IN _user VARCHAR(128),
     IN _avatar VARCHAR(256),
     IN _url VARCHAR(256),
-    IN _message VARCHAR(1024),
-    IN _isDebug BOOLEAN)
+    IN _message VARCHAR(1024))
 BEGIN
     INSERT INTO github_sessions (country, city, event, action, project, branch, user, avatar, url, message)
     VALUE (_country, _city, UPPER(_event), UPPER(_action), _project, _branch, _user, _avatar, _url, _message);
@@ -245,8 +269,7 @@ CREATE PROCEDURE github_project_register(
     IN _starCount INTEGER,
     IN _watchCount INTEGER,
     IN _forkCount INTEGER,
-    IN _issueCount INTEGER,
-    IN _isDebug BOOLEAN)
+    IN _issueCount INTEGER)
 BEGIN
     SET @_isFound = EXISTS(SELECT _id FROM github_projects WHERE project = _project);
 
@@ -292,8 +315,7 @@ CREATE PROCEDURE watch_session_register(
     IN _action VARCHAR(64),
     IN _user VARCHAR(128),
     IN _url VARCHAR(256),
-    IN _message VARCHAR(256),
-    IN _isDebug BOOLEAN)
+    IN _message VARCHAR(256))
 BEGIN
     SET @isFound =
 		(NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netAddress = _netAddress) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(_url) AND (project = _project)) OR (NOT ISNULL(_url) AND (url = _url))) LIMIT 1)) AND
