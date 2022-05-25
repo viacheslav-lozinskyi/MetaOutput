@@ -213,9 +213,10 @@ DROP PROCEDURE IF EXISTS review_session_register;
 DELIMITER %%
 CREATE PROCEDURE review_session_register(
     IN _netId VARCHAR(16),
-    IN _user VARCHAR(256),
     IN _source VARCHAR(128),
     IN _project VARCHAR(128),
+    IN _action VARCHAR(32),
+    IN _user VARCHAR(256),
     IN _avatar VARCHAR(256),
     IN _email VARCHAR(256),
     IN _url VARCHAR(256),
@@ -223,9 +224,12 @@ CREATE PROCEDURE review_session_register(
     IN _message VARCHAR(1024))
 BEGIN
 	IF (NOT ISNULL(_user) AND NOT ISNULL(_source) AND NOT ISNULL(_project)) THEN
-		IF (NOT EXISTS(SELECT _id FROM review_sessions WHERE (user = _user) AND (source = _source) AND (message = _message) AND (rating = _rating) AND (project = _project) LIMIT 1)) THEN
-			INSERT INTO review_sessions (netId, user, source, project, avatar, email, url, rating, message)
-			VALUE (_netId, _user, _source, _project, _avatar, _email, _url, _rating, _message);
+		IF (NOT ISNULL(_action)) THEN
+			SET _action = "REVIEW";
+        END IF;
+		IF (NOT EXISTS(SELECT _id FROM review_sessions WHERE (user = _user) AND (source = _source) AND (project = _project) AND (action = _action) AND (message = _message) AND (rating = _rating) LIMIT 1)) THEN
+			INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
+			VALUE (_netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
 
 			CALL net_realtime_register(_netId, "REVIEW", _source, _project, _rating);
 		END IF;
