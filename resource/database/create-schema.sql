@@ -94,6 +94,36 @@ CREATE TABLE review_sessions(
 
 CREATE INDEX metaoutput_review_sessions ON review_sessions(netId);
 
+CREATE VIEW review_sessions_view AS
+SELECT
+    review_sessions._id,
+    review_sessions._time,
+    review_sessions.netId,
+    review_sessions.source,
+    review_sessions.project,
+    review_sessions.user,
+    review_sessions.avatar,
+    review_sessions.email,
+    review_sessions.url,
+    review_sessions.rating,
+    review_sessions.message,    
+    net_sessions.country,
+    net_sessions.city,
+    net_sessions.coordinates,
+    net_sessions.organization,
+    net_sessions.os,
+    net_sessions.resolution,
+    net_sessions.language,
+    net_sessions.campaignName,
+    net_sessions.campaignSource,
+    net_sessions.campaignMedium,
+    net_sessions.campaignTerm,
+    net_sessions.campaignContent,
+    net_sessions.sessionCount
+FROM review_sessions
+LEFT JOIN net_sessions ON net_sessions.netAddress=review_sessions.netId;
+
+
 CREATE TABLE net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
