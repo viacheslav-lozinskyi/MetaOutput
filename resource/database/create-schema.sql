@@ -89,7 +89,7 @@ CREATE TABLE review_sessions(
     avatar VARCHAR(256),
     email VARCHAR(256),
     url VARCHAR(256),
-    rating FLOAT,
+    rating INTEGER,
     message VARCHAR(1024)
 );
 

@@ -212,6 +212,7 @@ DROP PROCEDURE IF EXISTS review_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE review_session_register(
+	IN _time VARCHAR(32),
     IN _netId VARCHAR(16),
     IN _source VARCHAR(128),
     IN _project VARCHAR(128),
@@ -224,15 +225,40 @@ CREATE PROCEDURE review_session_register(
     IN _message VARCHAR(1024))
 BEGIN
 	IF (NOT ISNULL(_user) AND NOT ISNULL(_source) AND NOT ISNULL(_project)) THEN
-		IF (NOT ISNULL(_action)) THEN
+		SET @_context1 = _rating;
+        SET @_context2 = _time;
+        SET _rating = 1;
+        SET _action = UPPER(_action);
+		IF (@_context1 >= 1) THEN
+			SET _rating = 1;
+        END IF;
+        IF (@_context1 >= 2) THEN
+			SET _rating = 2;
+        END IF;
+        IF (@_context1 >= 3) THEN
+			SET _rating = 3;
+        END IF;
+        IF (@_context1 >= 4) THEN
+			SET _rating = 4;
+        END IF;
+        IF (@_context1 >= 5) THEN
+			SET _rating = 5;
+        END IF;
+        IF (NOT ISNULL(_action)) THEN
 			SET _action = "REVIEW";
         END IF;
-		IF (NOT EXISTS(SELECT _id FROM review_sessions WHERE (user = _user) AND (source = _source) AND (project = _project) AND (action = _action) AND (message = _message) AND (rating = _rating) LIMIT 1)) THEN
+        
+		DELETE FROM review_sessions WHERE (user = _user) AND (source = _source) AND (project = _project) AND (action = _action) AND (message = _message) AND (url = _url);
+        
+		IF (ISNULL(_time)) THEN
 			INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
 			VALUE (_netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
-
-			CALL net_realtime_register(_netId, "REVIEW", _source, _project, _rating);
+		ELSE
+			INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
+			VALUE (STR_TO_DATE(@_context2, "%Y-%m-%d %H:%i"), _netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
 		END IF;
+
+		CALL net_realtime_register(_netId, "REVIEW", _source, _project, _rating);
     END IF;
 END;%%
 DELIMITER ;
