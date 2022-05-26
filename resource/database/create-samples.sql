@@ -112,7 +112,7 @@ CALL github_session_register(
 #    NULL);                                                                                     # url
 
 CALL app_session_register(
-	"127.0.0.101",                                                                             # netAddress
+    "127.0.0.101",                                                                             # netAddress
     "USER-1CAAFEAC-C113-4084-8CCE-43C2358EC991",                                               # userId
     "Visual Studio 2017",                                                                      # source
     "MetaOutput 2.0.7.172",                                                                    # project

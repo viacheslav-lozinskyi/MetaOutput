@@ -42,8 +42,8 @@ CREATE PROCEDURE net_realtime_register(
 BEGIN
     DELETE FROM net_realtime WHERE _time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-	INSERT INTO net_realtime(netAddress, source, value1, value2, value3)
-	VALUE (_netAddress, _source, _value1, _value2, _value3);
+    INSERT INTO net_realtime(netAddress, source, value1, value2, value3)
+    VALUE (_netAddress, _source, _value1, _value2, _value3);
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -53,7 +53,7 @@ DROP PROCEDURE IF EXISTS net_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE net_session_register(
-	IN _time TIMESTAMP,
+    IN _time TIMESTAMP,
     IN _netAddress VARCHAR(16),
     IN _country VARCHAR(64),
     IN _city VARCHAR(64),
@@ -76,7 +76,7 @@ BEGIN
         INSERT INTO net_sessions (netAddress, country, city, coordinates, organization, browser, os, resolution, language, ref)
         VALUE (_netAddress, _country, _city, _coordinates, _organization, _browser, _os, _resolution, _language, _ref);
     END IF;
-    
+
     IF (@_isFound AND NOT ISNULL(_time)) THEN
         UPDATE net_sessions SET time = _time WHERE netAddress = _netAddress;
     END IF;
@@ -92,7 +92,7 @@ BEGIN
     IF (@_isFound AND NOT ISNULL(_coordinates)) THEN
         UPDATE net_sessions SET coordinates = _coordinates WHERE netAddress = _netAddress;
     END IF;
-    
+
     IF (@_isFound AND NOT ISNULL(_organization)) THEN
         UPDATE net_sessions SET organization = _organization WHERE netAddress = _netAddress;
     END IF;
@@ -154,7 +154,7 @@ BEGIN
     INSERT INTO net_traces (netAddress, source, project, action, message)
     VALUE (_netAddress, _source, _project, UPPER(_action), _message);
 
-	CALL net_realtime_register(_netAddress, "TRACE", _source, _project, _action);
+    CALL net_realtime_register(_netAddress, "TRACE", _source, _project, _action);
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -170,35 +170,35 @@ CREATE PROCEDURE app_session_register(
     IN _project VARCHAR(128),
     IN _sessionCount INTEGER)
 BEGIN
-	IF (NOT ISNULL(_userId)) THEN
-		SET @_action = "START";
+    IF (NOT ISNULL(_userId)) THEN
+        SET @_action = "START";
         SET @_maxSession = 0;
-        
+
         IF (ISNULL(_sessionCount) OR (_sessionCount = 0)) THEN
-			SET _sessionCount = 1;
-		END IF;
+            SET _sessionCount = 1;
+        END IF;
 
-		IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId LIMIT 1)) THEN
-			IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = _project)) THEN
-				SET @_action = "UPDATE";
-			END IF;
-		ELSE
-			SET @_action = "INSTALL";
-		END IF;
+        IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = _userId LIMIT 1)) THEN
+            IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = _userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = _project)) THEN
+                SET @_action = "UPDATE";
+            END IF;
+        ELSE
+            SET @_action = "INSTALL";
+        END IF;
 
-		IF ((@_action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
-			INSERT INTO app_sessions (netAddress, userId, action, source, project)
-			VALUE (_netAddress, _userId, @_action, _source, _project);
+        IF ((@_action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = _userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
+            INSERT INTO app_sessions (netAddress, userId, action, source, project)
+            VALUE (_netAddress, _userId, @_action, _source, _project);
 
-			CALL net_realtime_register(_netAddress, "APPLICATION", _source, _project, NULL);
-		END IF;
-    
+            CALL net_realtime_register(_netAddress, "APPLICATION", _source, _project, NULL);
+        END IF;
+
         SELECT MAX(sessionCount) FROM net_sessions WHERE (netAddress = _netAddress) OR (userId = _userId) INTO @_maxSession;
         IF (ISNULL(@_maxSession)) THEN
-			SET @_maxSession = 1;
-		END IF;
+            SET @_maxSession = 1;
+        END IF;
         IF (_sessionCount < @_maxSession) THEN
-			SET _sessionCount = @_maxSession + 1;
+            SET _sessionCount = @_maxSession + 1;
         END IF;
         UPDATE net_sessions SET userId = _userId WHERE netAddress = _netAddress;
         UPDATE net_sessions SET sessionCount = _sessionCount WHERE (netAddress = _netAddress) OR (userId = _userId);
@@ -212,7 +212,7 @@ DROP PROCEDURE IF EXISTS review_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE review_session_register(
-	IN _time VARCHAR(32),
+    IN _time VARCHAR(32),
     IN _netId VARCHAR(16),
     IN _source VARCHAR(128),
     IN _project VARCHAR(128),
@@ -224,41 +224,45 @@ CREATE PROCEDURE review_session_register(
     IN _rating FLOAT,
     IN _message VARCHAR(1024))
 BEGIN
-	IF (NOT ISNULL(_user) AND NOT ISNULL(_source) AND NOT ISNULL(_project)) THEN
-		SET @_context1 = _rating;
+    IF (NOT ISNULL(_user) AND NOT ISNULL(_source) AND NOT ISNULL(_project)) THEN
+        SET @_context1 = _rating;
         SET @_context2 = _time;
-        SET _rating = 1;
         SET _action = UPPER(_action);
-		IF (@_context1 >= 1) THEN
-			SET _rating = 1;
-        END IF;
-        IF (@_context1 >= 2) THEN
-			SET _rating = 2;
-        END IF;
-        IF (@_context1 >= 3) THEN
-			SET _rating = 3;
-        END IF;
-        IF (@_context1 >= 4) THEN
-			SET _rating = 4;
-        END IF;
-        IF (@_context1 >= 5) THEN
-			SET _rating = 5;
-        END IF;
-        IF (NOT ISNULL(_action)) THEN
-			SET _action = "REVIEW";
-        END IF;
-        
-		DELETE FROM review_sessions WHERE (user = _user) AND (source = _source) AND (project = _project) AND (action = _action) AND (message = _message) AND (url = _url);
-        
-		IF (ISNULL(_time)) THEN
-			INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
-			VALUE (_netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
-		ELSE
-			INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
-			VALUE (STR_TO_DATE(@_context2, "%Y-%m-%d %H:%i"), _netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
-		END IF;
 
-		CALL net_realtime_register(_netId, "REVIEW", _source, _project, _rating);
+        IF (NOT ISNULL(_rating)) THEN
+            SET _rating = 1;
+            IF (@_context1 >= 1) THEN
+                SET _rating = 1;
+            END IF;
+            IF (@_context1 >= 2) THEN
+                SET _rating = 2;
+            END IF;
+            IF (@_context1 >= 3) THEN
+                SET _rating = 3;
+            END IF;
+            IF (@_context1 >= 4) THEN
+                SET _rating = 4;
+            END IF;
+            IF (@_context1 >= 5) THEN
+                SET _rating = 5;
+            END IF;
+        END IF;
+
+        IF (NOT ISNULL(_action)) THEN
+            SET _action = "REVIEW";
+        END IF;
+
+        DELETE FROM review_sessions WHERE (user = _user) AND (source = _source) AND (project = _project) AND (action = _action) AND (message = _message) AND (url = _url);
+
+        IF (ISNULL(_time)) THEN
+            INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
+            VALUE (_netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
+        ELSE
+            INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
+            VALUE (STR_TO_DATE(@_context2, "%Y-%m-%d %H:%i"), _netId, _source, _project, _action, _user, _avatar, _email, _url, _rating, _message);
+        END IF;
+
+        CALL net_realtime_register(_netId, "REVIEW", _source, _project, _rating);
     END IF;
 END;%%
 DELIMITER ;
@@ -269,7 +273,7 @@ DROP PROCEDURE IF EXISTS github_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE github_session_register(
-	IN _country VARCHAR(64),
+    IN _country VARCHAR(64),
     IN _city VARCHAR(64),
     IN _event VARCHAR(64),
     IN _action VARCHAR(64),
@@ -315,19 +319,19 @@ BEGIN
     IF (@_isFound AND NOT ISNULL(_url)) THEN
         UPDATE github_projects SET url = _url WHERE project = _project;
     END IF;
-    
+
     IF (@_isFound AND NOT ISNULL(_starCount)) THEN
         UPDATE github_projects SET starCount = _starCount WHERE project = _project;
     END IF;
-    
+
     IF (@_isFound AND NOT ISNULL(_watchCount)) THEN
         UPDATE github_projects SET watchCount = _watchCount WHERE project = _project;
     END IF;
-    
+
     IF (@_isFound AND NOT ISNULL(_forkCount)) THEN
         UPDATE github_projects SET forkCount = _forkCount WHERE project = _project;
     END IF;
-    
+
     IF (@_isFound AND NOT ISNULL(_issueCount)) THEN
         UPDATE github_projects SET issueCount = _issueCount WHERE project = _project;
     END IF;
@@ -348,8 +352,8 @@ CREATE PROCEDURE watch_session_register(
     IN _message VARCHAR(256))
 BEGIN
     SET @isFound =
-		(NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netAddress = _netAddress) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(_url) AND (project = _project)) OR (NOT ISNULL(_url) AND (url = _url))) LIMIT 1)) AND
-		(NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (_url LIKE value) LIMIT 1));
+        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netAddress = _netAddress) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(_url) AND (project = _project)) OR (NOT ISNULL(_url) AND (url = _url))) LIMIT 1)) AND
+        (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (_url LIKE value) LIMIT 1));
 
     IF (@isFound AND ISNULL(_project)) THEN
         SET _project = _url;
@@ -393,22 +397,22 @@ DROP PROCEDURE IF EXISTS service_cleanup_debug;
 
 DELIMITER %%
 CREATE PROCEDURE service_cleanup_debug(
-	IN _daysIgnore INTEGER)
+    IN _daysIgnore INTEGER)
 BEGIN
-	SET SQL_SAFE_UPDATES = 0;
+    SET SQL_SAFE_UPDATES = 0;
     #IF ISNULL(_daysIgnore) THEN
-	#	DELETE FROM app_sessions WHERE (isDebug = 1);
-	#	DELETE FROM net_traces WHERE (isDebug = 1);
-	#	DELETE FROM watch_sessions WHERE (isDebug = 1);
-	#	DELETE FROM github_sessions WHERE (isDebug = 1);
-	#	DELETE FROM github_projects WHERE (isDebug = 1);
+    #	DELETE FROM app_sessions WHERE (isDebug = 1);
+    #	DELETE FROM net_traces WHERE (isDebug = 1);
+    #	DELETE FROM watch_sessions WHERE (isDebug = 1);
+    #	DELETE FROM github_sessions WHERE (isDebug = 1);
+    #	DELETE FROM github_projects WHERE (isDebug = 1);
     #ELSE
-	#	DELETE FROM app_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-	#	DELETE FROM net_traces WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-	#	DELETE FROM watch_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-	#	DELETE FROM github_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+    #	DELETE FROM app_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+    #	DELETE FROM net_traces WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+    #	DELETE FROM watch_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
+    #	DELETE FROM github_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
     #END IF;
-    
+
     #DELETE FROM web_sessions WHERE action = "TEST";
     #DELETE FROM watch_sessions WHERE project = "unknown";
     SET SQL_SAFE_UPDATES = 1;
