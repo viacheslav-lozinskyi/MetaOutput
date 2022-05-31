@@ -117,23 +117,23 @@ BEGIN
         UPDATE net_sessions SET ref = _ref WHERE (netAddress = _netAddress) AND ISNULL(ref);
     END IF;
 
-    IF (NOT ISNULL(_campaignSource)) THEN
-        UPDATE net_sessions SET campaignSource = LOWER(_campaignSource) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignSource);
-    END IF;
-
-    IF (NOT ISNULL(_campaignMedium)) THEN
-        UPDATE net_sessions SET campaignMedium = LOWER(_campaignMedium) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignMedium);
-    END IF;
-
-    IF (NOT ISNULL(_campaignTerm)) THEN
-        UPDATE net_sessions SET campaignTerm = LOWER(_campaignTerm) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignTerm);
-    END IF;
-
-    IF (NOT ISNULL(_campaignContent)) THEN
-        UPDATE net_sessions SET campaignContent = LOWER(_campaignContent) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignContent);
-    END IF;
-
     IF (NOT ISNULL(_campaignName)) THEN
+        IF (NOT ISNULL(_campaignSource)) THEN
+            UPDATE net_sessions SET campaignSource = LOWER(_campaignSource) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignSource);
+        END IF;
+
+        IF (NOT ISNULL(_campaignMedium)) THEN
+            UPDATE net_sessions SET campaignMedium = LOWER(_campaignMedium) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignMedium);
+        END IF;
+
+        IF (NOT ISNULL(_campaignTerm)) THEN
+            UPDATE net_sessions SET campaignTerm = LOWER(_campaignTerm) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignTerm);
+        END IF;
+
+        IF (NOT ISNULL(_campaignContent)) THEN
+            UPDATE net_sessions SET campaignContent = LOWER(_campaignContent) WHERE (netAddress = _netAddress) AND ISNULL(campaignName) AND ISNULL(campaignContent);
+        END IF;
+
         UPDATE net_sessions SET campaignName = LOWER(_campaignName) WHERE (netAddress = _netAddress) AND ISNULL(campaignName);
     END IF;
 END;%%
@@ -400,18 +400,11 @@ CREATE PROCEDURE service_cleanup_debug(
     IN _daysIgnore INTEGER)
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
-    #IF ISNULL(_daysIgnore) THEN
-    #	DELETE FROM app_sessions WHERE (isDebug = 1);
-    #	DELETE FROM net_traces WHERE (isDebug = 1);
-    #	DELETE FROM watch_sessions WHERE (isDebug = 1);
-    #	DELETE FROM github_sessions WHERE (isDebug = 1);
-    #	DELETE FROM github_projects WHERE (isDebug = 1);
-    #ELSE
-    #	DELETE FROM app_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-    #	DELETE FROM net_traces WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-    #	DELETE FROM watch_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-    #	DELETE FROM github_sessions WHERE (isDebug = 1) AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));
-    #END IF;
+    IF ISNULL(_daysIgnore) THEN
+        DELETE FROM app_sessions WHERE (userId LIKE "TEST-%");
+    ELSE
+        DELETE FROM app_sessions WHERE (userId LIKE "TEST-%") AND (_time < DATE_SUB(NOW(), INTERVAL _daysIgnore DAY));        
+    END IF;
 
     #DELETE FROM web_sessions WHERE action = "TEST";
     #DELETE FROM watch_sessions WHERE project = "unknown";
@@ -481,33 +474,7 @@ SHOW FULL PROCESSLIST;
 # QUERIES #####################################################################
 
 SET SQL_SAFE_UPDATES = 0;
-#DELETE FROM watch_sessions WHERE project = "sandbox";
-#UPDATE net_sessions SET sessionCount = 3 WHERE country = "-unknown-";
-#UPDATE net_sessions SET language = "TR-TR" WHERE language = "TR";
-#UPDATE net_sessions SET os = null WHERE os = "Windows 10.0";
-#UPDATE net_sessions SET ref = null WHERE ref = "";
-#UPDATE net_sessions SET ref = null WHERE ref = "https://www.metaoutput.net/download";
-#UPDATE net_sessions SET country = null WHERE country = "Kenya";
-#UPDATE net_sessions SET country = null WHERE organization LIKE "%''%";
-#UPDATE net_sessions SET organization = null WHERE organization = "";
-#UPDATE net_sessions SET country = null WHERE organization LIKE "%.";
-#UPDATE net_sessions SET country = null WHERE ISNULL(organization);
-#SELECT DISTINCT country FROM net_sessions WHERE NOT ISNULL(country);
-#SELECT DISTINCT netAddress FROM net_sessions WHERE country = "-unknown-";
-#SELECT * FROM net_sessions WHERE country = null;
-#SELECT * FROM app_sessions_view WHERE ISNULL(country);
-#SELECT * FROM net_realtime_view;
-SELECT STR_TO_DATE("1973-12-26 23:59", "%Y-%m-%d %H:%i");
-SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 50000;
-#SELECT * FROM net_sessions a1, app_sessions a2 WHERE ISNULL(a1.sessionCount) AND (a1.netAddress = a2.netAddress) LIMIT 20000;
-#UPDATE net_sessions a1, app_sessions a2 SET a1.sessionCount = 2 WHERE ISNULL(a1.sessionCount) AND (a1.netAddress = a2.netAddress);
-#SELECT * FROM net_sessions WHERE userId = "USER-B6A247EA-8902-41DB-A52E-ED05769D1873";
-
-#SELECT * FROM watch_sessions WHERE ISNULL(url) ORDER BY _id DESC LIMIT 20000;
-#SELECT * FROM net_sessions WHERE (organization LIKE "%.") ORDER BY _id DESC LIMIT 20000;
-#SELECT * FROM net_sessions WHERE organization LIKE '%"%' ORDER BY _id DESC LIMIT 20000;
-#SELECT DISTINCT userId FROM net_sessions LIMIT 20000;
-#SELECT * FROM net_sessions WHERE country = "(unknown)";
+#SELECT * FROM net_sessions WHERE NOT ISNULL(country) ORDER BY _id DESC LIMIT 50000;
 SET SQL_SAFE_UPDATES = 1;
 
 # #############################################################################
