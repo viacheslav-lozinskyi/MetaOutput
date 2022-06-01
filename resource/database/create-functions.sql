@@ -72,6 +72,14 @@ CREATE PROCEDURE net_session_register(
 BEGIN
     SET @_isFound = EXISTS(SELECT _id FROM net_sessions WHERE netAddress = _netAddress);
 
+    IF (NOT ISNULL(_browser)) THEN
+        SET _browser = REPLACE(_browser, "/", " ");
+    END IF;
+    
+    IF (NOT ISNULL(_os)) THEN
+        SET _os = REPLACE(_os, "Windows NT", "Windows");
+    END IF;
+
     IF (NOT @_isFound) THEN
         INSERT INTO net_sessions (netAddress, country, city, coordinates, organization, browser, os, resolution, language, ref)
         VALUE (_netAddress, _country, _city, _coordinates, _organization, _browser, _os, _resolution, _language, _ref);
