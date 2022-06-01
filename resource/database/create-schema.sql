@@ -35,6 +35,7 @@ SET character_set_results = "UTF8MB4";
 
 #DROP VIEW IF EXISTS net_traces_view;
 #DROP VIEW IF EXISTS net_realtime_view;
+#DROP VIEW IF EXISTS review_sessions_view;
 #DROP VIEW IF EXISTS app_sessions_view;
 #DROP VIEW IF EXISTS watch_sessions_view;
 # #############################################################################
@@ -57,7 +58,7 @@ CREATE INDEX metaoutput_net_filters ON net_filters(type, value);
 CREATE TABLE net_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    netAddress VARCHAR(16) NOT NULL,
+    netId VARCHAR(16) NOT NULL,
     userId VARCHAR(64),
     country VARCHAR(64),
     city VARCHAR(64),
@@ -76,7 +77,7 @@ CREATE TABLE net_sessions(
     sessionCount INTEGER
 );
 
-CREATE INDEX metaoutput_net_sessions ON net_sessions(netAddress, userId);
+CREATE INDEX metaoutput_net_sessions ON net_sessions(netId, userId);
 
 CREATE TABLE review_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -108,7 +109,7 @@ SELECT
     review_sessions.email,
     review_sessions.url,
     review_sessions.rating,
-    review_sessions.message,    
+    review_sessions.message,
     net_sessions.country,
     net_sessions.city,
     net_sessions.coordinates,
@@ -123,13 +124,13 @@ SELECT
     net_sessions.campaignContent,
     net_sessions.sessionCount
 FROM review_sessions
-LEFT JOIN net_sessions ON net_sessions.netAddress=review_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId=review_sessions.netId;
 
 
 CREATE TABLE net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netAddress VARCHAR(16) NOT NULL,
+    netId VARCHAR(16) NOT NULL,
     source VARCHAR(128),
     project VARCHAR(128),
     action VARCHAR(32),
@@ -140,7 +141,7 @@ CREATE VIEW net_traces_view AS
 SELECT
     net_traces._id,
     net_traces._time,
-    net_traces.netAddress,
+    net_traces.netId,
     net_traces.source,
     net_traces.project,
     net_traces.action,
@@ -162,12 +163,12 @@ SELECT
     net_sessions.campaignContent,
     net_sessions.sessionCount
 FROM net_traces
-LEFT JOIN net_sessions ON net_sessions.netAddress=net_traces.netAddress;
+LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
 
 CREATE TABLE net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netAddress VARCHAR(16),
+    netId VARCHAR(16),
     source VARCHAR(64) NOT NULL,
     value1 VARCHAR(256),
     value2 VARCHAR(256),
@@ -180,7 +181,7 @@ CREATE VIEW net_realtime_view AS
 SELECT
     net_realtime._id,
     net_realtime._time,
-    net_realtime.netAddress,
+    net_realtime.netId,
     net_realtime.source,
     net_realtime.value1,
     net_realtime.value2,
@@ -193,25 +194,25 @@ SELECT
     net_sessions.resolution,
     net_sessions.language
 FROM net_realtime
-LEFT JOIN net_sessions ON net_sessions.netAddress=net_realtime.netAddress;
+LEFT JOIN net_sessions ON net_sessions.netId=net_realtime.netId;
 
 CREATE TABLE app_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netAddress VARCHAR(16) NOT NULL,
+    netId VARCHAR(16) NOT NULL,
     userId VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     source VARCHAR(128) NOT NULL,
     project VARCHAR(128) NOT NULL
 );
 
-CREATE INDEX metaoutput_app_sessions ON app_sessions(netAddress, userId);
+CREATE INDEX metaoutput_app_sessions ON app_sessions(netId, userId);
 
 CREATE VIEW app_sessions_view AS
 SELECT
     app_sessions._id,
     app_sessions._time,
-    app_sessions.netAddress,
+    app_sessions.netId,
     app_sessions.userId,
     app_sessions.action,
     app_sessions.source,
@@ -230,7 +231,7 @@ SELECT
     net_sessions.campaignContent,
     net_sessions.sessionCount
 FROM app_sessions
-LEFT JOIN net_sessions ON net_sessions.netAddress=app_sessions.netAddress;
+LEFT JOIN net_sessions ON net_sessions.netId=app_sessions.netId;
 
 CREATE TABLE github_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -265,7 +266,7 @@ CREATE INDEX metaoutput_github_projects ON github_projects(project);
 CREATE TABLE watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netAddress VARCHAR(16) NOT NULL,
+    netId VARCHAR(16) NOT NULL,
     source VARCHAR(128),
     action VARCHAR(64),
     project VARCHAR(128),
@@ -274,13 +275,13 @@ CREATE TABLE watch_sessions(
     message VARCHAR(256)
 );
 
-CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netAddress, source);
+CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netId, source);
 
 CREATE VIEW watch_sessions_view AS
 SELECT
     watch_sessions._id,
     watch_sessions._time,
-    watch_sessions.netAddress,
+    watch_sessions.netId,
     watch_sessions.source,
     watch_sessions.action,
     watch_sessions.project,
@@ -303,7 +304,7 @@ SELECT
     net_sessions.campaignTerm,
     net_sessions.campaignContent
 FROM watch_sessions
-LEFT JOIN net_sessions ON net_sessions.netAddress=watch_sessions.netAddress;
+LEFT JOIN net_sessions ON net_sessions.netId=watch_sessions.netId;
 # #############################################################################
 # #############################################################################
 

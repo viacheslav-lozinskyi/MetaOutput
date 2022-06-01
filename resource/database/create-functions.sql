@@ -44,10 +44,10 @@ BEGIN
     DELETE FROM net_realtime WHERE __time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
     IF (ISNULL(__time)) THEN
-        INSERT INTO net_realtime(netAddress, source, value1, value2, value3)
+        INSERT INTO net_realtime(netId, source, value1, value2, value3)
         VALUE (__netId, __source, __value1, __value2, __value3);
     ELSE
-        INSERT INTO net_realtime(_time, netAddress, source, value1, value2, value3)
+        INSERT INTO net_realtime(_time, netId, source, value1, value2, value3)
         VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __value1, __value2, __value3);
     END IF;
 END;%%
@@ -76,7 +76,7 @@ CREATE PROCEDURE net_session_register(
     IN __campaignTerm VARCHAR(128),
     IN __campaignContent VARCHAR(128))
 BEGIN
-    SET @_isFound = EXISTS(SELECT _id FROM net_sessions WHERE netAddress = __netId);
+    SET @_isFound = EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId);
 
     IF (NOT ISNULL(__browser)) THEN
         SET __browser = REPLACE(__browser, "/", " ");
@@ -87,68 +87,68 @@ BEGIN
     END IF;
 
     IF (NOT @_isFound) THEN
-        INSERT INTO net_sessions (netAddress, country, city, coordinates, organization, browser, os, resolution, language, ref)
+        INSERT INTO net_sessions (netId, country, city, coordinates, organization, browser, os, resolution, language, ref)
         VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref);
     END IF;
 
     IF (NOT ISNULL(__time)) THEN
-        UPDATE net_sessions SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i") WHERE netAddress = __netId;
+        UPDATE net_sessions SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i") WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__country)) THEN
-        UPDATE net_sessions SET country = __country WHERE netAddress = __netId;
+        UPDATE net_sessions SET country = __country WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__city)) THEN
-        UPDATE net_sessions SET city = __city WHERE netAddress = __netId;
+        UPDATE net_sessions SET city = __city WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__coordinates)) THEN
-        UPDATE net_sessions SET coordinates = __coordinates WHERE netAddress = __netId;
+        UPDATE net_sessions SET coordinates = __coordinates WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__organization)) THEN
-        UPDATE net_sessions SET organization = __organization WHERE netAddress = __netId;
+        UPDATE net_sessions SET organization = __organization WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__browser)) THEN
-        UPDATE net_sessions SET browser = __browser WHERE netAddress = __netId;
+        UPDATE net_sessions SET browser = __browser WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__os)) THEN
-        UPDATE net_sessions SET os = __os WHERE netAddress = __netId;
+        UPDATE net_sessions SET os = __os WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__resolution)) THEN
-        UPDATE net_sessions SET resolution = __resolution WHERE netAddress = __netId;
+        UPDATE net_sessions SET resolution = __resolution WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__language)) THEN
-        UPDATE net_sessions SET language = __language WHERE netAddress = __netId;
+        UPDATE net_sessions SET language = __language WHERE netId = __netId;
     END IF;
 
     IF (@_isFound AND NOT ISNULL(__ref)) THEN
-        UPDATE net_sessions SET ref = __ref WHERE (netAddress = __netId) AND ISNULL(ref);
+        UPDATE net_sessions SET ref = __ref WHERE (netId = __netId) AND ISNULL(ref);
     END IF;
 
     IF (NOT ISNULL(__campaignName)) THEN
         IF (NOT ISNULL(__campaignSource)) THEN
-            UPDATE net_sessions SET campaignSource = LOWER(__campaignSource) WHERE (netAddress = __netId) AND ISNULL(campaignName) AND ISNULL(campaignSource);
+            UPDATE net_sessions SET campaignSource = LOWER(__campaignSource) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignSource);
         END IF;
 
         IF (NOT ISNULL(__campaignMedium)) THEN
-            UPDATE net_sessions SET campaignMedium = LOWER(__campaignMedium) WHERE (netAddress = __netId) AND ISNULL(campaignName) AND ISNULL(campaignMedium);
+            UPDATE net_sessions SET campaignMedium = LOWER(__campaignMedium) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignMedium);
         END IF;
 
         IF (NOT ISNULL(__campaignTerm)) THEN
-            UPDATE net_sessions SET campaignTerm = LOWER(__campaignTerm) WHERE (netAddress = __netId) AND ISNULL(campaignName) AND ISNULL(campaignTerm);
+            UPDATE net_sessions SET campaignTerm = LOWER(__campaignTerm) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignTerm);
         END IF;
 
         IF (NOT ISNULL(__campaignContent)) THEN
-            UPDATE net_sessions SET campaignContent = LOWER(__campaignContent) WHERE (netAddress = __netId) AND ISNULL(campaignName) AND ISNULL(campaignContent);
+            UPDATE net_sessions SET campaignContent = LOWER(__campaignContent) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignContent);
         END IF;
 
-        UPDATE net_sessions SET campaignName = LOWER(__campaignName) WHERE (netAddress = __netId) AND ISNULL(campaignName);
+        UPDATE net_sessions SET campaignName = LOWER(__campaignName) WHERE (netId = __netId) AND ISNULL(campaignName);
     END IF;
 END;%%
 DELIMITER ;
@@ -167,10 +167,10 @@ CREATE PROCEDURE net_trace_register(
     IN __message VARCHAR(1024))
 BEGIN
     IF (ISNULL(__time)) THEN
-        INSERT INTO net_traces (netAddress, source, project, action, message)
+        INSERT INTO net_traces (netId, source, project, action, message)
         VALUE (__netId, __source, __project, UPPER(__action), __message);
     ELSE
-        INSERT INTO net_traces (_time, netAddress, source, project, action, message)
+        INSERT INTO net_traces (_time, netId, source, project, action, message)
         VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, UPPER(__action), __message);
     END IF;
 
@@ -209,17 +209,17 @@ BEGIN
 
         IF ((@__action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
             IF (ISNULL(__time)) THEN
-                INSERT INTO app_sessions (netAddress, userId, action, source, project)
+                INSERT INTO app_sessions (netId, userId, action, source, project)
                 VALUE (__netId, __userId, @__action, __source, __project);
             ELSE
-                INSERT INTO app_sessions (_time, netAddress, userId, action, source, project)
+                INSERT INTO app_sessions (_time, netId, userId, action, source, project)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, @__action, __source, __project);
             END IF;
 
             CALL net_realtime_register(__time, __netId, "APPLICATION", __source, __project, NULL);
         END IF;
 
-        SELECT MAX(sessionCount) FROM net_sessions WHERE (netAddress = __netId) OR (userId = __userId) INTO @_maxSession;
+        SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_maxSession;
         IF (ISNULL(@_maxSession)) THEN
             SET @_maxSession = 1;
         END IF;
@@ -227,8 +227,8 @@ BEGIN
             SET __sessionCount = @_maxSession + 1;
         END IF;
 
-        UPDATE net_sessions SET userId = __userId WHERE netAddress = __netId;
-        UPDATE net_sessions SET sessionCount = __sessionCount WHERE (netAddress = __netId) OR (userId = __userId);
+        UPDATE net_sessions SET userId = __userId WHERE netId = __netId;
+        UPDATE net_sessions SET sessionCount = __sessionCount WHERE (netId = __netId) OR (userId = __userId);
     END IF;
 END;%%
 DELIMITER ;
@@ -385,7 +385,7 @@ CREATE PROCEDURE watch_session_register(
     IN __message VARCHAR(256))
 BEGIN
     SET @isFound =
-        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netAddress = __netId) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
+        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
         (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1));
 
     IF (@isFound AND ISNULL(__project)) THEN
@@ -417,10 +417,10 @@ BEGIN
         SET __action = UPPER(__action);
 
         IF (ISNULL(__time)) THEN
-            INSERT INTO watch_sessions (netAddress, source, project, action, user, url, message)
+            INSERT INTO watch_sessions (netId, source, project, action, user, url, message)
             VALUE (__netId, __source, __project, __action, __user, __url, __message);
         ELSE
-            INSERT INTO watch_sessions (_time, netAddress, source, project, action, user, url, message)
+            INSERT INTO watch_sessions (_time, netId, source, project, action, user, url, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __url, __message);
         END IF;
 
@@ -490,7 +490,7 @@ SELECT * FROM app_sessions_view LIMIT 50000;
 SELECT * FROM watch_sessions LIMIT 50000;
 SELECT * FROM watch_sessions_view LIMIT 50000;
 SELECT * FROM github_sessions LIMIT 50000;
-SELECT * FROM github__projects LIMIT 50000;
+SELECT * FROM github_projects LIMIT 50000;
 
 SET PROFILING = 0;
 #SET GLOBAL MAX_CONNECTIONS = 200;
