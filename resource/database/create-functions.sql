@@ -43,9 +43,6 @@ CREATE PROCEDURE net_realtime_register(
 BEGIN
     DELETE FROM net_realtime WHERE __time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-    INSERT INTO net_realtime(netAddress, source, value1, value2, value3)
-    VALUE (__netId, __source, __value1, __value2, __value3);
-
     IF (ISNULL(__time)) THEN
         INSERT INTO net_realtime(netAddress, source, value1, value2, value3)
         VALUE (__netId, __source, __value1, __value2, __value3);
