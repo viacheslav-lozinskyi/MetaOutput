@@ -322,7 +322,7 @@ BEGIN
         VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __country, __city, UPPER(__event), UPPER(__action), __project, __branch, __user, __avatar, __url, __message);
     END IF;
 
-    CALL net_realtime_register(__time, "GITHUB", __event, __action, __project);
+    CALL net_realtime_register(__time, null, "GITHUB", __event, __action, __project);
 END;%%
 DELIMITER ;
 # #############################################################################
