@@ -167,8 +167,14 @@ CREATE PROCEDURE net_trace_register(
     IN __message VARCHAR(1024))
 BEGIN
     IF (ISNULL(__time)) THEN
-        INSERT INTO net_traces (netId, source, project, action, message)
-        VALUE (__netId, __source, __project, UPPER(__action), __message);
+        IF (EXISTS(SELECT _id FROM net_traces WHERE (DATE(_time) = CURRENT_DATE) AND (netId = __netId) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) LIMIT 1)) THEN
+            UPDATE net_traces
+            SET _time = CURRENT_TIME, eventCount = eventCount + 1
+            WHERE (DATE(_time) = CURRENT_DATE) AND (netId = __netId) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message);
+        ELSE
+            INSERT INTO net_traces (netId, source, project, action, message)
+            VALUE (__netId, __source, __project, UPPER(__action), __message);
+        END IF;
     ELSE
         INSERT INTO net_traces (_time, netId, source, project, action, message)
         VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, UPPER(__action), __message);

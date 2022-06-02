@@ -33,11 +33,11 @@ SET character_set_results = "UTF8MB4";
 #DROP TABLE IF EXISTS github_projects;
 #DROP TABLE IF EXISTS watch_sessions;
 
-#DROP VIEW IF EXISTS net_traces_view;
-#DROP VIEW IF EXISTS net_realtime_view;
-#DROP VIEW IF EXISTS review_sessions_view;
-#DROP VIEW IF EXISTS app_sessions_view;
-#DROP VIEW IF EXISTS watch_sessions_view;
+DROP VIEW IF EXISTS net_traces_view;
+DROP VIEW IF EXISTS net_realtime_view;
+DROP VIEW IF EXISTS review_sessions_view;
+DROP VIEW IF EXISTS app_sessions_view;
+DROP VIEW IF EXISTS watch_sessions_view;
 # #############################################################################
 # #############################################################################
 
@@ -134,8 +134,11 @@ CREATE TABLE net_traces(
     source VARCHAR(128),
     project VARCHAR(128),
     action VARCHAR(32),
-    message VARCHAR(1024)
+    message VARCHAR(1024),
+    eventCount INTEGER DEFAULT 1
 );
+
+CREATE INDEX metaoutput_net_traces ON net_traces(netId, _time);
 
 CREATE VIEW net_traces_view AS
 SELECT
@@ -161,7 +164,7 @@ SELECT
     net_sessions.campaignMedium,
     net_sessions.campaignTerm,
     net_sessions.campaignContent,
-    net_sessions.sessionCount
+    net_traces.eventCount
 FROM net_traces
 LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
 
