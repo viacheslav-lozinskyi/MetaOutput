@@ -198,43 +198,54 @@ CREATE PROCEDURE app_session_register(
     IN __sessionCount INTEGER)
 BEGIN
     IF (NOT ISNULL(__userId)) THEN
-        SET @__action = "START";
+        SET @_action = "START";
         SET @_maxSession = 0;
 
         IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
             SET __sessionCount = 1;
         END IF;
 
-        IF (EXISTS(SELECT _id FROM app_sessions WHERE userId = __userId LIMIT 1)) THEN
-            IF (NOT EXISTS(SELECT * FROM (SELECT * FROM app_sessions WHERE userId = __userId ORDER BY _id DESC LIMIT 1) AS context WHERE context.project = __project)) THEN
-                SET @__action = "UPDATE";
+        IF (ISNULL(__time)) THEN
+            IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN            
+                IF (EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) LIMIT 1)) THEN
+                    IF (NOT EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project = __project))) THEN
+                        SET @_action = "UPDATE";
+                    END IF;
+                ELSE
+                    SET @_action = "INSTALL";
+                END IF;
+                
+                SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_maxSession;
+                IF (ISNULL(@_maxSession)) THEN
+                    SET @_maxSession = 1;
+                END IF;
+                IF (__sessionCount < @_maxSession) THEN
+                    SET __sessionCount = @_maxSession + 1;
+                END IF;
+
+                INSERT INTO app_sessions (netId, userId, action, source, project)
+                VALUE (__netId, __userId, @_action, __source, __project);
+
+                UPDATE net_sessions SET userId = __userId WHERE (netId = __netId);
+                UPDATE net_sessions SET sessionCount = __sessionCount WHERE (userId = __userId);
+
+                CALL net_realtime_register(__time, __netId, "APPLICATION", __source, __project, NULL);
             END IF;
         ELSE
-            SET @__action = "INSTALL";
-        END IF;
-
-        IF ((@__action != "START") OR NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
-            IF (ISNULL(__time)) THEN
-                INSERT INTO app_sessions (netId, userId, action, source, project)
-                VALUE (__netId, __userId, @__action, __source, __project);
-            ELSE
-                INSERT INTO app_sessions (_time, netId, userId, action, source, project)
-                VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, @__action, __source, __project);
+            IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
+                IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) LIMIT 1)) THEN
+                    SET @_action = "INSTALL";
+                    UPDATE net_sessions SET action = "START" WHERE (userId = __userId) AND (action = "INSTALL");
+                END IF;
+                
+                IF (NOT EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project = __project))) THEN
+                    SET @_action = "UPDATE";
+                END IF;
+                
+                INSERT INTO app_sessions (_time, netId, userId, action, source, project, sessionCount)
+                VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, @_action, __source, __project, __sessionCount);
             END IF;
-
-            CALL net_realtime_register(__time, __netId, "APPLICATION", __source, __project, NULL);
         END IF;
-
-        SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_maxSession;
-        IF (ISNULL(@_maxSession)) THEN
-            SET @_maxSession = 1;
-        END IF;
-        IF (__sessionCount < @_maxSession) THEN
-            SET __sessionCount = @_maxSession + 1;
-        END IF;
-
-        UPDATE net_sessions SET userId = __userId WHERE netId = __netId;
-        UPDATE net_sessions SET sessionCount = __sessionCount WHERE (netId = __netId) OR (userId = __userId);
     END IF;
 END;%%
 DELIMITER ;
@@ -258,24 +269,24 @@ CREATE PROCEDURE review_session_register(
     IN __message VARCHAR(1024))
 BEGIN
     IF (NOT ISNULL(__user) AND NOT ISNULL(__source) AND NOT ISNULL(__project)) THEN
-        SET @_context1 = __rating;
+        SET @_context = __rating;
         SET __action = UPPER(__action);
 
         IF (NOT ISNULL(__rating)) THEN
             SET __rating = 1;
-            IF (@_context1 >= 1) THEN
+            IF (@_context >= 1) THEN
                 SET __rating = 1;
             END IF;
-            IF (@_context1 >= 2) THEN
+            IF (@_context >= 2) THEN
                 SET __rating = 2;
             END IF;
-            IF (@_context1 >= 3) THEN
+            IF (@_context >= 3) THEN
                 SET __rating = 3;
             END IF;
-            IF (@_context1 >= 4) THEN
+            IF (@_context >= 4) THEN
                 SET __rating = 4;
             END IF;
-            IF (@_context1 >= 5) THEN
+            IF (@_context >= 5) THEN
                 SET __rating = 5;
             END IF;
         END IF;
@@ -331,10 +342,10 @@ DELIMITER ;
 # #############################################################################
 
 # #############################################################################
-DROP PROCEDURE IF EXISTS github__project_register;
+DROP PROCEDURE IF EXISTS github_project_register;
 
 DELIMITER %%
-CREATE PROCEDURE github__project_register(
+CREATE PROCEDURE github_project_register(
     IN __project VARCHAR(128),
     IN __owner VARCHAR(128),
     IN __url VARCHAR(256),
