@@ -209,7 +209,7 @@ CREATE TABLE app_sessions(
     project VARCHAR(128) NOT NULL
 );
 
-CREATE INDEX metaoutput_app_sessions ON app_sessions(netId, userId);
+CREATE INDEX metaoutput_app_sessions ON app_sessions(netId, userId, action);
 
 CREATE VIEW app_sessions_view AS
 SELECT

@@ -205,6 +205,13 @@ BEGIN
             SET __sessionCount = 1;
         END IF;
 
+        SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_maxSession;
+        IF (ISNULL(@_maxSession)) THEN
+            SET @_maxSession = 1;
+        END IF;
+
+        SET SQL_SAFE_UPDATES = 0;
+        
         IF (ISNULL(__time)) THEN
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN            
                 IF (EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) LIMIT 1)) THEN
@@ -214,11 +221,7 @@ BEGIN
                 ELSE
                     SET @_action = "INSTALL";
                 END IF;
-                
-                SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_maxSession;
-                IF (ISNULL(@_maxSession)) THEN
-                    SET @_maxSession = 1;
-                END IF;
+
                 IF (__sessionCount < @_maxSession) THEN
                     SET __sessionCount = @_maxSession + 1;
                 END IF;
@@ -235,17 +238,26 @@ BEGIN
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
                 IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) LIMIT 1)) THEN
                     SET @_action = "INSTALL";
-                    UPDATE net_sessions SET action = "START" WHERE (userId = __userId) AND (action = "INSTALL");
+                    UPDATE app_sessions SET action = "START" WHERE (userId = __userId) AND (action = "INSTALL");
                 END IF;
-                
-                IF (NOT EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project = __project))) THEN
+
+                IF (EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project != __project))) THEN
                     SET @_action = "UPDATE";
+                    UPDATE app_sessions SET action = "START" WHERE (userId = __userId) AND (project = __project);
                 END IF;
+
+                IF (__sessionCount < @_maxSession) THEN
+                    SET __sessionCount = @_maxSession;
+                END IF;
+
+                INSERT INTO app_sessions (_time, netId, userId, action, source, project)
+                VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, @_action, __source, __project);
                 
-                INSERT INTO app_sessions (_time, netId, userId, action, source, project, sessionCount)
-                VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, @_action, __source, __project, __sessionCount);
+                UPDATE net_sessions SET sessionCount = __sessionCount WHERE (userId = __userId);
             END IF;
         END IF;
+
+        SET SQL_SAFE_UPDATES = 1;
     END IF;
 END;%%
 DELIMITER ;
