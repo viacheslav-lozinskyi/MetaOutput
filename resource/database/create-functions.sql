@@ -91,60 +91,60 @@ BEGIN
         VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref);
     END IF;
 
-    IF (NOT ISNULL(__time)) THEN
+    IF (NOT ISNULL(__time) AND (__time != "")) THEN
         UPDATE net_sessions SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i") WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__country)) THEN
+    IF (@_isFound AND NOT ISNULL(__country) AND (__country != "")) THEN
         UPDATE net_sessions SET country = __country WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__city)) THEN
+    IF (@_isFound AND NOT ISNULL(__city) AND (__city != "")) THEN
         UPDATE net_sessions SET city = __city WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__coordinates)) THEN
+    IF (@_isFound AND NOT ISNULL(__coordinates) AND (__coordinates != "")) THEN
         UPDATE net_sessions SET coordinates = __coordinates WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__organization)) THEN
+    IF (@_isFound AND NOT ISNULL(__organization) AND (__organization != "")) THEN
         UPDATE net_sessions SET organization = __organization WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__browser)) THEN
+    IF (@_isFound AND NOT ISNULL(__browser) AND (__browser != "")) THEN
         UPDATE net_sessions SET browser = __browser WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__os)) THEN
+    IF (@_isFound AND NOT ISNULL(__os) AND (__os != "")) THEN
         UPDATE net_sessions SET os = __os WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__resolution)) THEN
+    IF (@_isFound AND NOT ISNULL(__resolution) AND (__resolution != "")) THEN
         UPDATE net_sessions SET resolution = __resolution WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__language)) THEN
+    IF (@_isFound AND NOT ISNULL(__language) AND (__language != "")) THEN
         UPDATE net_sessions SET language = __language WHERE netId = __netId;
     END IF;
 
-    IF (@_isFound AND NOT ISNULL(__ref)) THEN
+    IF (@_isFound AND NOT ISNULL(__ref) AND (__ref != "")) THEN
         UPDATE net_sessions SET ref = __ref WHERE (netId = __netId) AND ISNULL(ref);
     END IF;
 
-    IF (NOT ISNULL(__campaignName)) THEN
-        IF (NOT ISNULL(__campaignSource)) THEN
+    IF (NOT ISNULL(__campaignName) AND (__campaignName != "")) THEN
+        IF (NOT ISNULL(__campaignSource) AND (__campaignSource != "")) THEN
             UPDATE net_sessions SET campaignSource = LOWER(__campaignSource) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignSource);
         END IF;
 
-        IF (NOT ISNULL(__campaignMedium)) THEN
+        IF (NOT ISNULL(__campaignMedium) AND (__campaignMedium != "")) THEN
             UPDATE net_sessions SET campaignMedium = LOWER(__campaignMedium) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignMedium);
         END IF;
 
-        IF (NOT ISNULL(__campaignTerm)) THEN
+        IF (NOT ISNULL(__campaignTerm) AND (__campaignTerm != "")) THEN
             UPDATE net_sessions SET campaignTerm = LOWER(__campaignTerm) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignTerm);
         END IF;
 
-        IF (NOT ISNULL(__campaignContent)) THEN
+        IF (NOT ISNULL(__campaignContent) AND (__campaignContent != "")) THEN
             UPDATE net_sessions SET campaignContent = LOWER(__campaignContent) WHERE (netId = __netId) AND ISNULL(campaignName) AND ISNULL(campaignContent);
         END IF;
 
@@ -211,9 +211,9 @@ BEGIN
         END IF;
 
         SET SQL_SAFE_UPDATES = 0;
-        
+
         IF (ISNULL(__time)) THEN
-            IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN            
+            IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
                 IF (EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) LIMIT 1)) THEN
                     IF (NOT EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project = __project))) THEN
                         SET @_action = "UPDATE";
@@ -252,7 +252,7 @@ BEGIN
 
                 INSERT INTO app_sessions (_time, netId, userId, action, source, project)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, @_action, __source, __project);
-                
+
                 UPDATE net_sessions SET sessionCount = __sessionCount WHERE (userId = __userId);
             END IF;
         END IF;
