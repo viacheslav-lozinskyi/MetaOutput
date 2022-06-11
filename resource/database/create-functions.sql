@@ -120,7 +120,7 @@ BEGIN
     IF (NOT ISNULL(__campaignName) AND (__campaignName = "")) THEN
         SET __campaignName = null;
     END IF;
-    
+
     IF (NOT ISNULL(__campaignSource) AND (__campaignSource = "")) THEN
         SET __campaignSource = null;
     END IF;
@@ -137,7 +137,7 @@ BEGIN
         SET __campaignContent = null;
     END IF;
 
-    IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId)) THEN
+    IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
         INSERT INTO net_sessions (netId, country, city, coordinates, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
         VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref, __campaignName, __campaignSource, __campaignMedium, __campaignTerm, __campaignContent);
     ELSE
@@ -186,16 +186,16 @@ BEGIN
         ELSE
             UPDATE net_sessions
             SET
-				country = __country,
-				city = __city,
-				coordinates = __coordinates,
-				organization = __organization,
-				os = __os,
-				resolution = __resolution,
-			    language = __language
+                country = __country,
+                city = __city,
+                coordinates = __coordinates,
+                organization = __organization,
+                os = __os,
+                resolution = __resolution,
+                language = __language
             WHERE netId = __netId;
         END IF;
-        
+
         IF (NOT ISNULL(__browser)) THEN
             UPDATE net_sessions
             SET browser = __browser
@@ -267,7 +267,7 @@ BEGIN
         IF (ISNULL(@_maxSession)) THEN
             SET @_maxSession = 1;
         END IF;
-        
+
         IF (NOT ISNULL(__time) AND (__time = "")) THEN
             SET __time = null;
         END IF;
@@ -294,7 +294,7 @@ BEGIN
                 UPDATE net_sessions
                 SET userId = __userId
                 WHERE (netId = __netId);
-                
+
                 UPDATE net_sessions
                 SET sessionCount = __sessionCount
                 WHERE (userId = __userId);
@@ -435,7 +435,7 @@ CREATE PROCEDURE github_project_register(
     IN __forkCount INTEGER,
     IN __issueCount INTEGER)
 BEGIN
-    SET @_isFound = EXISTS(SELECT _id FROM github__projects WHERE project = __project);
+    SET @_isFound = EXISTS(SELECT _id FROM github__projects WHERE project = __project LIMIT 1);
 
     IF (NOT @_isFound) THEN
         INSERT INTO github__projects (project, owner, url, starCount, watchCount, forkCount, issueCount)
@@ -549,9 +549,13 @@ CREATE PROCEDURE service_cleanup_debug(
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
     IF ISNULL(__daysIgnore) THEN
+        DELETE FROM net_sessions WHERE (userId LIKE "TEST-%") OR (netId = "54.86.50.139");
         DELETE FROM app_sessions WHERE (userId LIKE "TEST-%");
+        DELETE FROM watch_sessions WHERE (netId = "54.86.50.139");
     ELSE
-        DELETE FROM app_sessions WHERE (userId LIKE "TEST-%") AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM net_sessions WHERE ((userId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM app_sessions WHERE ((userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM watch_sessions WHERE ((netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
     SET SQL_SAFE_UPDATES = 1;
 END;%%
