@@ -257,22 +257,23 @@ CREATE PROCEDURE app_session_register(
     IN __sessionCount INTEGER)
 BEGIN
     IF (NOT ISNULL(__userId)) THEN
-        SET @_maxSession = 0;
+        SET @_context = 0;
+        SET __action = UPPER(__action);
 
         IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
             SET __sessionCount = 1;
         END IF;
 
-        SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_maxSession;
-        IF (ISNULL(@_maxSession)) THEN
-            SET @_maxSession = 1;
+        SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_context;
+        IF (ISNULL(@_context)) THEN
+            SET @_context = 1;
         END IF;
 
         IF (ISNULL(__action) OR (__action = "")) THEN
             SET __action = "START";
         END IF;
 
-        IF (__action != "START") THEN
+        IF ((__action != "START") AND (__action != "UNINSTALL")) THEN
             SET __sessionCount = null;
         END IF;
 
@@ -292,10 +293,6 @@ BEGIN
                     ELSE
                         SET __action = "INSTALL";
                     END IF;
-
-                    IF (__sessionCount < @_maxSession) THEN
-                        SET __sessionCount = @_maxSession + 1;
-                    END IF;
                 END IF;
 
                 INSERT INTO app_sessions (netId, userId, action, source, project)
@@ -305,9 +302,15 @@ BEGIN
                 SET userId = __userId
                 WHERE (netId = __netId);
 
-                UPDATE net_sessions
-                SET sessionCount = __sessionCount
-                WHERE (userId = __userId);
+                IF (NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
+                    SET __sessionCount = @_context + 1;
+                END IF;
+
+                IF (NOT ISNULL(__sessionCount)) THEN
+                    UPDATE net_sessions
+                    SET sessionCount = __sessionCount
+                    WHERE (userId = __userId);
+                END IF;
 
                 CALL net_realtime_register(__time, __netId, "APPLICATION", __source, __project, NULL);
             END IF;
@@ -323,18 +326,20 @@ BEGIN
                         SET __action = "UPDATE";
                         UPDATE app_sessions SET action = "START" WHERE (userId = __userId) AND (project = __project);
                     END IF;
-
-                    IF (__sessionCount < @_maxSession) THEN
-                        SET __sessionCount = @_maxSession;
-                    END IF;
                 END IF;
 
                 INSERT INTO app_sessions (_time, netId, userId, action, source, project)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, __action, __source, __project);
 
-                UPDATE net_sessions
-                SET sessionCount = __sessionCount
-                WHERE (userId = __userId);
+                IF (NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
+                    SET __sessionCount = @_context;
+                END IF;
+
+                IF (NOT ISNULL(__sessionCount)) THEN
+                    UPDATE net_sessions
+                    SET sessionCount = __sessionCount
+                    WHERE (userId = __userId);
+                END IF;
             END IF;
         END IF;
 
