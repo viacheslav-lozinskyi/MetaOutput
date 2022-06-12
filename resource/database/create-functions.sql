@@ -417,7 +417,6 @@ CREATE PROCEDURE github_session_register(
     IN __time VARCHAR(32),
     IN __country VARCHAR(64),
     IN __city VARCHAR(64),
-    IN __event VARCHAR(64),
     IN __action VARCHAR(64),
     IN __project VARCHAR(128),
     IN __branch VARCHAR(128),
@@ -426,15 +425,17 @@ CREATE PROCEDURE github_session_register(
     IN __url VARCHAR(256),
     IN __message VARCHAR(1024))
 BEGIN
+    SET __action = UPPER(__action);
+    
     IF (ISNULL(__time)) THEN
-        INSERT INTO github_sessions (country, city, event, action, project, branch, user, avatar, url, message)
-        VALUE (__country, __city, UPPER(__event), UPPER(__action), __project, __branch, __user, __avatar, __url, __message);
+        INSERT INTO github_sessions (country, city, action, project, branch, user, avatar, url, message)
+        VALUE (__country, __city, __action, __project, __branch, __user, __avatar, __url, __message);
     ELSE
-        INSERT INTO github_sessions (_time, country, city, event, action, project, branch, user, avatar, url, message)
-        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __country, __city, UPPER(__event), UPPER(__action), __project, __branch, __user, __avatar, __url, __message);
+        INSERT INTO github_sessions (_time, country, city, action, project, branch, user, avatar, url, message)
+        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __country, __city, __action, __project, __branch, __user, __avatar, __url, __message);
     END IF;
 
-    CALL net_realtime_register(__time, null, "GITHUB", __event, __action, __project);
+    CALL net_realtime_register(__time, null, "GITHUB", __action, __project, __branch);
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -452,47 +453,45 @@ CREATE PROCEDURE github_project_register(
     IN __forkCount INTEGER,
     IN __issueCount INTEGER)
 BEGIN
-    SET @_isFound = EXISTS(SELECT _id FROM github__projects WHERE project = __project LIMIT 1);
-
-    IF (NOT @_isFound) THEN
-        INSERT INTO github__projects (project, owner, url, starCount, watchCount, forkCount, issueCount)
+    IF (NOT EXISTS(SELECT _id FROM github_projects WHERE project = __project LIMIT 1)) THEN
+        INSERT INTO github_projects (project, owner, url, starCount, watchCount, forkCount, issueCount)
         VALUE (__project, __owner, __url, __starCount, __watchCount, __forkCount, __issueCount);
-    END IF;
+    ELSE
+        IF (NOT ISNULL(__owner)) THEN
+            UPDATE github_projects
+            SET owner = __owner
+            WHERE project = __project;
+        END IF;
 
-    IF (@_isFound AND NOT ISNULL(__owner)) THEN
-        UPDATE github__projects
-        SET owner = __owner
-        WHERE project = __project;
-    END IF;
+        IF (NOT ISNULL(__url)) THEN
+            UPDATE github_projects
+            SET url = __url
+            WHERE project = __project;
+        END IF;
 
-    IF (@_isFound AND NOT ISNULL(__url)) THEN
-        UPDATE github__projects
-        SET url = __url
-        WHERE project = __project;
-    END IF;
+        IF (NOT ISNULL(__starCount)) THEN
+            UPDATE github_projects
+            SET starCount = __starCount
+            WHERE project = __project;
+        END IF;
 
-    IF (@_isFound AND NOT ISNULL(__starCount)) THEN
-        UPDATE github__projects
-        SET starCount = __starCount
-        WHERE project = __project;
-    END IF;
-
-    IF (@_isFound AND NOT ISNULL(__watchCount)) THEN
-        UPDATE github__projects
-        SET watchCount = __watchCount
-        WHERE project = __project;
-    END IF;
-
-    IF (@_isFound AND NOT ISNULL(__forkCount)) THEN
-        UPDATE github__projects
-        SET forkCount = __forkCount
-        WHERE project = __project;
-    END IF;
-
-    IF (@_isFound AND NOT ISNULL(__issueCount)) THEN
-        UPDATE github__projects
-        SET issueCount = __issueCount
-        WHERE project = __project;
+        IF (NOT ISNULL(__watchCount)) THEN
+            UPDATE github_projects
+            SET watchCount = __watchCount
+            WHERE project = __project;
+        END IF;
+        
+        IF (NOT ISNULL(__forkCount)) THEN
+            UPDATE github_projects
+            SET forkCount = __forkCount
+            WHERE project = __project;
+        END IF;
+        
+        IF (NOT ISNULL(__issueCount)) THEN
+            UPDATE github_projects
+            SET issueCount = __issueCount
+            WHERE project = __project;
+        END IF;
     END IF;
 END;%%
 DELIMITER ;
