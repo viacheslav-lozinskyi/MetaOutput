@@ -319,11 +319,13 @@ BEGIN
                     SET __sessionCount = @_context + 1;
                 END IF;
 
-                IF (NOT ISNULL(__sessionCount)) THEN
-                    UPDATE net_sessions
-                    SET sessionCount = __sessionCount
-                    WHERE (userId = __userId);
+                IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
+                    SET __sessionCount = 1;
                 END IF;
+
+                UPDATE net_sessions
+                SET sessionCount = __sessionCount
+                WHERE (userId = __userId);
 
                 CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, null);
             END IF;
@@ -348,11 +350,13 @@ BEGIN
                     SET __sessionCount = @_context;
                 END IF;
 
-                IF (NOT ISNULL(__sessionCount)) THEN
-                    UPDATE net_sessions
-                    SET sessionCount = __sessionCount
-                    WHERE (userId = __userId);
+                IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
+                    SET __sessionCount = 1;
                 END IF;
+
+                UPDATE net_sessions
+                SET sessionCount = __sessionCount
+                WHERE (userId = __userId);
             END IF;
         END IF;
 
@@ -596,6 +600,25 @@ BEGIN
         DELETE FROM watch_sessions WHERE ((netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
 
+    SET SQL_SAFE_UPDATES = 1;
+END;%%
+DELIMITER ;
+# #############################################################################
+
+# #############################################################################
+DROP PROCEDURE IF EXISTS service_update_session_count;
+
+DELIMITER %%
+CREATE PROCEDURE service_update_session_count(
+    IN __netId VARCHAR(16))
+BEGIN
+    SET SQL_SAFE_UPDATES = 0;
+    SET @__count = 0;
+    SET @__userId = null;
+    SELECT COUNT(*) FROM app_sessions_view WHERE (netId = __netId) INTO @__count;
+    SELECT userId FROM app_sessions_view WHERE (netId = __netId) LIMIT 1 INTO @__userId;
+    UPDATE net_sessions SET sessionCount = @__count WHERE (userId = @__userId);
+    SELECT * FROM app_sessions_view WHERE (userId = @__userId) ORDER BY _time LIMIT 100000;
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
