@@ -275,6 +275,7 @@ CREATE PROCEDURE app_session_register(
 BEGIN
     IF (NOT ISNULL(__userId)) THEN
         SET @_context = 0;
+        SET @_isFound = false;
         SET __action = UPPER(__action);
 
         IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
@@ -293,8 +294,6 @@ BEGIN
         IF (ISNULL(__action) OR (__action = "") OR (__action = "UPDATE") OR (__action = "INSTALL")) THEN
             SET __action = "START";
         END IF;
-
-        SET SQL_SAFE_UPDATES = 0;
 
         IF (ISNULL(__time)) THEN
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = CURRENT_DATE) LIMIT 1)) THEN
@@ -315,9 +314,7 @@ BEGIN
                     SET __sessionCount = @_context + 1;
                 END IF;
 
-                UPDATE net_sessions
-                SET sessionCount = __sessionCount
-                WHERE (userId = __userId);
+                SET @_isFound = true;
 
                 CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, null);
             END IF;
@@ -342,13 +339,23 @@ BEGIN
                     SET __sessionCount = @_context;
                 END IF;
 
-                UPDATE net_sessions
-                SET sessionCount = __sessionCount
-                WHERE (userId = __userId);
+                SET @_isFound = true;
             END IF;
         END IF;
+        
+        IF (@_isFound = true) THEN
+            SET SQL_SAFE_UPDATES = 0;
 
-        SET SQL_SAFE_UPDATES = 1;
+            UPDATE net_sessions
+            SET userId = __userId
+            WHERE (netId = __netId);
+
+            UPDATE net_sessions
+            SET sessionCount = __sessionCount
+            WHERE (userId = __userId);
+
+            SET SQL_SAFE_UPDATES = 1;
+        END IF;
     END IF;
 END;%%
 DELIMITER ;
