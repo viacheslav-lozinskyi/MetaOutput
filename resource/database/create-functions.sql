@@ -313,10 +313,6 @@ BEGIN
                 INSERT INTO app_sessions (netId, userId, action, source, project)
                 VALUE (__netId, __userId, __action, __source, __project);
 
-                UPDATE net_sessions
-                SET userId = __userId
-                WHERE (netId = __netId);
-
                 IF (NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
                     SET __sessionCount = @_context + 1;
                 END IF;
