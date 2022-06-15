@@ -130,7 +130,7 @@ LEFT JOIN net_sessions ON net_sessions.netId=review_sessions.netId;
 CREATE TABLE net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16) NOT NULL,
+    netId VARCHAR(16),
     action VARCHAR(32),
     source VARCHAR(128),
     project VARCHAR(128),
@@ -171,7 +171,7 @@ LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
 CREATE TABLE net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16) NOT NULL,
+    netId VARCHAR(16),
     source VARCHAR(64) NOT NULL,
     value1 VARCHAR(256),
     value2 VARCHAR(256),

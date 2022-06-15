@@ -75,148 +75,150 @@ CREATE PROCEDURE net_session_register(
     IN __campaignTerm VARCHAR(128),
     IN __campaignContent VARCHAR(128))
 BEGIN
-    IF (NOT ISNULL(__browser)) THEN
-        SET __browser = REPLACE(__browser, "/", " ");
-    END IF;
+    IF (NOT ISNULL(__netId)) THEN
+        IF (NOT ISNULL(__browser)) THEN
+            SET __browser = REPLACE(__browser, "/", " ");
+        END IF;
 
-    IF (NOT ISNULL(__os)) THEN
-        SET __os = REPLACE(__os, "Windows NT", "Windows");
-    END IF;
+        IF (NOT ISNULL(__os)) THEN
+            SET __os = REPLACE(__os, "Windows NT", "Windows");
+        END IF;
 
-    IF (NOT ISNULL(__country) AND (__country = "")) THEN
-        SET __country = null;
-    END IF;
+        IF (NOT ISNULL(__country) AND (__country = "")) THEN
+            SET __country = null;
+        END IF;
 
-    IF (NOT ISNULL(__city) AND (__city = "")) THEN
-        SET __city = null;
-    END IF;
+        IF (NOT ISNULL(__city) AND (__city = "")) THEN
+            SET __city = null;
+        END IF;
 
-    IF (NOT ISNULL(__coordinates) AND (__coordinates = "")) THEN
-        SET __coordinates = null;
-    END IF;
+        IF (NOT ISNULL(__coordinates) AND (__coordinates = "")) THEN
+            SET __coordinates = null;
+        END IF;
 
-    IF (NOT ISNULL(__organization) AND (__organization = "")) THEN
-        SET __organization = null;
-    END IF;
+        IF (NOT ISNULL(__organization) AND (__organization = "")) THEN
+            SET __organization = null;
+        END IF;
 
-    IF (NOT ISNULL(__browser) AND (__browser = "")) THEN
-        SET __browser = null;
-    END IF;
+        IF (NOT ISNULL(__browser) AND (__browser = "")) THEN
+            SET __browser = null;
+        END IF;
 
-    IF (NOT ISNULL(__os) AND (__os = "")) THEN
-        SET __os = null;
-    END IF;
+        IF (NOT ISNULL(__os) AND (__os = "")) THEN
+            SET __os = null;
+        END IF;
 
-    IF (NOT ISNULL(__resolution) AND (__resolution = "")) THEN
-        SET __resolution = null;
-    END IF;
+        IF (NOT ISNULL(__resolution) AND (__resolution = "")) THEN
+            SET __resolution = null;
+        END IF;
 
-    IF (NOT ISNULL(__language) AND (__language = "")) THEN
-        SET __language = null;
-    END IF;
+        IF (NOT ISNULL(__language) AND (__language = "")) THEN
+            SET __language = null;
+        END IF;
 
-    IF (NOT ISNULL(__ref) AND (__ref = "")) THEN
-        SET __ref = null;
-    END IF;
+        IF (NOT ISNULL(__ref) AND (__ref = "")) THEN
+            SET __ref = null;
+        END IF;
 
-    IF (NOT ISNULL(__campaignName) AND (__campaignName = "")) THEN
-        SET __campaignName = null;
-    END IF;
+        IF (NOT ISNULL(__campaignName) AND (__campaignName = "")) THEN
+            SET __campaignName = null;
+        END IF;
 
-    IF (NOT ISNULL(__campaignSource) AND (__campaignSource = "")) THEN
-        SET __campaignSource = null;
-    END IF;
+        IF (NOT ISNULL(__campaignSource) AND (__campaignSource = "")) THEN
+            SET __campaignSource = null;
+        END IF;
 
-    IF (NOT ISNULL(__campaignMedium) AND (__campaignMedium = "")) THEN
-        SET __campaignMedium = null;
-    END IF;
+        IF (NOT ISNULL(__campaignMedium) AND (__campaignMedium = "")) THEN
+            SET __campaignMedium = null;
+        END IF;
 
-    IF (NOT ISNULL(__campaignTerm) AND (__campaignTerm = "")) THEN
-        SET __campaignTerm = null;
-    END IF;
+        IF (NOT ISNULL(__campaignTerm) AND (__campaignTerm = "")) THEN
+            SET __campaignTerm = null;
+        END IF;
 
-    IF (NOT ISNULL(__campaignContent) AND (__campaignContent = "")) THEN
-        SET __campaignContent = null;
-    END IF;
+        IF (NOT ISNULL(__campaignContent) AND (__campaignContent = "")) THEN
+            SET __campaignContent = null;
+        END IF;
 
-    IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
-        INSERT INTO net_sessions (netId, country, city, coordinates, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
-        VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
-    ELSE
-        IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__coordinates) OR ISNULL(__organization) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
+        IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
+            INSERT INTO net_sessions (netId, country, city, coordinates, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
+            VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
+        ELSE
+            IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__coordinates) OR ISNULL(__organization) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
+                SET SQL_SAFE_UPDATES = 0;
+
+                IF (NOT ISNULL(__country)) THEN
+                    UPDATE net_sessions
+                    SET country = __country
+                    WHERE netId = __netId;
+                END IF;
+
+                IF (NOT ISNULL(__city)) THEN
+                    UPDATE net_sessions
+                    SET city = __city
+                    WHERE netId = __netId;
+                END IF;
+
+                IF (NOT ISNULL(__coordinates)) THEN
+                    UPDATE net_sessions
+                    SET coordinates = __coordinates
+                    WHERE netId = __netId;
+                END IF;
+
+                IF (NOT ISNULL(__organization)) THEN
+                    UPDATE net_sessions
+                    SET organization = __organization
+                    WHERE netId = __netId;
+                END IF;
+
+                IF (NOT ISNULL(__os)) THEN
+                    UPDATE net_sessions
+                    SET os = __os
+                    WHERE netId = __netId;
+                END IF;
+
+                IF (NOT ISNULL(__resolution)) THEN
+                    UPDATE net_sessions
+                    SET resolution = __resolution
+                    WHERE netId = __netId;
+                END IF;
+
+                IF (NOT ISNULL(__language)) THEN
+                    UPDATE net_sessions
+                    SET language = __language
+                    WHERE netId = __netId;
+                END IF;
+            ELSE
+                UPDATE net_sessions
+                SET
+                    country = __country,
+                    city = __city,
+                    coordinates = __coordinates,
+                    organization = __organization,
+                    os = __os,
+                    resolution = __resolution,
+                    language = __language
+                WHERE netId = __netId;
+            END IF;
+
+            IF (NOT ISNULL(__browser)) THEN
+                UPDATE net_sessions
+                SET browser = __browser
+                WHERE netId = __netId;
+            END IF;
+
+            SET SQL_SAFE_UPDATES = 1;
+        END IF;
+
+        IF (NOT ISNULL(__time) AND (__time != "")) THEN
             SET SQL_SAFE_UPDATES = 0;
 
-            IF (NOT ISNULL(__country)) THEN
-                UPDATE net_sessions
-                SET country = __country
-                WHERE netId = __netId;
-            END IF;
-
-            IF (NOT ISNULL(__city)) THEN
-                UPDATE net_sessions
-                SET city = __city
-                WHERE netId = __netId;
-            END IF;
-
-            IF (NOT ISNULL(__coordinates)) THEN
-                UPDATE net_sessions
-                SET coordinates = __coordinates
-                WHERE netId = __netId;
-            END IF;
-
-            IF (NOT ISNULL(__organization)) THEN
-                UPDATE net_sessions
-                SET organization = __organization
-                WHERE netId = __netId;
-            END IF;
-
-            IF (NOT ISNULL(__os)) THEN
-                UPDATE net_sessions
-                SET os = __os
-                WHERE netId = __netId;
-            END IF;
-
-            IF (NOT ISNULL(__resolution)) THEN
-                UPDATE net_sessions
-                SET resolution = __resolution
-                WHERE netId = __netId;
-            END IF;
-
-            IF (NOT ISNULL(__language)) THEN
-                UPDATE net_sessions
-                SET language = __language
-                WHERE netId = __netId;
-            END IF;
-        ELSE
             UPDATE net_sessions
-            SET
-                country = __country,
-                city = __city,
-                coordinates = __coordinates,
-                organization = __organization,
-                os = __os,
-                resolution = __resolution,
-                language = __language
+            SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i")
             WHERE netId = __netId;
+
+            SET SQL_SAFE_UPDATES = 1;
         END IF;
-
-        IF (NOT ISNULL(__browser)) THEN
-            UPDATE net_sessions
-            SET browser = __browser
-            WHERE netId = __netId;
-        END IF;
-
-        SET SQL_SAFE_UPDATES = 1;
-    END IF;
-
-    IF (NOT ISNULL(__time) AND (__time != "")) THEN
-        SET SQL_SAFE_UPDATES = 0;
-
-        UPDATE net_sessions
-        SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i")
-        WHERE netId = __netId;
-
-        SET SQL_SAFE_UPDATES = 1;
     END IF;
 END;%%
 DELIMITER ;
