@@ -171,27 +171,27 @@ LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
 CREATE TABLE net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16),
+    netId VARCHAR(16) NOT NULL,
     source VARCHAR(64) NOT NULL,
     value1 VARCHAR(256),
     value2 VARCHAR(256),
-    value3 VARCHAR(256)
+    value3 VARCHAR(256),
+    value4 VARCHAR(256)
 );
 
 CREATE INDEX metaoutput_net_realtime ON net_realtime(_time);
 
 CREATE VIEW net_realtime_view AS
 SELECT
-    net_realtime._id,
     net_realtime._time,
     net_realtime.netId,
     net_realtime.source,
     net_realtime.value1,
     net_realtime.value2,
     net_realtime.value3,
+    net_realtime.value4,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.coordinates,
     net_sessions.organization,
     net_sessions.os,
     net_sessions.resolution,

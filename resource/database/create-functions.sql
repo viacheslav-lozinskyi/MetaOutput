@@ -34,19 +34,21 @@ DROP PROCEDURE IF EXISTS net_realtime_register;
 
 DELIMITER %%
 CREATE PROCEDURE net_realtime_register(
-    IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
     IN __source VARCHAR(64),
     IN __value1 VARCHAR(256),
     IN __value2 VARCHAR(256),
-    IN __value3 VARCHAR(256))
+    IN __value3 VARCHAR(256),
+    IN __value4 VARCHAR(256))
 BEGIN
+    SET SQL_SAFE_UPDATES = 0;
+
     DELETE FROM net_realtime WHERE _time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-    IF (ISNULL(__time)) THEN
-        INSERT INTO net_realtime(netId, source, value1, value2, value3)
-        VALUE (__netId, __source, __value1, __value2, __value3);
-    END IF;
+    INSERT INTO net_realtime(netId, source, value1, value2, value3, value4)
+    VALUE (__netId, __source, __value1, __value2, __value3, __value4);
+
+    SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -142,6 +144,8 @@ BEGIN
         VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
     ELSE
         IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__coordinates) OR ISNULL(__organization) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
+            SET SQL_SAFE_UPDATES = 0;
+
             IF (NOT ISNULL(__country)) THEN
                 UPDATE net_sessions
                 SET country = __country
@@ -201,12 +205,18 @@ BEGIN
             SET browser = __browser
             WHERE netId = __netId;
         END IF;
+
+        SET SQL_SAFE_UPDATES = 1;
     END IF;
 
     IF (NOT ISNULL(__time) AND (__time != "")) THEN
+        SET SQL_SAFE_UPDATES = 0;
+
         UPDATE net_sessions
         SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i")
         WHERE netId = __netId;
+
+        SET SQL_SAFE_UPDATES = 1;
     END IF;
 END;%%
 DELIMITER ;
@@ -224,21 +234,26 @@ CREATE PROCEDURE net_trace_register(
     IN __action VARCHAR(32),
     IN __message VARCHAR(1024))
 BEGIN
+    SET __action = UPPER(__action);
     IF (ISNULL(__time)) THEN
-        IF (EXISTS(SELECT _id FROM net_traces WHERE (DATE(_time) = CURRENT_DATE) AND (netId = __netId) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) LIMIT 1)) THEN
+        IF (EXISTS(SELECT _id FROM net_traces WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) LIMIT 1)) THEN
+            SET SQL_SAFE_UPDATES = 0;
+
             UPDATE net_traces
             SET _time = CURRENT_TIME, eventCount = eventCount + 1
-            WHERE (DATE(_time) = CURRENT_DATE) AND (netId = __netId) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message);
+            WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message);
+
+            SET SQL_SAFE_UPDATES = 1;
         ELSE
             INSERT INTO net_traces (netId, source, project, action, message)
-            VALUE (__netId, __source, __project, UPPER(__action), __message);
+            VALUE (__netId, __source, __project, __action, __message);
         END IF;
+
+        CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, __message);
     ELSE
         INSERT INTO net_traces (_time, netId, source, project, action, message)
-        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, UPPER(__action), __message);
+        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __message);
     END IF;
-
-    CALL net_realtime_register(__time, __netId, "TRACE", __source, __project, __action);
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -312,7 +327,7 @@ BEGIN
                     WHERE (userId = __userId);
                 END IF;
 
-                CALL net_realtime_register(__time, __netId, "APPLICATION", __source, __project, NULL);
+                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, null);
             END IF;
         ELSE
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
@@ -393,17 +408,21 @@ BEGIN
             SET __action = "REVIEW";
         END IF;
 
+        SET SQL_SAFE_UPDATES = 0;
+
         DELETE FROM review_sessions WHERE (user = __user) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (url = __url);
+
+        SET SQL_SAFE_UPDATES = 1;
 
         IF (ISNULL(__time)) THEN
             INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (__netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
+
+            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action, __rating);
         ELSE
             INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
         END IF;
-
-        CALL net_realtime_register(__time, __netId, "REVIEW", __source, __project, __rating);
     END IF;
 END;%%
 DELIMITER ;
@@ -426,16 +445,16 @@ CREATE PROCEDURE github_session_register(
     IN __message VARCHAR(1024))
 BEGIN
     SET __action = UPPER(__action);
-    
+
     IF (ISNULL(__time)) THEN
         INSERT INTO github_sessions (country, city, action, project, branch, user, avatar, url, message)
         VALUE (__country, __city, __action, __project, __branch, __user, __avatar, __url, __message);
+
+        CALL net_realtime_register(null, "GITHUB", __project, __branch, __action, __message);
     ELSE
         INSERT INTO github_sessions (_time, country, city, action, project, branch, user, avatar, url, message)
         VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __country, __city, __action, __project, __branch, __user, __avatar, __url, __message);
     END IF;
-
-    CALL net_realtime_register(__time, null, "GITHUB", __action, __project, __branch);
 END;%%
 DELIMITER ;
 # #############################################################################
@@ -457,6 +476,8 @@ BEGIN
         INSERT INTO github_projects (project, owner, url, starCount, watchCount, forkCount, issueCount)
         VALUE (__project, __owner, __url, __starCount, __watchCount, __forkCount, __issueCount);
     ELSE
+        SET SQL_SAFE_UPDATES = 0;
+
         IF (NOT ISNULL(__owner)) THEN
             UPDATE github_projects
             SET owner = __owner
@@ -480,18 +501,20 @@ BEGIN
             SET watchCount = __watchCount
             WHERE project = __project;
         END IF;
-        
+
         IF (NOT ISNULL(__forkCount)) THEN
             UPDATE github_projects
             SET forkCount = __forkCount
             WHERE project = __project;
         END IF;
-        
+
         IF (NOT ISNULL(__issueCount)) THEN
             UPDATE github_projects
             SET issueCount = __issueCount
             WHERE project = __project;
         END IF;
+
+        SET SQL_SAFE_UPDATES = 1;
     END IF;
 END;%%
 DELIMITER ;
@@ -545,12 +568,12 @@ BEGIN
         IF (ISNULL(__time)) THEN
             INSERT INTO watch_sessions (netId, source, project, action, user, url, message)
             VALUE (__netId, __source, __project, __action, __user, __url, __message);
+
+            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __message);
         ELSE
             INSERT INTO watch_sessions (_time, netId, source, project, action, user, url, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __url, __message);
         END IF;
-
-        CALL net_realtime_register(__time, __netId, "WATCH", __source, __project, __action);
     END IF;
 END;%%
 DELIMITER ;
@@ -564,6 +587,7 @@ CREATE PROCEDURE service_cleanup_debug(
     IN __daysIgnore INTEGER)
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
+
     IF ISNULL(__daysIgnore) THEN
         DELETE FROM net_sessions WHERE (userId LIKE "TEST-%") OR (netId = "54.86.50.139");
         DELETE FROM app_sessions WHERE (userId LIKE "TEST-%");
@@ -573,6 +597,7 @@ BEGIN
         DELETE FROM app_sessions WHERE ((userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
         DELETE FROM watch_sessions WHERE ((netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
+
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
@@ -609,18 +634,18 @@ CALL net_filter_register("URL", "%&suppressbi=true%");
 SET PROFILING_HISTORY_SIZE = 100;
 SET PROFILING = 1;
 
-SELECT * FROM net_filters LIMIT 50000;
-SELECT * FROM net_traces LIMIT 50000;
-SELECT * FROM net_traces_view LIMIT 50000;
-SELECT * FROM net_realtime LIMIT 50000;
-SELECT * FROM net_realtime_view LIMIT 50000;
-SELECT * FROM net_sessions LIMIT 50000;
-SELECT * FROM app_sessions LIMIT 50000;
-SELECT * FROM app_sessions_view LIMIT 50000;
-SELECT * FROM watch_sessions LIMIT 50000;
-SELECT * FROM watch_sessions_view LIMIT 50000;
-SELECT * FROM github_sessions LIMIT 50000;
-SELECT * FROM github_projects LIMIT 50000;
+#SELECT * FROM net_filters LIMIT 50000;
+#SELECT * FROM net_traces LIMIT 50000;
+#SELECT * FROM net_traces_view LIMIT 50000;
+#SELECT * FROM net_realtime LIMIT 50000;
+#SELECT * FROM net_realtime_view LIMIT 50000;
+#SELECT * FROM net_sessions LIMIT 50000;
+#SELECT * FROM app_sessions LIMIT 50000;
+#SELECT * FROM app_sessions_view LIMIT 50000;
+#SELECT * FROM watch_sessions LIMIT 50000;
+#SELECT * FROM watch_sessions_view LIMIT 50000;
+#SELECT * FROM github_sessions LIMIT 50000;
+#SELECT * FROM github_projects LIMIT 50000;
 
 SET PROFILING = 0;
 #SET GLOBAL MAX_CONNECTIONS = 200;
