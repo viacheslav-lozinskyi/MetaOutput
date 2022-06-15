@@ -286,16 +286,12 @@ BEGIN
             SET @_context = 1;
         END IF;
 
-        IF (ISNULL(__action) OR (__action = "")) THEN
-            SET __action = "START";
-        END IF;
-
-        IF ((__action != "START") AND (__action != "UNINSTALL")) THEN
-            SET __sessionCount = null;
-        END IF;
-
         IF (NOT ISNULL(__time) AND (__time = "")) THEN
             SET __time = null;
+        END IF;
+
+        IF (ISNULL(__action) OR (__action = "") OR (__action = "UPDATE") OR (__action = "INSTALL")) THEN
+            SET __action = "START";
         END IF;
 
         SET SQL_SAFE_UPDATES = 0;
@@ -315,12 +311,8 @@ BEGIN
                 INSERT INTO app_sessions (netId, userId, action, source, project)
                 VALUE (__netId, __userId, __action, __source, __project);
 
-                IF (NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
+                IF (NOT ISNULL(@_context) AND NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
                     SET __sessionCount = @_context + 1;
-                END IF;
-
-                IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
-                    SET __sessionCount = 1;
                 END IF;
 
                 UPDATE net_sessions
@@ -346,12 +338,8 @@ BEGIN
                 INSERT INTO app_sessions (_time, netId, userId, action, source, project)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, __action, __source, __project);
 
-                IF (NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
+                IF (NOT ISNULL(@_context) AND NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
                     SET __sessionCount = @_context;
-                END IF;
-
-                IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
-                    SET __sessionCount = 1;
                 END IF;
 
                 UPDATE net_sessions
@@ -610,15 +598,12 @@ DROP PROCEDURE IF EXISTS service_update_session_count;
 
 DELIMITER %%
 CREATE PROCEDURE service_update_session_count(
-    IN __netId VARCHAR(16))
+    IN __userId varchar(64))
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
     SET @__count = 0;
-    SET @__userId = null;
-    SELECT COUNT(*) FROM app_sessions_view WHERE (netId = __netId) INTO @__count;
-    SELECT userId FROM app_sessions_view WHERE (netId = __netId) LIMIT 1 INTO @__userId;
-    UPDATE net_sessions SET sessionCount = @__count WHERE (userId = @__userId);
-    SELECT * FROM app_sessions_view WHERE (userId = @__userId) ORDER BY _time LIMIT 100000;
+    SELECT COUNT(*) FROM app_sessions_view WHERE (userId = __userId) INTO @__count;
+    UPDATE net_sessions SET sessionCount = @__count WHERE (userId = __userId);
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
