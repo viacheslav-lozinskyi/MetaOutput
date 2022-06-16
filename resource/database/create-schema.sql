@@ -38,6 +38,7 @@ DROP VIEW IF EXISTS net_realtime_view;
 DROP VIEW IF EXISTS review_sessions_view;
 DROP VIEW IF EXISTS app_sessions_view;
 DROP VIEW IF EXISTS watch_sessions_view;
+DROP VIEW IF EXISTS github_sessions_view;
 # #############################################################################
 # #############################################################################
 
@@ -62,7 +63,6 @@ CREATE TABLE net_sessions(
     userId VARCHAR(64),
     country VARCHAR(64),
     city VARCHAR(64),
-    coordinates VARCHAR(32),
     organization VARCHAR(128),
     browser VARCHAR(64),
     os VARCHAR(64),
@@ -112,7 +112,6 @@ SELECT
     review_sessions.message,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.coordinates,
     net_sessions.organization,
     net_sessions.os,
     net_sessions.resolution,
@@ -152,7 +151,6 @@ SELECT
     net_sessions.userId,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.coordinates,
     net_sessions.organization,
     net_sessions.browser,
     net_sessions.os,
@@ -222,7 +220,6 @@ SELECT
     app_sessions.project,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.coordinates,
     net_sessions.organization,
     net_sessions.os,
     net_sessions.resolution,
@@ -239,18 +236,34 @@ LEFT JOIN net_sessions ON net_sessions.netId=app_sessions.netId;
 CREATE TABLE github_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    country VARCHAR(64),
-    city VARCHAR(64),
+    netId VARCHAR(16),
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
     branch VARCHAR(128),
-    user VARCHAR(128) NOT NULL,
-    avatar VARCHAR(256),
     url VARCHAR(256),
     message VARCHAR(1024)
 );
 
-CREATE INDEX metaoutput_github_sessions ON github_sessions(project);
+CREATE INDEX metaoutput_github_sessions ON github_sessions(netId, project);
+
+CREATE VIEW github_sessions_view AS
+SELECT
+    github_sessions._id,
+    github_sessions._time,
+    github_sessions.netId,
+    github_sessions.action,
+    github_sessions.project,
+    github_sessions.branch,
+    github_sessions.url,
+    github_sessions.message,
+    net_sessions.userId,
+    net_sessions.country,
+    net_sessions.city,
+    net_sessions.organization,
+    net_sessions.language,
+    net_sessions.ref
+FROM github_sessions
+LEFT JOIN net_sessions ON net_sessions.netId=github_sessions.netId;
 
 CREATE TABLE github_projects(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -273,8 +286,7 @@ CREATE TABLE watch_sessions(
     source VARCHAR(128),
     project VARCHAR(128),
     user VARCHAR(128),
-    url VARCHAR(256),
-    message VARCHAR(256)
+    url VARCHAR(256)
 );
 
 CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netId, source);
@@ -289,11 +301,9 @@ SELECT
     watch_sessions.project,
     watch_sessions.user,
     watch_sessions.url,
-    watch_sessions.message,
     net_sessions.userId,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.coordinates,
     net_sessions.organization,
     net_sessions.browser,
     net_sessions.os,

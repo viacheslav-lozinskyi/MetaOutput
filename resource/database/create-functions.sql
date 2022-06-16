@@ -60,9 +60,9 @@ DELIMITER %%
 CREATE PROCEDURE net_session_register(
     IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
+    IN __userId VARCHAR(64),
     IN __country VARCHAR(64),
     IN __city VARCHAR(64),
-    IN __coordinates VARCHAR(32),
     IN __organization VARCHAR(128),
     IN __browser VARCHAR(64),
     IN __os VARCHAR(64),
@@ -76,6 +76,10 @@ CREATE PROCEDURE net_session_register(
     IN __campaignContent VARCHAR(128))
 BEGIN
     IF (NOT ISNULL(__netId)) THEN
+        IF (NOT ISNULL(__userId) AND (__userId = "")) THEN
+            SET __userId = null;
+        END IF;
+
         IF (NOT ISNULL(__browser)) THEN
             SET __browser = REPLACE(__browser, "/", " ");
         END IF;
@@ -90,10 +94,6 @@ BEGIN
 
         IF (NOT ISNULL(__city) AND (__city = "")) THEN
             SET __city = null;
-        END IF;
-
-        IF (NOT ISNULL(__coordinates) AND (__coordinates = "")) THEN
-            SET __coordinates = null;
         END IF;
 
         IF (NOT ISNULL(__organization) AND (__organization = "")) THEN
@@ -141,12 +141,12 @@ BEGIN
         END IF;
 
         IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
-            INSERT INTO net_sessions (netId, country, city, coordinates, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
-            VALUE (__netId, __country, __city, __coordinates, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
+            INSERT INTO net_sessions (netId, userId, country, city, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
+            VALUE (__netId, __userId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
         ELSE
-            IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__coordinates) OR ISNULL(__organization) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
-                SET SQL_SAFE_UPDATES = 0;
+            SET SQL_SAFE_UPDATES = 0;
 
+            IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__organization) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
                 IF (NOT ISNULL(__country)) THEN
                     UPDATE net_sessions
                     SET country = __country
@@ -156,12 +156,6 @@ BEGIN
                 IF (NOT ISNULL(__city)) THEN
                     UPDATE net_sessions
                     SET city = __city
-                    WHERE netId = __netId;
-                END IF;
-
-                IF (NOT ISNULL(__coordinates)) THEN
-                    UPDATE net_sessions
-                    SET coordinates = __coordinates
                     WHERE netId = __netId;
                 END IF;
 
@@ -193,11 +187,16 @@ BEGIN
                 SET
                     country = __country,
                     city = __city,
-                    coordinates = __coordinates,
                     organization = __organization,
                     os = __os,
                     resolution = __resolution,
                     language = __language
+                WHERE netId = __netId;
+            END IF;
+
+            IF (NOT ISNULL(__userId)) THEN
+                UPDATE net_sessions
+                SET userId = __userId
                 WHERE netId = __netId;
             END IF;
 
@@ -342,7 +341,7 @@ BEGIN
                 SET @_isFound = true;
             END IF;
         END IF;
-        
+
         IF (@_isFound = true) THEN
             SET SQL_SAFE_UPDATES = 0;
 
@@ -431,26 +430,23 @@ DROP PROCEDURE IF EXISTS github_session_register;
 DELIMITER %%
 CREATE PROCEDURE github_session_register(
     IN __time VARCHAR(32),
-    IN __country VARCHAR(64),
-    IN __city VARCHAR(64),
+    IN __netId VARCHAR(16),
     IN __action VARCHAR(64),
     IN __project VARCHAR(128),
     IN __branch VARCHAR(128),
-    IN __user VARCHAR(128),
-    IN __avatar VARCHAR(256),
     IN __url VARCHAR(256),
     IN __message VARCHAR(1024))
 BEGIN
     SET __action = UPPER(__action);
 
     IF (ISNULL(__time)) THEN
-        INSERT INTO github_sessions (country, city, action, project, branch, user, avatar, url, message)
-        VALUE (__country, __city, __action, __project, __branch, __user, __avatar, __url, __message);
+        INSERT INTO github_sessions (netId, action, project, branch, url, message)
+        VALUE (__netId, __action, __project, __branch, __url, __message);
 
-        CALL net_realtime_register(null, "GITHUB", __project, __branch, __action, __message);
+        CALL net_realtime_register(__netId, "GITHUB", __project, __branch, __action, __message);
     ELSE
-        INSERT INTO github_sessions (_time, country, city, action, project, branch, user, avatar, url, message)
-        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __country, __city, __action, __project, __branch, __user, __avatar, __url, __message);
+        INSERT INTO github_sessions (_time, netId, action, project, branch, url, message)
+        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __action, __project, __branch, __url, __message);
     END IF;
 END;%%
 DELIMITER ;
@@ -527,8 +523,7 @@ CREATE PROCEDURE watch_session_register(
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
     IN __user VARCHAR(128),
-    IN __url VARCHAR(256),
-    IN __message VARCHAR(256))
+    IN __url VARCHAR(256))
 BEGIN
     SET @isFound =
         (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
@@ -563,13 +558,13 @@ BEGIN
         SET __action = UPPER(__action);
 
         IF (ISNULL(__time)) THEN
-            INSERT INTO watch_sessions (netId, source, project, action, user, url, message)
-            VALUE (__netId, __source, __project, __action, __user, __url, __message);
+            INSERT INTO watch_sessions (netId, source, project, action, user, url)
+            VALUE (__netId, __source, __project, __action, __user, __url);
 
-            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __message);
+            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action);
         ELSE
-            INSERT INTO watch_sessions (_time, netId, source, project, action, user, url, message)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __url, __message);
+            INSERT INTO watch_sessions (_time, netId, source, project, action, user, url)
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __url);
         END IF;
     END IF;
 END;%%
