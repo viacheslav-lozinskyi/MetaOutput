@@ -561,7 +561,7 @@ BEGIN
             INSERT INTO watch_sessions (netId, source, project, action, user, url)
             VALUE (__netId, __source, __project, __action, __user, __url);
 
-            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action);
+            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __user);
         ELSE
             INSERT INTO watch_sessions (_time, netId, source, project, action, user, url)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __url);
@@ -603,9 +603,31 @@ CREATE PROCEDURE service_update_session_count(
     IN __userId varchar(64))
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
-    SET @__count = 0;
+    SET @__count = null;
     SELECT COUNT(*) FROM app_sessions_view WHERE (userId = __userId) INTO @__count;
-    UPDATE net_sessions SET sessionCount = @__count WHERE (userId = __userId);
+    if (NOT ISNULL(@__count)) THEN
+        UPDATE net_sessions SET sessionCount = @__count WHERE (userId = __userId);
+        #SELECT * FROM app_sessions_view WHERE (userId = __userId) ORDER BY _time ASC;
+    END IF;
+    SET SQL_SAFE_UPDATES = 1;
+END;%%
+DELIMITER ;
+# #############################################################################
+
+# #############################################################################
+DROP PROCEDURE IF EXISTS service_update_app_session_user;
+
+DELIMITER %%
+CREATE PROCEDURE service_update_app_session_user(
+    IN __netId varchar(16))
+BEGIN
+    SET SQL_SAFE_UPDATES = 0;
+    SET @__userId = null;
+    SELECT userId FROM app_sessions_view WHERE (netId = __netId) LIMIT 1 INTO @__userId;
+    if (NOT ISNULL(@__userId)) THEN
+        UPDATE net_sessions SET userId = @__userId WHERE (netId = __netId);
+        CALL service_update_session_count(@__userId);
+    END IF;
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
