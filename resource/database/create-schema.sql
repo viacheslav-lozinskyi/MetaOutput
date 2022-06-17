@@ -30,7 +30,6 @@ SET character_set_results = "UTF8MB4";
 #DROP TABLE IF EXISTS net_realtime;
 #DROP TABLE IF EXISTS app_sessions;
 #DROP TABLE IF EXISTS github_sessions;
-#DROP TABLE IF EXISTS github_projects;
 #DROP TABLE IF EXISTS watch_sessions;
 
 DROP VIEW IF EXISTS net_traces_view;
@@ -260,23 +259,9 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
-    net_sessions.language,
     net_sessions.ref
 FROM github_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=github_sessions.netId;
-
-CREATE TABLE github_projects(
-    _id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    project VARCHAR(128) NOT NULL UNIQUE,
-    owner VARCHAR(128),
-    url VARCHAR(256),
-    starCount INTEGER,
-    watchCount INTEGER,
-    forkCount INTEGER,
-    issueCount INTEGER
-);
-
-CREATE INDEX metaoutput_github_projects ON github_projects(project);
 
 CREATE TABLE watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,

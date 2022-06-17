@@ -453,66 +453,6 @@ DELIMITER ;
 # #############################################################################
 
 # #############################################################################
-DROP PROCEDURE IF EXISTS github_project_register;
-
-DELIMITER %%
-CREATE PROCEDURE github_project_register(
-    IN __project VARCHAR(128),
-    IN __owner VARCHAR(128),
-    IN __url VARCHAR(256),
-    IN __starCount INTEGER,
-    IN __watchCount INTEGER,
-    IN __forkCount INTEGER,
-    IN __issueCount INTEGER)
-BEGIN
-    IF (NOT EXISTS(SELECT _id FROM github_projects WHERE project = __project LIMIT 1)) THEN
-        INSERT INTO github_projects (project, owner, url, starCount, watchCount, forkCount, issueCount)
-        VALUE (__project, __owner, __url, __starCount, __watchCount, __forkCount, __issueCount);
-    ELSE
-        SET SQL_SAFE_UPDATES = 0;
-
-        IF (NOT ISNULL(__owner)) THEN
-            UPDATE github_projects
-            SET owner = __owner
-            WHERE project = __project;
-        END IF;
-
-        IF (NOT ISNULL(__url)) THEN
-            UPDATE github_projects
-            SET url = __url
-            WHERE project = __project;
-        END IF;
-
-        IF (NOT ISNULL(__starCount)) THEN
-            UPDATE github_projects
-            SET starCount = __starCount
-            WHERE project = __project;
-        END IF;
-
-        IF (NOT ISNULL(__watchCount)) THEN
-            UPDATE github_projects
-            SET watchCount = __watchCount
-            WHERE project = __project;
-        END IF;
-
-        IF (NOT ISNULL(__forkCount)) THEN
-            UPDATE github_projects
-            SET forkCount = __forkCount
-            WHERE project = __project;
-        END IF;
-
-        IF (NOT ISNULL(__issueCount)) THEN
-            UPDATE github_projects
-            SET issueCount = __issueCount
-            WHERE project = __project;
-        END IF;
-
-        SET SQL_SAFE_UPDATES = 1;
-    END IF;
-END;%%
-DELIMITER ;
-
-# #############################################################################
 DROP PROCEDURE IF EXISTS watch_session_register;
 
 DELIMITER %%
