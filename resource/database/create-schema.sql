@@ -23,6 +23,7 @@ SET character_set_results = "UTF8MB4";
 
 # #############################################################################
 # DROPPING TABLES #############################################################
+#DROP TABLE IF EXISTS net_crawlers;
 #DROP TABLE IF EXISTS net_filters;
 #DROP TABLE IF EXISTS net_sessions;
 #DROP TABLE IF EXISTS review_sessions;
@@ -46,6 +47,14 @@ DROP VIEW IF EXISTS github_sessions_view;
 
 # #############################################################################
 # CREATING TABLES #############################################################
+
+CREATE TABLE net_crawlers(
+    _id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    url VARCHAR(256) NOT NULL UNIQUE,
+    downloads INTEGER,
+    reviews INTEGER
+);
 
 CREATE TABLE net_filters(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,

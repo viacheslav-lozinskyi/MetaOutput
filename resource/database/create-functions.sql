@@ -10,6 +10,21 @@ USE metaoutput;
 
 # #############################################################################
 # CREATING STORED PROCUDURES ##################################################
+DROP PROCEDURE IF EXISTS net_crawler_register;
+
+DELIMITER %%
+CREATE PROCEDURE net_crawler_register(
+    IN __url VARCHAR(256))
+BEGIN
+    IF (NOT ISNULL(__url) AND NOT EXISTS(SELECT _id FROM net_crawlers WHERE (url = __url))) THEN
+        INSERT INTO net_crawlers(url)
+        VALUE (__url);
+    END IF;
+END;%%
+DELIMITER ;
+# #############################################################################
+
+# #############################################################################
 DROP PROCEDURE IF EXISTS net_filter_register;
 
 DELIMITER %%
@@ -21,7 +36,7 @@ BEGIN
     SET __value = LOWER(__value);
     SET __value = TRIM(__value);
 
-    IF (NOT EXISTS(SELECT __value FROM net_filters WHERE (type = __type) AND (value = __value))) THEN
+    IF (NOT ISNULL(__type) AND NOT ISNULL(__value) AND NOT EXISTS(SELECT _id FROM net_filters WHERE (type = __type) AND (value = __value))) THEN
         INSERT INTO net_filters(type, value)
         VALUE (__type, __value);
     END IF;
@@ -593,6 +608,29 @@ CALL net_filter_register("URL", "https://www.metaoutput.net/?requestedBy=screens
 CALL net_filter_register("URL", "https://www.metaoutput.net//%");
 CALL net_filter_register("URL", "%&suppressbi=true%");
 #CALL net_filter_register("IP", "127.0.0.1");
+
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject-2022");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-AUDIO");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-CS");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-CSV");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-DLL");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-HTML");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-INI");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-JS");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-JSON");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-MD");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-PDF");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-PICTURE");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-SQL");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-TOML");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-VB");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-VIDEO");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-XML");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-YAML");
+CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-ZIP");
 # #############################################################################
 # #############################################################################
 
