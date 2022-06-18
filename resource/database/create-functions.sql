@@ -454,14 +454,24 @@ CREATE PROCEDURE github_session_register(
 BEGIN
     SET __action = UPPER(__action);
 
-    IF (ISNULL(__time)) THEN
-        INSERT INTO github_sessions (netId, action, project, branch, url, message)
-        VALUE (__netId, __action, __project, __branch, __url, __message);
+    IF (INSTR(__action, "DELETED") > 0) THEN
+        SET __action = REPLACE(__action, "DELETED", "CREATED");
+        SET SQL_SAFE_UPDATES = 0;
 
-        CALL net_realtime_register(__netId, "GITHUB", __project, __branch, __action, __message);
+        DELETE FROM github_sessions
+        WHERE (netId = __netId) AND (action = __action) AND (project = __project);
+
+        SET SQL_SAFE_UPDATES = 1;
     ELSE
-        INSERT INTO github_sessions (_time, netId, action, project, branch, url, message)
-        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __action, __project, __branch, __url, __message);
+        IF (ISNULL(__time)) THEN
+            INSERT INTO github_sessions (netId, action, project, branch, url, message)
+            VALUE (__netId, __action, __project, __branch, __url, __message);
+
+            CALL net_realtime_register(__netId, "GITHUB", __project, __branch, __action, __message);
+        ELSE
+            INSERT INTO github_sessions (_time, netId, action, project, branch, url, message)
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __action, __project, __branch, __url, __message);
+        END IF;
     END IF;
 END;%%
 DELIMITER ;
