@@ -228,7 +228,7 @@ BEGIN
             SET SQL_SAFE_UPDATES = 0;
 
             UPDATE net_sessions
-            SET _time = STR_TO_DATE(__time, "%Y-%m-%d %H:%i")
+            SET _time = STR_TO_DATE(__time, "%Y-%m-%dT%TZ")
             WHERE netId = __netId;
 
             SET SQL_SAFE_UPDATES = 1;
@@ -268,7 +268,7 @@ BEGIN
         CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, __message);
     ELSE
         INSERT INTO net_traces (_time, netId, source, project, action, message)
-        VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __message);
+        VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __message);
     END IF;
 END;%%
 DELIMITER ;
@@ -347,7 +347,7 @@ BEGIN
                 END IF;
 
                 INSERT INTO app_sessions (_time, netId, userId, action, source, project)
-                VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __userId, __action, __source, __project);
+                VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __userId, __action, __source, __project);
 
                 IF (NOT ISNULL(@_context) AND NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
                     SET __sessionCount = @_context;
@@ -432,7 +432,7 @@ BEGIN
             CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action, __rating);
         ELSE
             INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
         END IF;
     END IF;
 END;%%
@@ -470,7 +470,7 @@ BEGIN
             CALL net_realtime_register(__netId, "GITHUB", __project, __branch, __action, __message);
         ELSE
             INSERT INTO github_sessions (_time, netId, action, project, branch, url, message)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __action, __project, __branch, __url, __message);
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __project, __branch, __url, __message);
         END IF;
     END IF;
 END;%%
@@ -529,7 +529,7 @@ BEGIN
             CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __user);
         ELSE
             INSERT INTO watch_sessions (_time, netId, source, project, action, user, url)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%d %H:%i"), __netId, __source, __project, __action, __user, __url);
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __url);
         END IF;
     END IF;
 END;%%
