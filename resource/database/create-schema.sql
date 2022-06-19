@@ -30,7 +30,7 @@ SET character_set_results = "UTF8MB4";
 #DROP TABLE IF EXISTS net_traces;
 #DROP TABLE IF EXISTS net_realtime;
 #DROP TABLE IF EXISTS app_sessions;
-#DROP TABLE IF EXISTS github_sessions;
+#DROP TABLE IF EXISTS dev_sessions;
 #DROP TABLE IF EXISTS watch_sessions;
 
 DROP VIEW IF EXISTS net_traces_view;
@@ -38,7 +38,7 @@ DROP VIEW IF EXISTS net_realtime_view;
 DROP VIEW IF EXISTS review_sessions_view;
 DROP VIEW IF EXISTS app_sessions_view;
 DROP VIEW IF EXISTS watch_sessions_view;
-DROP VIEW IF EXISTS github_sessions_view;
+DROP VIEW IF EXISTS dev_sessions_view;
 # #############################################################################
 # #############################################################################
 
@@ -241,7 +241,7 @@ SELECT
 FROM app_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=app_sessions.netId;
 
-CREATE TABLE github_sessions(
+CREATE TABLE dev_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
@@ -253,26 +253,26 @@ CREATE TABLE github_sessions(
     message VARCHAR(1024)
 );
 
-CREATE INDEX metaoutput_github_sessions ON github_sessions(netId, project);
+CREATE INDEX metaoutput_dev_sessions ON dev_sessions(netId, project);
 
-CREATE VIEW github_sessions_view AS
+CREATE VIEW dev_sessions_view AS
 SELECT
-    github_sessions._id,
-    github_sessions._time,
-    github_sessions.netId,
-    github_sessions.action,
-    github_sessions.source,
-    github_sessions.project,
-    github_sessions.branch,
-    github_sessions.url,
-    github_sessions.message,
+    dev_sessions._id,
+    dev_sessions._time,
+    dev_sessions.netId,
+    dev_sessions.action,
+    dev_sessions.source,
+    dev_sessions.project,
+    dev_sessions.branch,
+    dev_sessions.url,
+    dev_sessions.message,
     net_sessions.userId,
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
     net_sessions.ref
-FROM github_sessions
-LEFT JOIN net_sessions ON net_sessions.netId=github_sessions.netId;
+FROM dev_sessions
+LEFT JOIN net_sessions ON net_sessions.netId=dev_sessions.netId;
 
 CREATE TABLE watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,

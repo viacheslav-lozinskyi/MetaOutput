@@ -440,10 +440,10 @@ DELIMITER ;
 # #############################################################################
 
 # #############################################################################
-DROP PROCEDURE IF EXISTS github_session_register;
+DROP PROCEDURE IF EXISTS dev_session_register;
 
 DELIMITER %%
-CREATE PROCEDURE github_session_register(
+CREATE PROCEDURE dev_session_register(
     IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
     IN __action VARCHAR(64),
@@ -459,18 +459,18 @@ BEGIN
         SET __action = REPLACE(__action, "DELETED", "CREATED");
         SET SQL_SAFE_UPDATES = 0;
 
-        DELETE FROM github_sessions
-        WHERE (netId = __netId) AND (action = __action) AND (project = __project);
+        DELETE FROM dev_sessions
+        WHERE (netId = __netId) AND (action = __action) AND (source = __source) AND (project = __project);
 
         SET SQL_SAFE_UPDATES = 1;
     ELSE
         IF (ISNULL(__time)) THEN
-            INSERT INTO github_sessions (netId, action, source, project, branch, url, message)
+            INSERT INTO dev_sessions (netId, action, source, project, branch, url, message)
             VALUE (__netId, __action, __source, __project, __branch, __url, __message);
 
-            CALL net_realtime_register(__netId, "GITHUB", __project, __source, __action, __message);
+            CALL net_realtime_register(__netId, "DEVELOPMENT", __project, __source, __action, __message);
         ELSE
-            INSERT INTO github_sessions (_time, netId, action, source, project, branch, url, message)
+            INSERT INTO dev_sessions (_time, netId, action, source, project, branch, url, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __url, __message);
         END IF;
     END IF;
@@ -663,8 +663,8 @@ SET PROFILING = 1;
 #SELECT * FROM app_sessions_view LIMIT 50000;
 #SELECT * FROM watch_sessions LIMIT 50000;
 #SELECT * FROM watch_sessions_view LIMIT 50000;
-#SELECT * FROM github_sessions LIMIT 50000;
-#SELECT * FROM github_projects LIMIT 50000;
+#SELECT * FROM dev_sessions LIMIT 50000;
+#SELECT * FROM dev_projects LIMIT 50000;
 
 SET PROFILING = 0;
 #SET GLOBAL MAX_CONNECTIONS = 200;
