@@ -464,14 +464,16 @@ BEGIN
 
         SET SQL_SAFE_UPDATES = 1;
     ELSE
-        IF (ISNULL(__time)) THEN
-            INSERT INTO dev_sessions (netId, action, source, project, branch, url, message)
-            VALUE (__netId, __action, __source, __project, __branch, __url, __message);
+        IF (NOT ((INSTR(__action, "CREATED") > 0) AND EXISTS(SELECT * FROM dev_sessions WHERE (netId = __netId) AND (action = __action) AND (source = __source) AND (project = __project)))) THEN
+            IF (ISNULL(__time)) THEN
+                INSERT INTO dev_sessions (netId, action, source, project, branch, url, message)
+                VALUE (__netId, __action, __source, __project, __branch, __url, __message);
 
-            CALL net_realtime_register(__netId, "DEVELOPMENT", __project, __source, __action, __message);
-        ELSE
-            INSERT INTO dev_sessions (_time, netId, action, source, project, branch, url, message)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __url, __message);
+                CALL net_realtime_register(__netId, "DEVELOPMENT", __project, __source, __action, __message);
+            ELSE
+                INSERT INTO dev_sessions (_time, netId, action, source, project, branch, url, message)
+                VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __url, __message);
+            END IF;
         END IF;
     END IF;
 END;%%
