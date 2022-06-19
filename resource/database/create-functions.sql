@@ -447,6 +447,7 @@ CREATE PROCEDURE github_session_register(
     IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
     IN __action VARCHAR(64),
+    IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __branch VARCHAR(128),
     IN __url VARCHAR(256),
@@ -464,13 +465,13 @@ BEGIN
         SET SQL_SAFE_UPDATES = 1;
     ELSE
         IF (ISNULL(__time)) THEN
-            INSERT INTO github_sessions (netId, action, project, branch, url, message)
-            VALUE (__netId, __action, __project, __branch, __url, __message);
+            INSERT INTO github_sessions (netId, action, source, project, branch, url, message)
+            VALUE (__netId, __action, __source, __project, __branch, __url, __message);
 
-            CALL net_realtime_register(__netId, "GITHUB", __project, __branch, __action, __message);
+            CALL net_realtime_register(__netId, "GITHUB", __project, __source, __action, __message);
         ELSE
-            INSERT INTO github_sessions (_time, netId, action, project, branch, url, message)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __project, __branch, __url, __message);
+            INSERT INTO github_sessions (_time, netId, action, source, project, branch, url, message)
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __url, __message);
         END IF;
     END IF;
 END;%%

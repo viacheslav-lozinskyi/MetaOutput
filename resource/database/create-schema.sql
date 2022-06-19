@@ -247,6 +247,7 @@ CREATE TABLE github_sessions(
     netId VARCHAR(16),
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
+    source VARCHAR(128) NOT NULL,
     branch VARCHAR(128),
     url VARCHAR(256),
     message VARCHAR(1024)
@@ -260,6 +261,7 @@ SELECT
     github_sessions._time,
     github_sessions.netId,
     github_sessions.action,
+    github_sessions.source,
     github_sessions.project,
     github_sessions.branch,
     github_sessions.url,
