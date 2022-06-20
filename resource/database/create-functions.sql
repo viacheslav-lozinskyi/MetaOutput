@@ -495,7 +495,7 @@ CREATE PROCEDURE watch_session_register(
     IN __eventCount INTEGER)
 BEGIN
     SET @isFound =
-        #(NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND (_time = __time) LIMIT 1)) AND
+        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND (_time = __time) LIMIT 1)) AND
         (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND ISNULL(__time) AND (__time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
         (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1));
 
