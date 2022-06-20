@@ -128,8 +128,7 @@ SELECT
     net_sessions.campaignSource,
     net_sessions.campaignMedium,
     net_sessions.campaignTerm,
-    net_sessions.campaignContent,
-    net_sessions.sessionCount
+    net_sessions.campaignContent
 FROM review_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=review_sessions.netId;
 
@@ -282,7 +281,8 @@ CREATE TABLE watch_sessions(
     source VARCHAR(128),
     project VARCHAR(128),
     user VARCHAR(128),
-    url VARCHAR(256)
+    url VARCHAR(256),
+    eventCount INTEGER DEFAULT 1
 );
 
 CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netId, source);
@@ -310,7 +310,8 @@ SELECT
     net_sessions.campaignSource,
     net_sessions.campaignMedium,
     net_sessions.campaignTerm,
-    net_sessions.campaignContent
+    net_sessions.campaignContent,
+    watch_sessions.eventCount
 FROM watch_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=watch_sessions.netId;
 # #############################################################################

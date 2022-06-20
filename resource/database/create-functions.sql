@@ -285,15 +285,15 @@ CREATE PROCEDURE app_session_register(
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
     IN __userId VARCHAR(64),
-    IN __sessionCount INTEGER)
+    IN __eventCount INTEGER)
 BEGIN
     IF (NOT ISNULL(__userId)) THEN
         SET @_context = 0;
         SET @_isFound = false;
         SET __action = UPPER(__action);
 
-        IF (ISNULL(__sessionCount) OR (__sessionCount = 0)) THEN
-            SET __sessionCount = 1;
+        IF (ISNULL(__eventCount) OR (__eventCount = 0)) THEN
+            SET __eventCount = 1;
         END IF;
 
         SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_context;
@@ -324,8 +324,8 @@ BEGIN
                 INSERT INTO app_sessions (netId, userId, action, source, project)
                 VALUE (__netId, __userId, __action, __source, __project);
 
-                IF (NOT ISNULL(@_context) AND NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
-                    SET __sessionCount = @_context + 1;
+                IF (NOT ISNULL(@_context) AND NOT ISNULL(__eventCount) AND (__eventCount < @_context)) THEN
+                    SET __eventCount = @_context + 1;
                 END IF;
 
                 SET @_isFound = true;
@@ -349,8 +349,8 @@ BEGIN
                 INSERT INTO app_sessions (_time, netId, userId, action, source, project)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __userId, __action, __source, __project);
 
-                IF (NOT ISNULL(@_context) AND NOT ISNULL(__sessionCount) AND (__sessionCount < @_context)) THEN
-                    SET __sessionCount = @_context;
+                IF (NOT ISNULL(@_context) AND NOT ISNULL(__eventCount) AND (__eventCount < @_context)) THEN
+                    SET __eventCount = @_context;
                 END IF;
 
                 SET @_isFound = true;
@@ -365,7 +365,7 @@ BEGIN
             WHERE (netId = __netId);
 
             UPDATE net_sessions
-            SET sessionCount = __sessionCount
+            SET sessionCount = __eventCount
             WHERE (userId = __userId);
 
             SET SQL_SAFE_UPDATES = 1;
@@ -491,11 +491,17 @@ CREATE PROCEDURE watch_session_register(
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
     IN __user VARCHAR(128),
-    IN __url VARCHAR(256))
+    IN __url VARCHAR(256),
+    IN __eventCount INTEGER)
 BEGIN
     SET @isFound =
-        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
+        #(NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND (_time = __time) LIMIT 1)) AND
+        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND ISNULL(__time) AND (__time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
         (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1));
+
+    IF (ISNULL(__eventCount)) THEN
+        SET __eventCount = 1;
+    END IF;
 
     IF (@isFound AND ISNULL(__project)) THEN
         SET __project = __url;
@@ -526,13 +532,13 @@ BEGIN
         SET __action = UPPER(__action);
 
         IF (ISNULL(__time)) THEN
-            INSERT INTO watch_sessions (netId, source, project, action, user, url)
-            VALUE (__netId, __source, __project, __action, __user, __url);
+            INSERT INTO watch_sessions (netId, source, project, action, user, url, eventCount)
+            VALUE (__netId, __source, __project, __action, __user, __url, __eventCount);
 
             CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __user);
         ELSE
-            INSERT INTO watch_sessions (_time, netId, source, project, action, user, url)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __url);
+            INSERT INTO watch_sessions (_time, netId, source, project, action, user, url, eventCount)
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __url, __eventCount);
         END IF;
     END IF;
 END;%%
@@ -549,13 +555,13 @@ BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     IF ISNULL(__daysIgnore) THEN
-        DELETE FROM net_sessions WHERE (userId LIKE "TEST-%") OR (netId = "54.86.50.139");
-        DELETE FROM app_sessions WHERE (userId LIKE "TEST-%");
-        DELETE FROM watch_sessions WHERE (netId = "54.86.50.139");
+        DELETE FROM net_sessions WHERE (netId LIKE "TEST-%") OR (userId LIKE "TEST-%") OR (netId = "54.86.50.139");
+        DELETE FROM app_sessions WHERE (netId LIKE "TEST-%") OR (userId LIKE "TEST-%");
+        DELETE FROM watch_sessions WHERE (netId LIKE "TEST-%") OR (netId = "54.86.50.139");
     ELSE
-        DELETE FROM net_sessions WHERE ((userId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM app_sessions WHERE ((userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM watch_sessions WHERE ((netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM net_sessions WHERE ((netId LIKE "TEST-%") OR (userId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM app_sessions WHERE ((netId LIKE "TEST-%") OR (userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM watch_sessions WHERE ((netId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
 
     SET SQL_SAFE_UPDATES = 1;
