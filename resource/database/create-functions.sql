@@ -490,13 +490,12 @@ CREATE PROCEDURE watch_session_register(
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
-    IN __user VARCHAR(128),
     IN __url VARCHAR(256),
     IN __eventCount INTEGER)
 BEGIN
     SET @isFound =
-        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND (_time = __time) LIMIT 1)) AND
-        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND ISNULL(__time) AND (__time > DATE_SUB(NOW(), INTERVAL 1 DAY)) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) LIMIT 1)) AND
+        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND (url = __url) AND (_time = __time) LIMIT 1)) AND
+        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) AND ISNULL(__time) AND (__time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1)) AND
         (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1));
 
     IF (ISNULL(__eventCount)) THEN
@@ -532,13 +531,13 @@ BEGIN
         SET __action = UPPER(__action);
 
         IF (ISNULL(__time)) THEN
-            INSERT INTO watch_sessions (netId, source, project, action, user, url, eventCount)
-            VALUE (__netId, __source, __project, __action, __user, __url, __eventCount);
+            INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
+            VALUE (__netId, __source, __project, __action, __url, __eventCount);
 
-            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __user);
+            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __eventCount);
         ELSE
-            INSERT INTO watch_sessions (_time, netId, source, project, action, user, url, eventCount)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __url, __eventCount);
+            INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __eventCount);
         END IF;
     END IF;
 END;%%

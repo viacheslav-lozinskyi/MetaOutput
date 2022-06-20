@@ -280,7 +280,6 @@ CREATE TABLE watch_sessions(
     action VARCHAR(64),
     source VARCHAR(128),
     project VARCHAR(128),
-    user VARCHAR(128),
     url VARCHAR(256),
     eventCount INTEGER DEFAULT 1
 );
@@ -295,7 +294,6 @@ SELECT
     watch_sessions.action,
     watch_sessions.source,
     watch_sessions.project,
-    watch_sessions.user,
     watch_sessions.url,
     net_sessions.userId,
     net_sessions.country,
