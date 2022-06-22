@@ -296,7 +296,7 @@ BEGIN
             SET __eventCount = 1;
         END IF;
 
-        SELECT MAX(sessionCount) FROM net_sessions WHERE (netId = __netId) OR (userId = __userId) INTO @_context;
+        SELECT MAX(sessionCount) FROM net_sessions WHERE (userId = __userId) INTO @_context;
         IF (ISNULL(@_context)) THEN
             SET @_context = 1;
         END IF;
@@ -612,7 +612,7 @@ DROP PROCEDURE IF EXISTS service_find_repeated_messages;
 DELIMITER %%
 CREATE PROCEDURE service_find_repeated_messages()
 BEGIN
-    SELECT * FROM app_sessions A WHERE userId IN (SELECT userId FROM app_sessions WHERE (_id != A._id) AND (DATE(_time) = DATE(A._time)) AND (userId = A.userId) AND (netId = A.netId)) ORDER BY userId, _time LIMIT 1000000;
+    SELECT * FROM app_sessions A WHERE userId IN (SELECT userId FROM app_sessions WHERE (_id != A._id) AND (netId = A.netId) AND (DATE(_time) = DATE(A._time)) AND (userId = A.userId)) ORDER BY userId, _time LIMIT 1000000;
 END;%%
 DELIMITER ;
 # #############################################################################
