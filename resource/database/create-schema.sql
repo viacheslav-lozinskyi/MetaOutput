@@ -271,6 +271,7 @@ CREATE TABLE dev_sessions(
     project VARCHAR(128) NOT NULL,
     source VARCHAR(128) NOT NULL,
     branch VARCHAR(128),
+    user VARCHAR(128),
     url VARCHAR(256),
     message VARCHAR(1024)
 );
@@ -286,9 +287,9 @@ SELECT
     dev_sessions.source,
     dev_sessions.project,
     dev_sessions.branch,
+    dev_sessions.user,
     dev_sessions.url,
     dev_sessions.message,
-    net_sessions.userId,
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
