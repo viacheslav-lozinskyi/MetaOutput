@@ -140,7 +140,7 @@ SELECT
     net_sessions.campaignTerm,
     net_sessions.campaignContent
 FROM review_sessions
-LEFT JOIN net_sessions ON net_sessions.netId=review_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = review_sessions.netId;
 
 # #############################################################################
 # net_traces ##################################################################
@@ -176,7 +176,7 @@ SELECT
     net_sessions.language,
     net_traces.eventCount
 FROM net_traces
-LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = net_traces.netId;
 
 # #############################################################################
 # net_realtime ################################################################
@@ -210,7 +210,7 @@ SELECT
     net_sessions.resolution,
     net_sessions.language
 FROM net_realtime
-LEFT JOIN net_sessions ON net_sessions.netId=net_realtime.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = net_realtime.netId;
 
 # #############################################################################
 # app_sessions ################################################################
@@ -250,7 +250,7 @@ SELECT
     net_sessions.campaignContent,
     app_sessions.eventCount
 FROM app_sessions
-LEFT JOIN net_sessions ON net_sessions.netId=app_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = app_sessions.netId;
 
 # #############################################################################
 # dev_sessions ################################################################
@@ -288,7 +288,7 @@ SELECT
     net_sessions.city,
     net_sessions.organization
 FROM dev_sessions
-LEFT JOIN net_sessions ON net_sessions.netId=dev_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = dev_sessions.netId;
 
 # #############################################################################
 # watch_sessions ##############################################################
@@ -331,8 +331,8 @@ SELECT
     net_sessions.campaignContent,
     watch_sessions.eventCount
 FROM watch_sessions
-LEFT JOIN net_sessions ON net_sessions.netId=watch_sessions.netId
-LEFT JOIN app_sessions ON app_sessions.netId=watch_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = watch_sessions.netId
+LEFT JOIN app_sessions ON app_sessions.netId = watch_sessions.netId;
 # #############################################################################
 # #############################################################################
 

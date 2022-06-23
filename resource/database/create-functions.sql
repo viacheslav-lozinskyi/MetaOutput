@@ -588,7 +588,11 @@ DROP PROCEDURE IF EXISTS service_find_repeated_messages;
 DELIMITER %%
 CREATE PROCEDURE service_find_repeated_messages()
 BEGIN
-    SELECT * FROM app_sessions A WHERE userId IN (SELECT userId FROM app_sessions WHERE (_id != A._id) AND (netId = A.netId) AND (DATE(_time) = DATE(A._time)) AND (userId = A.userId)) ORDER BY userId, _time LIMIT 1000000;
+    SELECT *
+    FROM app_sessions
+    GROUP BY netId, userId, DATE(_time), source, project
+    HAVING COUNT(userId) > 1
+    ORDER BY _time, userId;
 END;%%
 DELIMITER ;
 # #############################################################################
