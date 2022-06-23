@@ -80,7 +80,6 @@ DROP PROCEDURE IF EXISTS net_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE net_session_register(
-    IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
     IN __country VARCHAR(64),
     IN __city VARCHAR(64),
@@ -216,16 +215,6 @@ BEGIN
                 SET browser = __browser
                 WHERE netId = __netId;
             END IF;
-
-            SET SQL_SAFE_UPDATES = 1;
-        END IF;
-
-        IF (NOT ISNULL(__time) AND (__time != "")) THEN
-            SET SQL_SAFE_UPDATES = 0;
-
-            UPDATE net_sessions
-            SET _time = STR_TO_DATE(__time, "%Y-%m-%dT%TZ")
-            WHERE netId = __netId;
 
             SET SQL_SAFE_UPDATES = 1;
         END IF;

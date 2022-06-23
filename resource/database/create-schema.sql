@@ -76,7 +76,6 @@ CREATE INDEX metaoutput_net_filters ON net_filters(type, value);
 # #############################################################################
 CREATE TABLE net_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
     country VARCHAR(64),
     city VARCHAR(64),
@@ -93,7 +92,7 @@ CREATE TABLE net_sessions(
     campaignContent VARCHAR(128)
 );
 
-CREATE INDEX metaoutput_net_sessions ON net_sessions(netId, userId);
+CREATE INDEX metaoutput_net_sessions ON net_sessions(netId);
 
 # #############################################################################
 # review_sessions #############################################################
