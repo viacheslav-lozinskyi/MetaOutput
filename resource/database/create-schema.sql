@@ -168,7 +168,6 @@ SELECT
     net_traces.source,
     net_traces.project,
     net_traces.message,
-    net_sessions.userId,
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
@@ -176,12 +175,6 @@ SELECT
     net_sessions.os,
     net_sessions.resolution,
     net_sessions.language,
-    net_sessions.ref,
-    net_sessions.campaignName,
-    net_sessions.campaignSource,
-    net_sessions.campaignMedium,
-    net_sessions.campaignTerm,
-    net_sessions.campaignContent,
     net_traces.eventCount
 FROM net_traces
 LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
