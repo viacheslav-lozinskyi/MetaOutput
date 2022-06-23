@@ -471,7 +471,7 @@ BEGIN
                 INSERT INTO dev_sessions (netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (__netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
 
-                CALL net_realtime_register(__netId, "DEVELOPMENT", __project, __source, __action, __message);
+                CALL net_realtime_register(__netId, "DEVELOPMENT", __project, __source, __action, __user);
             ELSE
                 INSERT INTO dev_sessions (_time, netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
