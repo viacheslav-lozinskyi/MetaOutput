@@ -272,6 +272,7 @@ CREATE TABLE dev_sessions(
     source VARCHAR(128) NOT NULL,
     branch VARCHAR(128),
     user VARCHAR(128),
+    avatar VARCHAR(256),
     url VARCHAR(256),
     message VARCHAR(1024)
 );
@@ -288,12 +289,12 @@ SELECT
     dev_sessions.project,
     dev_sessions.branch,
     dev_sessions.user,
+    dev_sessions.avatar,
     dev_sessions.url,
     dev_sessions.message,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.organization,
-    net_sessions.ref
+    net_sessions.organization
 FROM dev_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=dev_sessions.netId;
 
