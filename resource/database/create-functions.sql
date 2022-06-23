@@ -7,9 +7,13 @@ USE metaoutput;
 
 
 
+# #############################################################################
+# CREATING PROCEDURES #########################################################
+# #############################################################################
 
 # #############################################################################
-# CREATING STORED PROCUDURES ##################################################
+# net_crawler_register ########################################################
+# #############################################################################
 DROP PROCEDURE IF EXISTS net_crawler_register;
 
 DELIMITER %%
@@ -22,8 +26,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# net_filter_register #########################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS net_filter_register;
 
@@ -42,8 +47,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# net_realtime_register #######################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS net_realtime_register;
 
@@ -66,8 +72,9 @@ BEGIN
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# net_session_register ########################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS net_session_register;
 
@@ -75,7 +82,6 @@ DELIMITER %%
 CREATE PROCEDURE net_session_register(
     IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
-    IN __userId VARCHAR(64),
     IN __country VARCHAR(64),
     IN __city VARCHAR(64),
     IN __organization VARCHAR(128),
@@ -91,10 +97,6 @@ CREATE PROCEDURE net_session_register(
     IN __campaignContent VARCHAR(128))
 BEGIN
     IF (NOT ISNULL(__netId)) THEN
-        IF (NOT ISNULL(__userId) AND (__userId = "")) THEN
-            SET __userId = null;
-        END IF;
-
         IF (NOT ISNULL(__browser)) THEN
             SET __browser = REPLACE(__browser, "/", " ");
         END IF;
@@ -156,8 +158,8 @@ BEGIN
         END IF;
 
         IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
-            INSERT INTO net_sessions (netId, userId, country, city, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
-            VALUE (__netId, __userId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
+            INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaignName, campaignSource, campaignMedium, campaignTerm, campaignContent)
+            VALUE (__netId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, LOWER(__campaignName), LOWER(__campaignSource), LOWER(__campaignMedium), LOWER(__campaignTerm), LOWER(__campaignContent));
         ELSE
             SET SQL_SAFE_UPDATES = 0;
 
@@ -209,12 +211,6 @@ BEGIN
                 WHERE netId = __netId;
             END IF;
 
-            IF (NOT ISNULL(__userId)) THEN
-                UPDATE net_sessions
-                SET userId = __userId
-                WHERE netId = __netId;
-            END IF;
-
             IF (NOT ISNULL(__browser)) THEN
                 UPDATE net_sessions
                 SET browser = __browser
@@ -236,8 +232,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# net_trace_register ##########################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS net_trace_register;
 
@@ -272,8 +269,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# app_session_register ########################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS app_session_register;
 
@@ -296,7 +294,7 @@ BEGIN
             SET __eventCount = 1;
         END IF;
 
-        SELECT MAX(sessionCount) FROM net_sessions WHERE (userId = __userId) INTO @_context;
+        SELECT MAX(eventCount) FROM app_sessions WHERE (userId = __userId) INTO @_context;
         IF (ISNULL(@_context)) THEN
             SET @_context = 1;
         END IF;
@@ -337,12 +335,16 @@ BEGIN
                 IF (__action = "START") THEN
                     IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) LIMIT 1)) THEN
                         SET __action = "INSTALL";
-                        UPDATE app_sessions SET action = "START" WHERE (userId = __userId) AND (action = "INSTALL");
+                        UPDATE app_sessions
+                        SET action = "START"
+                        WHERE (userId = __userId) AND (action = "INSTALL");
                     END IF;
 
                     IF (EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project != __project))) THEN
                         SET __action = "UPDATE";
-                        UPDATE app_sessions SET action = "START" WHERE (userId = __userId) AND (project = __project);
+                        UPDATE app_sessions
+                        SET action = "START"
+                        WHERE (userId = __userId) AND (project = __project);
                     END IF;
                 END IF;
 
@@ -360,12 +362,8 @@ BEGIN
         IF (@_isFound = true) THEN
             SET SQL_SAFE_UPDATES = 0;
 
-            UPDATE net_sessions
-            SET userId = __userId
-            WHERE (netId = __netId);
-
-            UPDATE net_sessions
-            SET sessionCount = __eventCount
+            UPDATE app_sessions
+            SET eventCount = __eventCount
             WHERE (userId = __userId);
 
             SET SQL_SAFE_UPDATES = 1;
@@ -373,8 +371,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# review_session_register #####################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS review_session_register;
 
@@ -437,8 +436,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# dev_session_register ########################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS dev_session_register;
 
@@ -478,8 +478,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# watch_session_register ######################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS watch_session_register;
 
@@ -542,8 +543,9 @@ BEGIN
     END IF;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# service_cleanup_debug #######################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS service_cleanup_debug;
 
@@ -554,11 +556,11 @@ BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     IF ISNULL(__daysIgnore) THEN
-        DELETE FROM net_sessions WHERE (netId LIKE "TEST-%") OR (userId LIKE "TEST-%") OR (netId = "54.86.50.139");
+        DELETE FROM net_sessions WHERE (netId LIKE "TEST-%") OR (netId = "54.86.50.139");
         DELETE FROM app_sessions WHERE (netId LIKE "TEST-%") OR (userId LIKE "TEST-%");
         DELETE FROM watch_sessions WHERE (netId LIKE "TEST-%") OR (netId = "54.86.50.139");
     ELSE
-        DELETE FROM net_sessions WHERE ((netId LIKE "TEST-%") OR (userId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM net_sessions WHERE ((netId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
         DELETE FROM app_sessions WHERE ((netId LIKE "TEST-%") OR (userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
         DELETE FROM watch_sessions WHERE ((netId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
@@ -566,8 +568,9 @@ BEGIN
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
-# #############################################################################
 
+# #############################################################################
+# service_update_session_count ################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS service_update_session_count;
 
@@ -577,35 +580,17 @@ CREATE PROCEDURE service_update_session_count(
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
     SET @__count = null;
-    SELECT COUNT(*) FROM app_sessions_view WHERE (userId = __userId) INTO @__count;
+    SELECT COUNT(*) FROM app_sessions WHERE (userId = __userId) INTO @__count;
     if (NOT ISNULL(@__count)) THEN
-        UPDATE net_sessions SET sessionCount = @__count WHERE (userId = __userId);
-        #SELECT * FROM app_sessions_view WHERE (userId = __userId) ORDER BY _time ASC;
+        UPDATE app_sessions SET eventCount = @__count WHERE (userId = __userId);
+        #SELECT * FROM app_sessions WHERE (userId = __userId) ORDER BY _time ASC;
     END IF;
     SET SQL_SAFE_UPDATES = 1;
 END;%%
 DELIMITER ;
-# #############################################################################
 
 # #############################################################################
-DROP PROCEDURE IF EXISTS service_update_app_session_user;
-
-DELIMITER %%
-CREATE PROCEDURE service_update_app_session_user(
-    IN __netId varchar(16))
-BEGIN
-    SET SQL_SAFE_UPDATES = 0;
-    SET @__userId = null;
-    SELECT userId FROM app_sessions_view WHERE (netId = __netId) LIMIT 1 INTO @__userId;
-    if (NOT ISNULL(@__userId)) THEN
-        UPDATE net_sessions SET userId = @__userId WHERE (netId = __netId);
-        CALL service_update_session_count(@__userId);
-    END IF;
-    SET SQL_SAFE_UPDATES = 1;
-END;%%
-DELIMITER ;
-# #############################################################################
-
+# service_find_repeated_messages ##############################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS service_find_repeated_messages;
 

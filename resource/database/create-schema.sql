@@ -47,7 +47,11 @@ DROP VIEW IF EXISTS dev_sessions_view;
 
 # #############################################################################
 # CREATING TABLES #############################################################
+# #############################################################################
 
+# #############################################################################
+# net_crawlers ################################################################
+# #############################################################################
 CREATE TABLE net_crawlers(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -56,6 +60,9 @@ CREATE TABLE net_crawlers(
     reviews INTEGER
 );
 
+# #############################################################################
+# net_filters #################################################################
+# #############################################################################
 CREATE TABLE net_filters(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     type ENUM("IP", "URL") NOT NULL,
@@ -64,11 +71,13 @@ CREATE TABLE net_filters(
 
 CREATE INDEX metaoutput_net_filters ON net_filters(type, value);
 
+# #############################################################################
+# net_sessions ################################################################
+# #############################################################################
 CREATE TABLE net_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
-    userId VARCHAR(64),
     country VARCHAR(64),
     city VARCHAR(64),
     organization VARCHAR(128),
@@ -81,12 +90,14 @@ CREATE TABLE net_sessions(
     campaignSource VARCHAR(64),
     campaignMedium VARCHAR(64),
     campaignTerm VARCHAR(128),
-    campaignContent VARCHAR(128),
-    sessionCount INTEGER
+    campaignContent VARCHAR(128)
 );
 
 CREATE INDEX metaoutput_net_sessions ON net_sessions(netId, userId);
 
+# #############################################################################
+# review_sessions #############################################################
+# #############################################################################
 CREATE TABLE review_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -132,7 +143,9 @@ SELECT
 FROM review_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=review_sessions.netId;
 
-
+# #############################################################################
+# net_traces ##################################################################
+# #############################################################################
 CREATE TABLE net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -173,6 +186,9 @@ SELECT
 FROM net_traces
 LEFT JOIN net_sessions ON net_sessions.netId=net_traces.netId;
 
+# #############################################################################
+# net_realtime ################################################################
+# #############################################################################
 CREATE TABLE net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -204,6 +220,9 @@ SELECT
 FROM net_realtime
 LEFT JOIN net_sessions ON net_sessions.netId=net_realtime.netId;
 
+# #############################################################################
+# app_sessions ################################################################
+# #############################################################################
 CREATE TABLE app_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -211,7 +230,8 @@ CREATE TABLE app_sessions(
     userId VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     source VARCHAR(128) NOT NULL,
-    project VARCHAR(128) NOT NULL
+    project VARCHAR(128) NOT NULL,
+    eventCount INTEGER DEFAULT 1
 );
 
 CREATE INDEX metaoutput_app_sessions ON app_sessions(netId, userId, action);
@@ -236,10 +256,13 @@ SELECT
     net_sessions.campaignMedium,
     net_sessions.campaignTerm,
     net_sessions.campaignContent,
-    net_sessions.sessionCount
+    app_sessions.eventCount
 FROM app_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=app_sessions.netId;
 
+# #############################################################################
+# dev_sessions ################################################################
+# #############################################################################
 CREATE TABLE dev_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -273,6 +296,9 @@ SELECT
 FROM dev_sessions
 LEFT JOIN net_sessions ON net_sessions.netId=dev_sessions.netId;
 
+# #############################################################################
+# watch_sessions ##############################################################
+# #############################################################################
 CREATE TABLE watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -295,7 +321,7 @@ SELECT
     watch_sessions.source,
     watch_sessions.project,
     watch_sessions.url,
-    net_sessions.userId,
+    app_sessions.userId,
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
@@ -311,7 +337,8 @@ SELECT
     net_sessions.campaignContent,
     watch_sessions.eventCount
 FROM watch_sessions
-LEFT JOIN net_sessions ON net_sessions.netId=watch_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId=watch_sessions.netId
+LEFT JOIN app_sessions ON app_sessions.netId=watch_sessions.netId;
 # #############################################################################
 # #############################################################################
 
