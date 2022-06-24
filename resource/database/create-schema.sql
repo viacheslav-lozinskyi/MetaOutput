@@ -1,28 +1,21 @@
 # #############################################################################
 # CREATING DATABASE ###########################################################
+# #############################################################################
 #CREATE DATABASE IF NOT EXISTS metaoutput_dev;
 CREATE DATABASE IF NOT EXISTS metaoutput;
-# #############################################################################
-# #############################################################################
-
-
-
 
 # #############################################################################
 # SET DEFAULT DATABASE ########################################################
+# #############################################################################
 #USE metaoutput_dev;
 USE metaoutput;
 SET time_zone = "Europe/Kiev";
 SET character_set_client = "UTF8MB4";
 SET character_set_results = "UTF8MB4";
-# #############################################################################
-# #############################################################################
-
-
-
 
 # #############################################################################
 # DROPPING TABLES #############################################################
+# #############################################################################
 #DROP TABLE IF EXISTS net_crawlers;
 #DROP TABLE IF EXISTS net_filters;
 #DROP TABLE IF EXISTS net_sessions;
@@ -33,22 +26,8 @@ SET character_set_results = "UTF8MB4";
 #DROP TABLE IF EXISTS dev_sessions;
 #DROP TABLE IF EXISTS watch_sessions;
 
-DROP VIEW IF EXISTS net_traces_view;
-DROP VIEW IF EXISTS net_realtime_view;
-DROP VIEW IF EXISTS review_sessions_view;
-DROP VIEW IF EXISTS app_sessions_view;
-DROP VIEW IF EXISTS watch_sessions_view;
-DROP VIEW IF EXISTS dev_sessions_view;
-# #############################################################################
-# #############################################################################
-
-
-
-
 # #############################################################################
 # CREATING TABLES #############################################################
-# #############################################################################
-
 # #############################################################################
 # net_crawlers ################################################################
 # #############################################################################
@@ -74,7 +53,7 @@ CREATE INDEX metaoutput_net_filters ON net_filters(type, value);
 # #############################################################################
 # net_sessions ################################################################
 # #############################################################################
-CREATE TABLE net_sessions(
+CREATE TABLE IF NOT EXISTS net_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     netId VARCHAR(16) NOT NULL,
     country VARCHAR(64),
@@ -97,7 +76,7 @@ CREATE INDEX metaoutput_net_sessions ON net_sessions(netId);
 # #############################################################################
 # review_sessions #############################################################
 # #############################################################################
-CREATE TABLE review_sessions(
+CREATE TABLE IF NOT EXISTS review_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
@@ -113,6 +92,8 @@ CREATE TABLE review_sessions(
 );
 
 CREATE INDEX metaoutput_review_sessions ON review_sessions(netId);
+
+DROP VIEW IF EXISTS review_sessions_view;
 
 CREATE VIEW review_sessions_view AS
 SELECT
@@ -130,22 +111,14 @@ SELECT
     review_sessions.message,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.organization,
-    net_sessions.os,
-    net_sessions.resolution,
-    net_sessions.language,
-    net_sessions.campaignName,
-    net_sessions.campaignSource,
-    net_sessions.campaignMedium,
-    net_sessions.campaignTerm,
-    net_sessions.campaignContent
+    net_sessions.organization
 FROM review_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = review_sessions.netId;
 
 # #############################################################################
 # net_traces ##################################################################
 # #############################################################################
-CREATE TABLE net_traces(
+CREATE TABLE IF NOT EXISTS net_traces(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
@@ -157,6 +130,8 @@ CREATE TABLE net_traces(
 );
 
 CREATE INDEX metaoutput_net_traces ON net_traces(netId, _time);
+
+DROP VIEW IF EXISTS net_traces_view;
 
 CREATE VIEW net_traces_view AS
 SELECT
@@ -181,7 +156,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = net_traces.netId;
 # #############################################################################
 # net_realtime ################################################################
 # #############################################################################
-CREATE TABLE net_realtime(
+CREATE TABLE IF NOT EXISTS net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
@@ -193,6 +168,8 @@ CREATE TABLE net_realtime(
 );
 
 CREATE INDEX metaoutput_net_realtime ON net_realtime(_time);
+
+DROP VIEW IF EXISTS net_realtime_view;
 
 CREATE VIEW net_realtime_view AS
 SELECT
@@ -215,7 +192,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = net_realtime.netId;
 # #############################################################################
 # app_sessions ################################################################
 # #############################################################################
-CREATE TABLE app_sessions(
+CREATE TABLE IF NOT EXISTS app_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
@@ -227,6 +204,8 @@ CREATE TABLE app_sessions(
 );
 
 CREATE INDEX metaoutput_app_sessions ON app_sessions(netId, userId, action);
+
+DROP VIEW IF EXISTS app_sessions_view;
 
 CREATE VIEW app_sessions_view AS
 SELECT
@@ -255,7 +234,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = app_sessions.netId;
 # #############################################################################
 # dev_sessions ################################################################
 # #############################################################################
-CREATE TABLE dev_sessions(
+CREATE TABLE IF NOT EXISTS dev_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
@@ -270,6 +249,8 @@ CREATE TABLE dev_sessions(
 );
 
 CREATE INDEX metaoutput_dev_sessions ON dev_sessions(netId, project);
+
+DROP VIEW IF EXISTS dev_sessions_view;
 
 CREATE VIEW dev_sessions_view AS
 SELECT
@@ -293,7 +274,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = dev_sessions.netId;
 # #############################################################################
 # watch_sessions ##############################################################
 # #############################################################################
-CREATE TABLE watch_sessions(
+CREATE TABLE IF NOT EXISTS watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
@@ -305,6 +286,8 @@ CREATE TABLE watch_sessions(
 );
 
 CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netId, source);
+
+DROP VIEW IF EXISTS watch_sessions_view;
 
 CREATE VIEW watch_sessions_view AS
 SELECT
