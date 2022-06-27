@@ -223,38 +223,69 @@ END;%%
 DELIMITER ;
 
 # #############################################################################
-# net_trace_register ##########################################################
+# trace_session_register ######################################################
 # #############################################################################
-DROP PROCEDURE IF EXISTS net_trace_register;
+DROP PROCEDURE IF EXISTS trace_session_register;
 
 DELIMITER %%
-CREATE PROCEDURE net_trace_register(
+CREATE PROCEDURE trace_session_register(
     IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(32),
-    IN __message VARCHAR(1024))
+    IN __message VARCHAR(1024),
+    IN __stack TEXT)
 BEGIN
-    SET __action = UPPER(__action);
-    IF (ISNULL(__time)) THEN
-        IF (EXISTS(SELECT _id FROM net_traces WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) LIMIT 1)) THEN
-            SET SQL_SAFE_UPDATES = 0;
+    IF (NOT ISNULL(__message)) THEN
+        SET __action = UPPER(__action);
+        SET __message = REPLACE(__message, '|||', '\n');
+        SET __message = REPLACE(__message, '\r\n', '\n');
+        SET __message = REPLACE(__message, '\r', '\n');
+        SET __message = REPLACE(__message, '\t', ' ');
+        SET __message = TRIM(__message);
+        SET @__index = POSITION('\n' IN __message);
 
-            UPDATE net_traces
-            SET _time = CURRENT_TIME, eventCount = eventCount + 1
-            WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message);
-
-            SET SQL_SAFE_UPDATES = 1;
-        ELSE
-            INSERT INTO net_traces (netId, source, project, action, message)
-            VALUE (__netId, __source, __project, __action, __message);
+        IF ((@__index > 0) AND ISNULL(__stack)) THEN
+            SET __stack = SUBSTR(__message, @__index + 1, LENGTH(__message) - @__index);
+        END IF;
+        
+        IF (@__index > 0) THEN
+            SET __message = SUBSTR(__message, 1, @__index);
+            SET __message = TRIM(__message);
         END IF;
 
-        CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, __message);
-    ELSE
-        INSERT INTO net_traces (_time, netId, source, project, action, message)
-        VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __message);
+        IF (NOT ISNULL(__stack)) THEN
+            SET __stack = REPLACE(__stack, '|||', '\n');
+            SET __stack = REPLACE(__stack, '\r\n', '\n');
+            SET __stack = REPLACE(__stack, '\r', '\n');
+            SET __stack = REPLACE(__stack, '\t', ' ');
+            SET __stack = REPLACE(__stack, '\n    ', '\n');
+            SET __stack = REPLACE(__stack, '\n   ', '\n');
+            SET __stack = REPLACE(__stack, '\n  ', '\n');
+            SET __stack = REPLACE(__stack, '\n ', '\n');
+            SET __stack = TRIM(__stack);
+        END IF;
+
+        IF (ISNULL(__time)) THEN
+            IF (EXISTS(SELECT _id FROM trace_sessions WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (stack = __stack) LIMIT 1)) THEN
+                SET SQL_SAFE_UPDATES = 0;
+
+                UPDATE trace_sessions
+                SET _time = CURRENT_TIME, eventCount = eventCount + 1
+                WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (stack = __stack);
+
+                SET SQL_SAFE_UPDATES = 1;
+            ELSE
+                INSERT INTO trace_sessions (netId, source, project, action, message, stack)
+                VALUE (__netId, __source, __project, __action, __message, __stack);
+            END IF;
+
+            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, __message);
+        ELSE
+            INSERT INTO trace_sessions (_time, netId, source, project, action, message, stack)
+            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __message, __stack);
+        END IF;
     END IF;
 END;%%
 DELIMITER ;
@@ -547,13 +578,19 @@ BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     IF ISNULL(__daysIgnore) THEN
-        DELETE FROM net_sessions WHERE (netId LIKE "TEST-%") OR (netId = "54.86.50.139");
+        DELETE FROM net_sessions WHERE (netId LIKE "TEST-%");
         DELETE FROM app_sessions WHERE (netId LIKE "TEST-%") OR (userId LIKE "TEST-%");
-        DELETE FROM watch_sessions WHERE (netId LIKE "TEST-%") OR (netId = "54.86.50.139");
+        DELETE FROM dev_sessions WHERE (netId LIKE "TEST-%");
+        DELETE FROM review_sessions WHERE (netId LIKE "TEST-%");
+        DELETE FROM trace_sessions WHERE (netId LIKE "TEST-%");
+        DELETE FROM watch_sessions WHERE (netId LIKE "TEST-%");
     ELSE
-        DELETE FROM net_sessions WHERE ((netId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM net_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
         DELETE FROM app_sessions WHERE ((netId LIKE "TEST-%") OR (userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM watch_sessions WHERE ((netId LIKE "TEST-%") OR (netId = "54.86.50.139")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM dev_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM review_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM trace_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM watch_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
 
     SET SQL_SAFE_UPDATES = 1;
@@ -652,8 +689,8 @@ SET PROFILING_HISTORY_SIZE = 100;
 SET PROFILING = 1;
 
 #SELECT * FROM net_filters LIMIT 50000;
-#SELECT * FROM net_traces LIMIT 50000;
-#SELECT * FROM net_traces_view LIMIT 50000;
+#SELECT * FROM trace_sessions LIMIT 50000;
+#SELECT * FROM trace_sessions_view LIMIT 50000;
 #SELECT * FROM net_realtime LIMIT 50000;
 #SELECT * FROM net_realtime_view LIMIT 50000;
 #SELECT * FROM net_sessions LIMIT 50000;

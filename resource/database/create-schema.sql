@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS review_sessions(
     email VARCHAR(256),
     url VARCHAR(256),
     rating INTEGER,
+    title VARCHAR(256),
     message VARCHAR(1024)
 );
 
@@ -108,6 +109,7 @@ SELECT
     review_sessions.email,
     review_sessions.url,
     review_sessions.rating,
+    review_sessions.title,
     review_sessions.message,
     net_sessions.country,
     net_sessions.city,
@@ -116,9 +118,9 @@ FROM review_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = review_sessions.netId;
 
 # #############################################################################
-# net_traces ##################################################################
+# trace_sessions ##############################################################
 # #############################################################################
-CREATE TABLE IF NOT EXISTS net_traces(
+CREATE TABLE IF NOT EXISTS trace_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
@@ -126,22 +128,24 @@ CREATE TABLE IF NOT EXISTS net_traces(
     source VARCHAR(128),
     project VARCHAR(128),
     message VARCHAR(1024),
+    stack TEXT,
     eventCount INTEGER DEFAULT 1
 );
 
-CREATE INDEX metaoutput_net_traces ON net_traces(netId, _time);
+CREATE INDEX metaoutput_trace_sessions ON trace_sessions(netId, _time);
 
-DROP VIEW IF EXISTS net_traces_view;
+DROP VIEW IF EXISTS trace_sessions_view;
 
-CREATE VIEW net_traces_view AS
+CREATE VIEW trace_sessions_view AS
 SELECT
-    net_traces._id,
-    net_traces._time,
-    net_traces.netId,
-    net_traces.action,
-    net_traces.source,
-    net_traces.project,
-    net_traces.message,
+    trace_sessions._id,
+    trace_sessions._time,
+    trace_sessions.netId,
+    trace_sessions.action,
+    trace_sessions.source,
+    trace_sessions.project,
+    trace_sessions.message,
+    trace_sessions.stack,
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
@@ -149,9 +153,9 @@ SELECT
     net_sessions.os,
     net_sessions.resolution,
     net_sessions.language,
-    net_traces.eventCount
-FROM net_traces
-LEFT JOIN net_sessions ON net_sessions.netId = net_traces.netId;
+    trace_sessions.eventCount
+FROM trace_sessions
+LEFT JOIN net_sessions ON net_sessions.netId = trace_sessions.netId;
 
 # #############################################################################
 # net_realtime ################################################################
