@@ -122,7 +122,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = review_sessions.netId;
 # #############################################################################
 CREATE TABLE IF NOT EXISTS trace_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     netId VARCHAR(16),
     action VARCHAR(32),
     source VARCHAR(128),

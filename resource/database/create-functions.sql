@@ -272,7 +272,7 @@ BEGIN
                 SET SQL_SAFE_UPDATES = 0;
 
                 UPDATE trace_sessions
-                SET _time = CURRENT_TIME, eventCount = eventCount + 1
+                SET _time = eventCount = eventCount + 1
                 WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (stack = __stack);
 
                 SET SQL_SAFE_UPDATES = 1;
