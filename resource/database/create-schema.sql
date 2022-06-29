@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS net_sessions(
     resolution VARCHAR(64),
     language VARCHAR(8),
     ref VARCHAR(256),
+    campaignId VARCHAR(128),
     campaignName VARCHAR(64),
     campaignSource VARCHAR(64),
     campaignMedium VARCHAR(64),
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS net_sessions(
     campaignContent VARCHAR(128)
 );
 
-CREATE INDEX metaoutput_net_sessions ON net_sessions(netId);
+CREATE INDEX metaoutput_net_sessions ON net_sessions(netId, campaignId);
 
 # #############################################################################
 # review_sessions #############################################################
@@ -226,6 +227,7 @@ SELECT
     net_sessions.os,
     net_sessions.resolution,
     net_sessions.language,
+    net_sessions.ref,
     net_sessions.campaignName,
     net_sessions.campaignSource,
     net_sessions.campaignMedium,
@@ -274,6 +276,23 @@ SELECT
     net_sessions.organization
 FROM dev_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = dev_sessions.netId;
+
+# #############################################################################
+# net_campaigns ###############################################################
+# #############################################################################
+CREATE TABLE IF NOT EXISTS net_campaigns(
+    _id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    campaignId VARCHAR(128),
+    name VARCHAR(128),
+    source VARCHAR(128),
+    medium VARCHAR(128),
+    description VARCHAR(256),
+    pattern VARCHAR(256),
+    logo TEXT
+);
+
+CREATE INDEX metaoutput_net_campaigns ON net_campaigns(campaignId, name, source, medium);
 
 # #############################################################################
 # watch_sessions ##############################################################
