@@ -65,9 +65,6 @@ CREATE TABLE IF NOT EXISTS net_sessions(
     language VARCHAR(8),
     ref VARCHAR(256),
     campaignId VARCHAR(128),
-    campaignName VARCHAR(64),
-    campaignSource VARCHAR(64),
-    campaignMedium VARCHAR(64),
     campaignTerm VARCHAR(128),
     campaignContent VARCHAR(128)
 );
