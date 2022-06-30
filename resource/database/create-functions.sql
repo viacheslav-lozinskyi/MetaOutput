@@ -89,7 +89,7 @@ CREATE PROCEDURE net_session_register(
     IN __resolution VARCHAR(64),
     IN __language VARCHAR(8),
     IN __ref VARCHAR(256),
-    IN __campaign VARCHAR(128),
+    IN __campaignGroup VARCHAR(128),
     IN __campaignTerm VARCHAR(128),
     IN __campaignContent VARCHAR(128))
 BEGIN
@@ -134,8 +134,8 @@ BEGIN
             SET __ref = null;
         END IF;
 
-        IF (NOT ISNULL(__campaign) AND (__campaign = "")) THEN
-            SET __campaign = null;
+        IF (NOT ISNULL(__campaignGroup) AND (__campaignGroup = "")) THEN
+            SET __campaignGroup = null;
         END IF;
 
         IF (NOT ISNULL(__campaignTerm) AND (__campaignTerm = "")) THEN
@@ -147,15 +147,15 @@ BEGIN
         END IF;
 
         IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
-            IF (ISNULL(__campaign) AND NOT ISNULL(__ref)) THEN
+            IF (ISNULL(__campaignGroup) AND NOT ISNULL(__ref)) THEN
                 SET @__context = LOWER(__ref);
-                SELECT campaign FROM net_campaigns WHERE @__context LIKE pattern LIMIT 1 INTO __campaign;
+                SELECT campaignGroup FROM net_campaigns WHERE @__context LIKE pattern LIMIT 1 INTO __campaignGroup;
                 #SET __campaignContent = REPLACE(REPLACE(REPLACE(__ref, "https://", ""), "http://", ""), "/", "");
                 #SET __campaignTerm = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y-%m-%d");
             END IF;
-            
-            INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaign, campaignTerm, campaignContent)
-            VALUE (__netId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, UPPER(__campaign), LOWER(__campaignTerm), LOWER(__campaignContent));
+
+            INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaignGroup, campaignTerm, campaignContent)
+            VALUE (__netId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, UPPER(__campaignGroup), LOWER(__campaignTerm), LOWER(__campaignContent));
         ELSE
             SET SQL_SAFE_UPDATES = 0;
 
@@ -246,7 +246,7 @@ BEGIN
         IF ((@__index > 0) AND ISNULL(__stack)) THEN
             SET __stack = SUBSTR(__message, @__index + 1, LENGTH(__message) - @__index);
         END IF;
-        
+
         IF (@__index > 0) THEN
             SET __message = SUBSTR(__message, 1, @__index);
             SET __message = TRIM(__message);
@@ -397,7 +397,7 @@ DROP PROCEDURE IF EXISTS campaign_session_register;
 DELIMITER %%
 CREATE PROCEDURE campaign_session_register(
     IN __time VARCHAR(32),
-    IN __campaign VARCHAR(128),
+    IN __campaignGroup VARCHAR(128),
     IN __name VARCHAR(128),
     IN __source VARCHAR(128),
     IN __medium VARCHAR(128),
@@ -420,22 +420,22 @@ BEGIN
             SET __time = CURRENT_TIMESTAMP();
         END IF;
 
-        IF (ISNULL(__campaign) OR (NOT ISNULL(__campaign) AND NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium) AND (pattern = __pattern) LIMIT 1))) THEN
-            IF (ISNULL(__campaign)) THEN
+        IF (ISNULL(__campaignGroup) OR (NOT ISNULL(__campaignGroup) AND NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium) LIMIT 1))) THEN
+            IF (ISNULL(__campaignGroup)) THEN
                 SET @__context = 0;
                 SELECT COUNT(_id) + 1 FROM net_campaigns WHERE source = __source INTO @__context;
-                SET __campaign = CONCAT(__source, "-", @__context);
-                SET __campaign = REPLACE(__campaign, '.', '-');
-                SET __campaign = UPPER(__campaign);
+                SET __campaignGroup = CONCAT(__source, "-", @__context);
+                SET __campaignGroup = REPLACE(__campaignGroup, '.', '-');
+                SET __campaignGroup = UPPER(__campaignGroup);
             END IF;
 
-            IF (NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium) AND (pattern = __pattern))) THEN
-                INSERT INTO net_campaigns (_time, campaign, name, source, medium, description, pattern, logo)
-                VALUE (__time, __campaign, __name, __source, __medium, __description, __pattern, __logo);
+            IF (NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium))) THEN
+                INSERT INTO net_campaigns (_time, campaignGroup, name, source, medium, description, pattern, logo)
+                VALUE (__time, __campaignGroup, __name, __source, __medium, __description, __pattern, __logo);
             END IF;
         ELSE
             SET SQL_SAFE_UPDATES = 0;
-            SET __campaign = UPPER(__campaign);
+            SET __campaignGroup = UPPER(__campaignGroup);
 
             UPDATE net_campaigns
             SET
@@ -446,7 +446,7 @@ BEGIN
                 description = __description,
                 pattern = __pattern,
                 logo = __logo
-            WHERE (campaign = __campaign);
+            WHERE (campaignGroup = __campaignGroup);
 
             SET SQL_SAFE_UPDATES = 1;
         END IF;
@@ -502,7 +502,8 @@ BEGIN
 
         SET SQL_SAFE_UPDATES = 0;
 
-        DELETE FROM review_sessions WHERE (user = __user) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (url = __url);
+        DELETE FROM review_sessions
+        WHERE (user = __user) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (url = __url);
 
         SET SQL_SAFE_UPDATES = 1;
 
@@ -578,33 +579,30 @@ CREATE PROCEDURE watch_session_register(
     IN __url VARCHAR(256),
     IN __eventCount INTEGER)
 BEGIN
-    SET @isFound =
-        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND (url = __url) AND (_time = __time) LIMIT 1)) AND
-        (NOT EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (project = __project) AND (source = __source) AND (action = __action) AND ((ISNULL(__url) AND (project = __project)) OR (NOT ISNULL(__url) AND (url = __url))) AND ISNULL(__time) AND (__time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1)) AND
-        (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1));
+    IF (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1)) THEN
+        SET @__isFound = null;
+        
+        IF (ISNULL(__eventCount)) THEN
+            SET __eventCount = 1;
+        END IF;
 
-    IF (ISNULL(__eventCount)) THEN
-        SET __eventCount = 1;
-    END IF;
-
-    IF (@isFound AND ISNULL(__project)) THEN
-        SET __project = __url;
         IF (ISNULL(__project)) THEN
-            SET __project = "unknown";
+            SET __project = __url;
+            IF (ISNULL(__project)) THEN
+                SET __project = "unknown";
+            END IF;
+            SET __project = TRIM(__project);
+            IF (POSITION("://" IN __project) > 0) THEN
+                SET __project = MID(__project, POSITION("://" IN __project) + 3, LENGTH(__project));
+            END IF;
+            IF (POSITION("www." IN __project) = 1) THEN
+                SET __project = MID(__project, 5, LENGTH(__project));
+            END IF;
+            IF (POSITION("/" IN __project) > 0) THEN
+                SET __project = LEFT(__project, POSITION("/" IN __project) - 1);
+            END IF;
         END IF;
-        SET __project = TRIM(__project);
-        IF (POSITION("://" IN __project) > 0) THEN
-            SET __project = MID(__project, POSITION("://" IN __project) + 3, LENGTH(__project));
-        END IF;
-        IF (POSITION("www." IN __project) = 1) THEN
-            SET __project = MID(__project, 5, LENGTH(__project));
-        END IF;
-        IF (POSITION("/" IN __project) > 0) THEN
-            SET __project = LEFT(__project, POSITION("/" IN __project) - 1);
-        END IF;
-    END IF;
-
-    IF (@isFound) THEN
+        
         IF (ISNULL(__source)) THEN
             SET __source = "WEB-SITE";
         END IF;
@@ -615,14 +613,36 @@ BEGIN
         SET __source = UPPER(__source);
         SET __action = UPPER(__action);
 
-        IF (ISNULL(__time)) THEN
-            INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
-            VALUE (__netId, __source, __project, __action, __url, __eventCount);
-
-            CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __eventCount);
+        IF (ISNULL(__url)) THEN
+            SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1);
         ELSE
-            INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
-            VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __eventCount);
+            SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1);
+        END IF;
+
+        IF (NOT @__isFound) THEN
+            IF (ISNULL(__time)) THEN
+                INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
+                VALUE (__netId, __source, __project, __action, __url, __eventCount);
+
+                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __eventCount);
+            ELSE
+                INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
+                VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __eventCount);
+            END IF;
+        ELSE
+            SET SQL_SAFE_UPDATES = 0;
+
+            IF (ISNULL(__url)) THEN
+                UPDATE watch_sessions
+                SET eventCount = eventCount + __eventCount
+                WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
+            ELSE
+                UPDATE watch_sessions
+                SET eventCount = eventCount + __eventCount
+                WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
+            END IF;
+
+            SET SQL_SAFE_UPDATES = 1;
         END IF;
     END IF;
 END;%%
@@ -689,7 +709,7 @@ CREATE PROCEDURE service_find_repeated_messages()
 BEGIN
     SELECT *
     FROM app_sessions
-    GROUP BY netId, userId, DATE(_time), source, project
+    GROUP BY netId, userId, DATE(_time), action, source, project
     HAVING COUNT(userId) > 1
     ORDER BY _time, userId;
 END;%%

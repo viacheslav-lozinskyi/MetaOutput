@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS net_sessions(
     resolution VARCHAR(64),
     language VARCHAR(8),
     ref VARCHAR(256),
-    campaign VARCHAR(128),
+    campaignGroup VARCHAR(128),
     campaignId VARCHAR(128),
     campaignTerm VARCHAR(128),
     campaignContent VARCHAR(128)
@@ -79,9 +79,9 @@ CREATE TABLE IF NOT EXISTS review_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
-    action VARCHAR(32),
-    source VARCHAR(128),
-    project VARCHAR(128),
+    action VARCHAR(32) NOT NULL,
+    source VARCHAR(128) NOT NULL,
+    project VARCHAR(128) NOT NULL,
     user VARCHAR(256),
     avatar VARCHAR(256),
     email VARCHAR(256),
@@ -123,9 +123,9 @@ CREATE TABLE IF NOT EXISTS trace_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     netId VARCHAR(16),
-    action VARCHAR(32),
-    source VARCHAR(128),
-    project VARCHAR(128),
+    action VARCHAR(32) NOT NULL,
+    source VARCHAR(128) NOT NULL,
+    project VARCHAR(128) NOT NULL,
     message VARCHAR(1024),
     stack TEXT,
     eventCount INTEGER DEFAULT 1
@@ -201,8 +201,8 @@ CREATE TABLE IF NOT EXISTS app_sessions(
     netId VARCHAR(16) NOT NULL,
     userId VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
-    source VARCHAR(128) NOT NULL,
     project VARCHAR(128) NOT NULL,
+    source VARCHAR(128) NOT NULL,
     eventCount INTEGER DEFAULT 1
 );
 
@@ -226,7 +226,7 @@ SELECT
     net_sessions.resolution,
     net_sessions.language,
     net_sessions.ref,
-    net_sessions.campaign,
+    net_sessions.campaignGroup,
     net_sessions.campaignId,
     net_campaigns.name AS campaignName,
     net_campaigns.source AS campaignSource,
@@ -236,7 +236,7 @@ SELECT
     app_sessions.eventCount
 FROM app_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = app_sessions.netId
-LEFT JOIN net_campaigns ON net_sessions.campaign = net_campaigns.campaign;
+LEFT JOIN net_campaigns ON net_sessions.campaignGroup = net_campaigns.campaignGroup;
 
 # #############################################################################
 # dev_sessions ################################################################
@@ -284,16 +284,16 @@ LEFT JOIN net_sessions ON net_sessions.netId = dev_sessions.netId;
 CREATE TABLE IF NOT EXISTS net_campaigns(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    campaign VARCHAR(128),
-    name VARCHAR(128),
-    source VARCHAR(128),
-    medium VARCHAR(128),
+    campaignGroup VARCHAR(128) UNIQUE NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    source VARCHAR(128) NOT NULL,
+    medium VARCHAR(128) NOT NULL,
     description VARCHAR(256),
     pattern VARCHAR(256),
     logo TEXT
 );
 
-CREATE INDEX metaoutput_net_campaigns ON net_campaigns(campaign, name, source, medium);
+CREATE INDEX metaoutput_net_campaigns ON net_campaigns(campaignGroup, name, source, medium);
 
 # #############################################################################
 # watch_sessions ##############################################################
@@ -302,9 +302,9 @@ CREATE TABLE IF NOT EXISTS watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16) NOT NULL,
-    action VARCHAR(64),
-    source VARCHAR(128),
-    project VARCHAR(128),
+    action VARCHAR(64) NOT NULL,
+    project VARCHAR(128) NOT NULL,
+    source VARCHAR(128) NOT NULL,
     url VARCHAR(256),
     eventCount INTEGER DEFAULT 1
 );
@@ -331,7 +331,7 @@ SELECT
     net_sessions.resolution,
     net_sessions.language,
     net_sessions.ref,
-    net_sessions.campaign,
+    net_sessions.campaignGroup,
     net_sessions.campaignId,
     net_campaigns.name AS campaignName,
     net_campaigns.source AS campaignSource,
@@ -342,7 +342,7 @@ SELECT
 FROM watch_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = watch_sessions.netId
 LEFT JOIN app_sessions ON app_sessions.netId = watch_sessions.netId
-LEFT JOIN net_campaigns ON net_sessions.campaign = net_campaigns.campaign;
+LEFT JOIN net_campaigns ON net_sessions.campaignGroup = net_campaigns.campaignGroup;
 # #############################################################################
 # #############################################################################
 
