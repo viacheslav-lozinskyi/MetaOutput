@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS net_sessions(
     resolution VARCHAR(64),
     language VARCHAR(8),
     ref VARCHAR(256),
+    campaign VARCHAR(128),
     campaignId VARCHAR(128),
     campaignTerm VARCHAR(128),
     campaignContent VARCHAR(128)
@@ -225,14 +226,17 @@ SELECT
     net_sessions.resolution,
     net_sessions.language,
     net_sessions.ref,
-    net_sessions.campaignName,
-    net_sessions.campaignSource,
-    net_sessions.campaignMedium,
+    net_sessions.campaign,
+    net_sessions.campaignId,
+    net_campaigns.name AS campaignName,
+    net_campaigns.source AS campaignSource,
+    net_campaigns.medium AS campaignMedium,
     net_sessions.campaignTerm,
     net_sessions.campaignContent,
     app_sessions.eventCount
 FROM app_sessions
-LEFT JOIN net_sessions ON net_sessions.netId = app_sessions.netId;
+LEFT JOIN net_sessions ON net_sessions.netId = app_sessions.netId
+LEFT JOIN net_campaigns ON net_sessions.campaign = net_campaigns.campaign;
 
 # #############################################################################
 # dev_sessions ################################################################
@@ -280,7 +284,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = dev_sessions.netId;
 CREATE TABLE IF NOT EXISTS net_campaigns(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    campaignId VARCHAR(128),
+    campaign VARCHAR(128),
     name VARCHAR(128),
     source VARCHAR(128),
     medium VARCHAR(128),
@@ -289,7 +293,7 @@ CREATE TABLE IF NOT EXISTS net_campaigns(
     logo TEXT
 );
 
-CREATE INDEX metaoutput_net_campaigns ON net_campaigns(campaignId, name, source, medium);
+CREATE INDEX metaoutput_net_campaigns ON net_campaigns(campaign, name, source, medium);
 
 # #############################################################################
 # watch_sessions ##############################################################
@@ -327,15 +331,18 @@ SELECT
     net_sessions.resolution,
     net_sessions.language,
     net_sessions.ref,
-    net_sessions.campaignName,
-    net_sessions.campaignSource,
-    net_sessions.campaignMedium,
+    net_sessions.campaign,
+    net_sessions.campaignId,
+    net_campaigns.name AS campaignName,
+    net_campaigns.source AS campaignSource,
+    net_campaigns.medium AS campaignMedium,
     net_sessions.campaignTerm,
     net_sessions.campaignContent,
     watch_sessions.eventCount
 FROM watch_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = watch_sessions.netId
-LEFT JOIN app_sessions ON app_sessions.netId = watch_sessions.netId;
+LEFT JOIN app_sessions ON app_sessions.netId = watch_sessions.netId
+LEFT JOIN net_campaigns ON net_sessions.campaign = net_campaigns.campaign;
 # #############################################################################
 # #############################################################################
 

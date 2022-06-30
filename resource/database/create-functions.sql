@@ -89,7 +89,7 @@ CREATE PROCEDURE net_session_register(
     IN __resolution VARCHAR(64),
     IN __language VARCHAR(8),
     IN __ref VARCHAR(256),
-    IN __campaignId VARCHAR(128),
+    IN __campaign VARCHAR(128),
     IN __campaignTerm VARCHAR(128),
     IN __campaignContent VARCHAR(128))
 BEGIN
@@ -134,8 +134,8 @@ BEGIN
             SET __ref = null;
         END IF;
 
-        IF (NOT ISNULL(__campaignId) AND (__campaignId = "")) THEN
-            SET __campaignId = null;
+        IF (NOT ISNULL(__campaign) AND (__campaign = "")) THEN
+            SET __campaign = null;
         END IF;
 
         IF (NOT ISNULL(__campaignTerm) AND (__campaignTerm = "")) THEN
@@ -147,15 +147,15 @@ BEGIN
         END IF;
 
         IF (NOT EXISTS(SELECT _id FROM net_sessions WHERE netId = __netId LIMIT 1)) THEN
-            IF (ISNULL(__campaignId) AND NOT ISNULL(__ref)) THEN
+            IF (ISNULL(__campaign) AND NOT ISNULL(__ref)) THEN
                 SET @__context = LOWER(__ref);
-                SELECT campaignId FROM net_campaigns WHERE @__context LIKE pattern LIMIT 1 INTO __campaignId;
+                SELECT campaign FROM net_campaigns WHERE @__context LIKE pattern LIMIT 1 INTO __campaign;
                 #SET __campaignContent = REPLACE(REPLACE(REPLACE(__ref, "https://", ""), "http://", ""), "/", "");
                 #SET __campaignTerm = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y-%m-%d");
             END IF;
             
-            INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaignId, campaignTerm, campaignContent)
-            VALUE (__netId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, UPPER(__campaignId), LOWER(__campaignTerm), LOWER(__campaignContent));
+            INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaign, campaignTerm, campaignContent)
+            VALUE (__netId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, UPPER(__campaign), LOWER(__campaignTerm), LOWER(__campaignContent));
         ELSE
             SET SQL_SAFE_UPDATES = 0;
 
@@ -397,7 +397,7 @@ DROP PROCEDURE IF EXISTS campaign_session_register;
 DELIMITER %%
 CREATE PROCEDURE campaign_session_register(
     IN __time VARCHAR(32),
-    IN __campaignId VARCHAR(128),
+    IN __campaign VARCHAR(128),
     IN __name VARCHAR(128),
     IN __source VARCHAR(128),
     IN __medium VARCHAR(128),
@@ -420,22 +420,22 @@ BEGIN
             SET __time = CURRENT_TIMESTAMP();
         END IF;
 
-        IF (ISNULL(__campaignId) OR (NOT ISNULL(__campaignId) AND NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium) AND (pattern = __pattern) LIMIT 1))) THEN
-            IF (ISNULL(__campaignId)) THEN
+        IF (ISNULL(__campaign) OR (NOT ISNULL(__campaign) AND NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium) AND (pattern = __pattern) LIMIT 1))) THEN
+            IF (ISNULL(__campaign)) THEN
                 SET @__context = 0;
                 SELECT COUNT(_id) + 1 FROM net_campaigns WHERE source = __source INTO @__context;
-                SET __campaignId = CONCAT(__source, "-", @__context);
-                SET __campaignId = REPLACE(__campaignId, '.', '-');
-                SET __campaignId = UPPER(__campaignId);
+                SET __campaign = CONCAT(__source, "-", @__context);
+                SET __campaign = REPLACE(__campaign, '.', '-');
+                SET __campaign = UPPER(__campaign);
             END IF;
 
             IF (NOT EXISTS(SELECT _id FROM net_campaigns WHERE (name = __name) AND (source = __source) AND (medium = __medium) AND (pattern = __pattern))) THEN
-                INSERT INTO net_campaigns (_time, campaignId, name, source, medium, description, pattern, logo)
-                VALUE (__time, __campaignId, __name, __source, __medium, __description, __pattern, __logo);
+                INSERT INTO net_campaigns (_time, campaign, name, source, medium, description, pattern, logo)
+                VALUE (__time, __campaign, __name, __source, __medium, __description, __pattern, __logo);
             END IF;
         ELSE
             SET SQL_SAFE_UPDATES = 0;
-            SET __campaignId = UPPER(__campaignId);
+            SET __campaign = UPPER(__campaign);
 
             UPDATE net_campaigns
             SET
@@ -446,7 +446,7 @@ BEGIN
                 description = __description,
                 pattern = __pattern,
                 logo = __logo
-            WHERE (campaignId = __campaignId);
+            WHERE (campaign = __campaign);
 
             SET SQL_SAFE_UPDATES = 1;
         END IF;
@@ -640,19 +640,19 @@ BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     IF ISNULL(__daysIgnore) THEN
-        DELETE FROM net_sessions WHERE (netId LIKE "TEST-%");
-        DELETE FROM app_sessions WHERE (netId LIKE "TEST-%") OR (userId LIKE "TEST-%");
-        DELETE FROM dev_sessions WHERE (netId LIKE "TEST-%");
-        DELETE FROM review_sessions WHERE (netId LIKE "TEST-%");
-        DELETE FROM trace_sessions WHERE (netId LIKE "TEST-%");
-        DELETE FROM watch_sessions WHERE (netId LIKE "TEST-%");
+        DELETE FROM net_sessions WHERE (netId LIKE "%TEST-%");
+        DELETE FROM app_sessions WHERE (netId LIKE "%TEST-%") OR (userId LIKE "TEST-%");
+        DELETE FROM dev_sessions WHERE (netId LIKE "%TEST-%");
+        DELETE FROM review_sessions WHERE (netId LIKE "%TEST-%");
+        DELETE FROM trace_sessions WHERE (netId LIKE "%TEST-%");
+        DELETE FROM watch_sessions WHERE (netId LIKE "%TEST-%");
     ELSE
-        DELETE FROM net_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM app_sessions WHERE ((netId LIKE "TEST-%") OR (userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM dev_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM review_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM trace_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM watch_sessions WHERE ((netId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM net_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM app_sessions WHERE ((netId LIKE "%TEST-%") OR (userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM dev_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM review_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM trace_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM watch_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
 
     SET SQL_SAFE_UPDATES = 1;
