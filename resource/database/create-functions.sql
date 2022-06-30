@@ -150,8 +150,6 @@ BEGIN
             IF (ISNULL(__campaignGroup) AND NOT ISNULL(__ref)) THEN
                 SET @__context = LOWER(__ref);
                 SELECT campaignGroup FROM net_campaigns WHERE @__context LIKE pattern LIMIT 1 INTO __campaignGroup;
-                #SET __campaignContent = REPLACE(REPLACE(REPLACE(__ref, "https://", ""), "http://", ""), "/", "");
-                #SET __campaignTerm = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y-%m-%d");
             END IF;
 
             INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaignGroup, campaignTerm, campaignContent)
@@ -351,17 +349,21 @@ BEGIN
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
                 IF (__action = "START") THEN
                     IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) LIMIT 1)) THEN
+                        SET SQL_SAFE_UPDATES = 0;
                         SET __action = "INSTALL";
                         UPDATE app_sessions
                         SET action = "START"
                         WHERE (userId = __userId) AND (action = "INSTALL");
+                        SET SQL_SAFE_UPDATES = 1;
                     END IF;
 
                     IF (EXISTS(SELECT _id FROM (SELECT _id, project FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) < DATE(__time)) ORDER BY _time DESC LIMIT 1) AS context WHERE (context.project != __project))) THEN
+                        SET SQL_SAFE_UPDATES = 0;
                         SET __action = "UPDATE";
                         UPDATE app_sessions
                         SET action = "START"
                         WHERE (userId = __userId) AND (project = __project);
+                        SET SQL_SAFE_UPDATES = 1;
                     END IF;
                 END IF;
 
@@ -378,11 +380,9 @@ BEGIN
 
         IF (@_isFound = true) THEN
             SET SQL_SAFE_UPDATES = 0;
-
             UPDATE app_sessions
             SET eventCount = __eventCount
             WHERE (userId = __userId);
-
             SET SQL_SAFE_UPDATES = 1;
         END IF;
     END IF;
@@ -581,7 +581,7 @@ CREATE PROCEDURE watch_session_register(
 BEGIN
     IF (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1)) THEN
         SET @__isFound = null;
-        
+
         IF (ISNULL(__eventCount)) THEN
             SET __eventCount = 1;
         END IF;
@@ -602,7 +602,7 @@ BEGIN
                 SET __project = LEFT(__project, POSITION("/" IN __project) - 1);
             END IF;
         END IF;
-        
+
         IF (ISNULL(__source)) THEN
             SET __source = "WEB-SITE";
         END IF;
@@ -634,11 +634,15 @@ BEGIN
 
             IF (ISNULL(__url)) THEN
                 UPDATE watch_sessions
-                SET eventCount = eventCount + __eventCount
+                SET
+                    _time = CURRENT_TIMESTAMP,
+                    eventCount = eventCount + 1
                 WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
             ELSE
                 UPDATE watch_sessions
-                SET eventCount = eventCount + __eventCount
+                SET
+                    _time = CURRENT_TIMESTAMP,
+                    eventCount = eventCount + 1
                 WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
             END IF;
 
