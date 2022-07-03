@@ -29,15 +29,16 @@ SET character_set_results = "UTF8MB4";
 # #############################################################################
 # CREATING TABLES #############################################################
 # #############################################################################
-# net_crawlers ################################################################
+# net_detectors ###############################################################
 # #############################################################################
-CREATE TABLE net_crawlers(
+CREATE TABLE net_detectors(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    url VARCHAR(256) NOT NULL UNIQUE,
-    downloads INTEGER,
-    reviews INTEGER
+    _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    project VARCHAR(128) NOT NULL,
+    url VARCHAR(256) NOT NULL UNIQUE
 );
+
+CREATE INDEX metaoutput_net_detectors ON net_detectors(url);
 
 # #############################################################################
 # net_filters #################################################################
@@ -163,14 +164,13 @@ CREATE TABLE IF NOT EXISTS net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
-    source VARCHAR(64) NOT NULL,
-    value1 VARCHAR(256),
-    value2 VARCHAR(256),
-    value3 VARCHAR(256),
-    value4 VARCHAR(256)
+    mode VARCHAR(64) NOT NULL,
+    action VARCHAR(64) NOT NULL,
+    project VARCHAR(128) NOT NULL,
+    source VARCHAR(128) NOT NULL
 );
 
-CREATE INDEX metaoutput_net_realtime ON net_realtime(_time);
+CREATE INDEX metaoutput_net_realtime ON net_realtime(_time, netId);
 
 DROP VIEW IF EXISTS net_realtime_view;
 
@@ -178,11 +178,10 @@ CREATE VIEW net_realtime_view AS
 SELECT
     net_realtime._time,
     net_realtime.netId,
+    net_realtime.mode,
+    net_realtime.action,
+    net_realtime.project,
     net_realtime.source,
-    net_realtime.value1,
-    net_realtime.value2,
-    net_realtime.value3,
-    net_realtime.value4,
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
@@ -309,7 +308,7 @@ CREATE TABLE IF NOT EXISTS watch_sessions(
     eventCount INTEGER DEFAULT 1
 );
 
-CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netId, source);
+CREATE INDEX metaoutput_watch_sessions ON watch_sessions(netId, source, project, action);
 
 DROP VIEW IF EXISTS watch_sessions_view;
 

@@ -12,17 +12,61 @@ USE metaoutput;
 # #############################################################################
 
 # #############################################################################
-# net_crawler_register ########################################################
+# net_detector_register #######################################################
 # #############################################################################
-DROP PROCEDURE IF EXISTS net_crawler_register;
+DROP PROCEDURE IF EXISTS net_detector_register;
 
 DELIMITER %%
-CREATE PROCEDURE net_crawler_register(
+CREATE PROCEDURE net_detector_register(
+    IN __project VARCHAR(128),
     IN __url VARCHAR(256))
 BEGIN
-    IF (NOT ISNULL(__url) AND NOT EXISTS(SELECT _id FROM net_crawlers WHERE (url = __url))) THEN
-        INSERT INTO net_crawlers(url)
-        VALUE (__url);
+    IF (NOT ISNULL(__url) AND NOT EXISTS(SELECT _id FROM net_detectors WHERE (url = __url))) THEN
+        INSERT INTO net_detectors(project, url)
+        VALUE (__project, __url);
+    ELSE
+        SET SQL_SAFE_UPDATES = 0;
+        UPDATE net_detectors
+        SET project = __project
+        WHERE (url = __url);
+        SET SQL_SAFE_UPDATES = 1;
+    END IF;
+END;%%
+DELIMITER ;
+
+# #############################################################################
+# net_detector_unregister #####################################################
+# #############################################################################
+DROP PROCEDURE IF EXISTS net_detector_unregister;
+
+DELIMITER %%
+CREATE PROCEDURE net_detector_unregister(
+    IN __url VARCHAR(256))
+BEGIN
+    IF (NOT ISNULL(__url) AND EXISTS(SELECT _id FROM net_detectors WHERE (url = __url))) THEN
+        SET SQL_SAFE_UPDATES = 0;
+        DELETE FROM net_detectors
+        WHERE (url = __url);
+        SET SQL_SAFE_UPDATES = 1;
+    END IF;
+END;%%
+DELIMITER ;
+
+# #############################################################################
+# net_detector_update #########################################################
+# #############################################################################
+DROP PROCEDURE IF EXISTS net_detector_update;
+
+DELIMITER %%
+CREATE PROCEDURE net_detector_update(
+    IN __url VARCHAR(256))
+BEGIN
+    IF (NOT ISNULL(__url) AND EXISTS(SELECT _id FROM net_detectors WHERE (url = __url))) THEN
+        SET SQL_SAFE_UPDATES = 0;
+        UPDATE net_detectors
+        SET _time = CURRENT_TIMESTAMP()
+        WHERE (url = __url);
+        SET SQL_SAFE_UPDATES = 1;
     END IF;
 END;%%
 DELIMITER ;
@@ -49,6 +93,29 @@ END;%%
 DELIMITER ;
 
 # #############################################################################
+# net_filter_unregister #######################################################
+# #############################################################################
+DROP PROCEDURE IF EXISTS net_filter_unregister;
+
+DELIMITER %%
+CREATE PROCEDURE net_filter_unregister(
+    IN __type ENUM("IP", "URL"),
+    IN __value VARCHAR(256))
+BEGIN
+    SET __type = UPPER(__type);
+    SET __value = LOWER(__value);
+    SET __value = TRIM(__value);
+    
+    IF (NOT ISNULL(__type) AND NOT ISNULL(__value) AND EXISTS(SELECT _id FROM net_filters WHERE (type = __type) AND (value = __value))) THEN
+        SET SQL_SAFE_UPDATES = 0;
+        DELETE FROM net_filters
+        WHERE (type = __type) AND (value = __value);
+        SET SQL_SAFE_UPDATES = 1;
+    END IF;
+END;%%
+DELIMITER ;
+
+# #############################################################################
 # net_realtime_register #######################################################
 # #############################################################################
 DROP PROCEDURE IF EXISTS net_realtime_register;
@@ -56,18 +123,17 @@ DROP PROCEDURE IF EXISTS net_realtime_register;
 DELIMITER %%
 CREATE PROCEDURE net_realtime_register(
     IN __netId VARCHAR(16),
-    IN __source VARCHAR(64),
-    IN __value1 VARCHAR(256),
-    IN __value2 VARCHAR(256),
-    IN __value3 VARCHAR(256),
-    IN __value4 VARCHAR(256))
+    IN __mode VARCHAR(64),
+    IN __source VARCHAR(128),
+    IN __project VARCHAR(128),
+    IN __action VARCHAR(64))
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     DELETE FROM net_realtime WHERE _time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-    INSERT INTO net_realtime(netId, source, value1, value2, value3, value4)
-    VALUE (__netId, __source, __value1, __value2, __value3, __value4);
+    INSERT INTO net_realtime(netId, mode, action, project, source)
+    VALUE (__netId, __mode, __action, __project, __source);
 
     SET SQL_SAFE_UPDATES = 1;
 END;%%
@@ -265,18 +331,16 @@ BEGIN
         IF (ISNULL(__time)) THEN
             IF (EXISTS(SELECT _id FROM trace_sessions WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (stack = __stack) LIMIT 1)) THEN
                 SET SQL_SAFE_UPDATES = 0;
-
                 UPDATE trace_sessions
                 SET _time = eventCount = eventCount + 1
                 WHERE (netId = __netId) AND (DATE(_time) = CURRENT_DATE) AND (source = __source) AND (project = __project) AND (action = __action) AND (message = __message) AND (stack = __stack);
-
                 SET SQL_SAFE_UPDATES = 1;
             ELSE
                 INSERT INTO trace_sessions (netId, source, project, action, message, stack)
                 VALUE (__netId, __source, __project, __action, __message, __stack);
             END IF;
 
-            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, __message);
+            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action);
         ELSE
             INSERT INTO trace_sessions (_time, netId, source, project, action, message, stack)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __message, __stack);
@@ -343,7 +407,7 @@ BEGIN
 
                 SET @_isFound = true;
 
-                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, null);
+                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action);
             END IF;
         ELSE
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
@@ -511,7 +575,7 @@ BEGIN
             INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (__netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
 
-            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action, __rating);
+            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action);
         ELSE
             INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
@@ -529,9 +593,9 @@ DELIMITER %%
 CREATE PROCEDURE dev_session_register(
     IN __time VARCHAR(32),
     IN __netId VARCHAR(16),
-    IN __action VARCHAR(64),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
+    IN __action VARCHAR(64),
     IN __branch VARCHAR(128),
     IN __user VARCHAR(128),
     IN __avatar VARCHAR(256),
@@ -554,7 +618,7 @@ BEGIN
                 INSERT INTO dev_sessions (netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (__netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
 
-                CALL net_realtime_register(__netId, "DEVELOPMENT", __project, __source, __action, __user);
+                CALL net_realtime_register(__netId, "DEVELOPMENT", __source, __project, __action);
             ELSE
                 INSERT INTO dev_sessions (_time, netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
@@ -624,7 +688,7 @@ BEGIN
                 INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
                 VALUE (__netId, __source, __project, __action, __url, __eventCount);
 
-                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __eventCount);
+                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action);
             ELSE
                 INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __eventCount);
@@ -635,13 +699,13 @@ BEGIN
             IF (ISNULL(__url)) THEN
                 UPDATE watch_sessions
                 SET
-                    _time = CURRENT_TIMESTAMP,
+                    _time = CURRENT_TIMESTAMP(),
                     eventCount = eventCount + 1
                 WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
             ELSE
                 UPDATE watch_sessions
                 SET
-                    _time = CURRENT_TIMESTAMP,
+                    _time = CURRENT_TIMESTAMP(),
                     eventCount = eventCount + 1
                 WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
             END IF;
@@ -713,7 +777,7 @@ CREATE PROCEDURE service_find_repeated_messages()
 BEGIN
     SELECT *
     FROM app_sessions
-    GROUP BY netId, userId, DATE(_time), action, source, project
+    GROUP BY netId, userId, DATE(_time), source, project
     HAVING COUNT(userId) > 1
     ORDER BY _time, userId;
 END;%%
@@ -754,28 +818,28 @@ CALL campaign_session_register(null, "VISUAL-STUDIO-MARKETPLACE", "view-extensio
 CALL campaign_session_register(null, "YOUTUBE", "view-video", "youtube.com", "organic", "View video on YouTube.", "%youtube.com%", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEABAMAAACuXLVVAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAqUExURUdwTM0gH84iIc0gH84hIM0gH80gHtleXe7OzeWfn80gH////+ng4Pns7PpP7nkAAAAKdFJOUwCcwnfhTijM7Nz0C+NIAAAD90lEQVR42u2cMW/aQBSASSkMnTBRl0zBYmIyRV0yRQh18FQpIkMmVBWGzJkyZmGP8gMCOBnuFyRymJNK3jMk/S+1DUMX2/fu3rtHpPdNSCC9T/fOd+fj3tVqgiAIgiAIgiAIgiAIgiAIgiAIgvBRmM1m4/F4MBh4GZ2On9PtDoebT+12/kX6g/Rn6Y+Rok7Hg77nd0fKgGjoe/uD8amhy7Tf7iokhp39U2D4k55CJvoKCN88UAQsfurGb/QUCUtNgyZR/DQNegYHioyFTvxfipAfGgkIKQVUdRLOSOOru8oGUMRUNcFvaoGqJgipBaLy+HVFTlAqcE4vcFwq0KMXKB2MGsoBkxKBPRcCAW8XKO8ERy4E7jhHgXxZwDgOV/XCuhuB4l74yY1Aq1DgixuBW661QPVjcORGYMWxHNV7DkM3AqpQwFH8woGg6UrgJ+dkXDYQ1F0JHHKuBsomZGcCRUPhZ1cC99wCd7xzUbHAuSuBFe9kWPxqwC6gPxtbzlpL69l4bmcQWQu8PZMI6L+ZvsVzigUBRGA9ZxaIn67wBUKIQPxuYTDBEIiTa2wBBRNYJzfIazKgQPxkbIAkEL+bGgS2i+KtQJwkF7wC6yS5xBNowAXSbmBkgCeQdoOXS1aBtBsYGAS27yX/CaTd4KXHKZAmAW6AKpAZ/Ak5BdIkQA1wBQwMWrgCWRJgBsgtsDF4tm6BPXOBLAkQA+wUbA3mfC2wSYK+AYEAzIBCIE9CcsUnsDW44RPYJEHPgEYAYEAkkCdBa3VAJJAt0PRWaFQC2uv0QyqB+IbxMQTEJxO4VrwCV5aTUd1SALBfQNICkD0bihYA7RkRCMD2rPAFgPuG6ALQfUtsgVfWd0OD+AUt0DAUgMfHbYHXEEvArAUeTXbuEQWM4iMKmMXH26YzjI8m8NhTrAIPpvGLThIBBczj4wg8XCpWAZv4Rdv1IUDgySY+gsDaKr79f0Z/7eIXCej36gu7+Pb/G6oPLmD/57Uly10VOHIlsNhVgTNXAivuYzw7e5DJmQD7WbJb3oPVO3CekP1EJfuZ0hb3qdqA+1zxhPtkNWeZU9ls7GxBsOAucFhxl3jccxe5HHOX+bR2t9DJzXMYcRe7LbjL/e65Cx4POcueS3YnnPXCiLvst7z0eo+3Czgp/Z7UeHNQVfxOvi4Mqi4gIB4MV9V3gDAOAg6uQNC4BIM0CcvJh7gIhegqmjR+UNOk+Y2k/bUvw8mehTb2kBjtT2owpv0ujsTI9wbfT6Hht7mYnvQ93x+ZmIyGeWCky6lqzdl0cydW3/Pavu8PRznhRi1KP+a3Y3U6XnYrFtadWIIgCIIgCIIgCIIgCIIgCIIgCILggn/JJFu5AinihQAAAABJRU5ErkJggg==");
 CALL campaign_session_register(null, "METAOUTPUT", "view-site", "metaoutput.net", "organic", "View MetaOutput web site.", "%metaoutput.net%", "data:image/png;base64,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");
 
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject-2022");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-AUDIO");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-CS");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-CSV");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-DLL");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-HTML");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-INI");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-JS");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-JSON");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-MD");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-PDF");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-PICTURE");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-SQL");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-TOML");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-VB");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-VIDEO");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-XML");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-YAML");
-CALL net_crawler_register("https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-ZIP");
+CALL net_detector_register("MetaOutput", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019");
+CALL net_detector_register("MetaOutput", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022");
+CALL net_detector_register("MetaProject", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject");
+CALL net_detector_register("MetaProject", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject-2022");
+CALL net_detector_register("Preview-AUDIO", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-AUDIO");
+CALL net_detector_register("Preview-CS", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-CS");
+CALL net_detector_register("Preview-CSV", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-CSV");
+CALL net_detector_register("Preview-DLL", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-DLL");
+CALL net_detector_register("Preview-HTML", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-HTML");
+CALL net_detector_register("Preview-INI", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-INI");
+CALL net_detector_register("Preview-JS", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-JS");
+CALL net_detector_register("Preview-JSON", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-JSON");
+CALL net_detector_register("Preview-MD", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-MD");
+CALL net_detector_register("Preview-PDF", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-PDF");
+CALL net_detector_register("Preview-PICTURE", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-PICTURE");
+CALL net_detector_register("Preview-SQL", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-SQL");
+CALL net_detector_register("Preview-TOML", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-TOML");
+CALL net_detector_register("Preview-VB", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-VB");
+CALL net_detector_register("Preview-VIDEO", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-VIDEO");
+CALL net_detector_register("Preview-XML", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-XML");
+CALL net_detector_register("Preview-YAML", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-YAML");
+CALL net_detector_register("Preview-ZIP", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-ZIP");
 # #############################################################################
 # #############################################################################
 
