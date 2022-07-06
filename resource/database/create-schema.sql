@@ -287,12 +287,68 @@ CREATE TABLE IF NOT EXISTS net_campaigns(
     name VARCHAR(128) NOT NULL,
     source VARCHAR(128) NOT NULL,
     medium VARCHAR(128) NOT NULL,
+    user VARCHAR(128),
     description VARCHAR(256),
     pattern VARCHAR(256),
     logo TEXT
 );
 
 CREATE INDEX metaoutput_net_campaigns ON net_campaigns(campaignGroup, name, source, medium);
+
+DROP VIEW campaign_sessions_view;
+
+CREATE VIEW campaign_sessions_view AS
+SELECT
+    app_sessions._time,
+    app_sessions.netId,
+    app_sessions.action,
+    app_sessions.source,
+    app_sessions.project,
+    net_sessions.country,
+    net_sessions.city,
+    net_sessions.organization,
+    net_sessions.os,
+    net_sessions.resolution,
+    net_sessions.language,
+    net_sessions.ref,
+    net_sessions.campaignGroup,
+    net_sessions.campaignId,
+    net_campaigns.name AS campaignName,
+    net_campaigns.source AS campaignSource,
+    net_campaigns.medium AS campaignMedium,
+    net_sessions.campaignTerm,
+    net_sessions.campaignContent
+FROM app_sessions
+LEFT JOIN net_sessions ON net_sessions.netId = app_sessions.netId
+LEFT JOIN net_campaigns ON net_sessions.campaignGroup = net_campaigns.campaignGroup
+WHERE NOT ISNULL(net_sessions.campaignGroup) AND (app_sessions.action != "START")
+
+UNION
+
+SELECT
+    watch_sessions._time,
+    watch_sessions.netId,
+    watch_sessions.action,
+    watch_sessions.source,
+    watch_sessions.project,
+    net_sessions.country,
+    net_sessions.city,
+    net_sessions.organization,
+    net_sessions.os,
+    net_sessions.resolution,
+    net_sessions.language,
+    net_sessions.ref,
+    net_sessions.campaignGroup,
+    net_sessions.campaignId,
+    net_campaigns.name AS campaignName,
+    net_campaigns.source AS campaignSource,
+    net_campaigns.medium AS campaignMedium,
+    net_sessions.campaignTerm,
+    net_sessions.campaignContent
+FROM watch_sessions
+LEFT JOIN net_sessions ON net_sessions.netId = watch_sessions.netId
+LEFT JOIN net_campaigns ON net_sessions.campaignGroup = net_campaigns.campaignGroup
+WHERE NOT ISNULL(net_sessions.campaignGroup);
 
 # #############################################################################
 # watch_sessions ##############################################################
