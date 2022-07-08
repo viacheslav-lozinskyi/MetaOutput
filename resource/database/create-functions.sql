@@ -713,13 +713,13 @@ BEGIN
                 IF (ISNULL(__url)) THEN
                     UPDATE watch_sessions
                     SET
-                        _time = CURRENT_TIMESTAMP(),
+                        _time = __time,
                         eventCount = eventCount + __eventCount
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (DATE(_time) = DATE(__time));
                 ELSE
                     UPDATE watch_sessions
                     SET
-                        _time = CURRENT_TIMESTAMP(),
+                        _time = __time,
                         eventCount = eventCount + __eventCount
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (DATE(_time) = DATE(__time));
                 END IF;
