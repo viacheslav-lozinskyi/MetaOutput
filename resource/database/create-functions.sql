@@ -677,13 +677,56 @@ BEGIN
         SET __source = UPPER(__source);
         SET __action = UPPER(__action);
 
-        IF (ISNULL(__url)) THEN
-            SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1);
+        IF (ISNULL(__time)) THEN
+            IF (ISNULL(__url)) THEN
+                SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1);
+            ELSE
+                SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1);
+            END IF;
         ELSE
-            SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY)) LIMIT 1);
+            IF (ISNULL(__url)) THEN
+                SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (DATE(_time) = DATE(__time)) LIMIT 1);
+            ELSE
+                SET @__isFound = EXISTS(SELECT _id FROM watch_sessions WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (DATE(_time) = DATE(__time)) LIMIT 1);
+            END IF;
+
         END IF;
 
-        IF (NOT @__isFound) THEN
+        IF (@__isFound) THEN
+            SET SQL_SAFE_UPDATES = 0;
+            
+            IF (ISNULL(__time)) THEN
+                IF (ISNULL(__url)) THEN
+                    UPDATE watch_sessions
+                    SET
+                        _time = CURRENT_TIMESTAMP(),
+                        eventCount = eventCount + 1
+                    WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
+                ELSE
+                    UPDATE watch_sessions
+                    SET
+                        _time = CURRENT_TIMESTAMP(),
+                        eventCount = eventCount + 1
+                    WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
+                END IF;
+            ELSE
+                IF (ISNULL(__url)) THEN
+                    UPDATE watch_sessions
+                    SET
+                        _time = CURRENT_TIMESTAMP(),
+                        eventCount = eventCount + 1
+                    WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (DATE(_time) = DATE(__time));
+                ELSE
+                    UPDATE watch_sessions
+                    SET
+                        _time = CURRENT_TIMESTAMP(),
+                        eventCount = eventCount + 1
+                    WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (DATE(_time) = DATE(__time));
+                END IF;
+            END IF;
+
+            SET SQL_SAFE_UPDATES = 1;
+        ELSE
             IF (ISNULL(__time)) THEN
                 INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
                 VALUE (__netId, __source, __project, __action, __url, __eventCount);
@@ -693,24 +736,6 @@ BEGIN
                 INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __eventCount);
             END IF;
-        ELSE
-            SET SQL_SAFE_UPDATES = 0;
-
-            IF (ISNULL(__url)) THEN
-                UPDATE watch_sessions
-                SET
-                    _time = CURRENT_TIMESTAMP(),
-                    eventCount = eventCount + 1
-                WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
-            ELSE
-                UPDATE watch_sessions
-                SET
-                    _time = CURRENT_TIMESTAMP(),
-                    eventCount = eventCount + 1
-                WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
-            END IF;
-
-            SET SQL_SAFE_UPDATES = 1;
         END IF;
     END IF;
 END;%%
@@ -840,6 +865,10 @@ CALL net_detector_register("Preview-VIDEO", "https://marketplace.visualstudio.co
 CALL net_detector_register("Preview-XML", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-XML");
 CALL net_detector_register("Preview-YAML", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-YAML");
 CALL net_detector_register("Preview-ZIP", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-ZIP");
+CALL net_detector_register("Preview-CPP", "https://marketplace.visualstudio.com/items?itemName=NesviatypaskhaOleksii.Preview-cpp");
+CALL net_detector_register("MetaOutput.Client", "https://www.nuget.org/packages/MetaOutput.Client");
+CALL net_detector_register("MetaOutput.Media", "https://www.nuget.org/packages/MetaOutput.Media");
+CALL net_detector_register("MetaPlatform", "https://www.nuget.org/packages/MetaPlatform");
 # #############################################################################
 # #############################################################################
 
