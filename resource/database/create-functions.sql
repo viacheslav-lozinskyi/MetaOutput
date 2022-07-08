@@ -646,7 +646,7 @@ BEGIN
     IF (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1)) THEN
         SET @__isFound = null;
 
-        IF (ISNULL(__eventCount)) THEN
+        IF (ISNULL(__eventCount) OR (__eventCount < 1)) THEN
             SET __eventCount = 1;
         END IF;
 
@@ -700,13 +700,13 @@ BEGIN
                     UPDATE watch_sessions
                     SET
                         _time = CURRENT_TIMESTAMP(),
-                        eventCount = eventCount + 1
+                        eventCount = eventCount + __eventCount
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
                 ELSE
                     UPDATE watch_sessions
                     SET
                         _time = CURRENT_TIMESTAMP(),
-                        eventCount = eventCount + 1
+                        eventCount = eventCount + __eventCount
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
                 END IF;
             ELSE
@@ -714,13 +714,13 @@ BEGIN
                     UPDATE watch_sessions
                     SET
                         _time = CURRENT_TIMESTAMP(),
-                        eventCount = eventCount + 1
+                        eventCount = eventCount + __eventCount
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (DATE(_time) = DATE(__time));
                 ELSE
                     UPDATE watch_sessions
                     SET
                         _time = CURRENT_TIMESTAMP(),
-                        eventCount = eventCount + 1
+                        eventCount = eventCount + __eventCount
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (DATE(_time) = DATE(__time));
                 END IF;
             END IF;
