@@ -167,7 +167,8 @@ CREATE TABLE IF NOT EXISTS net_realtime(
     mode VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
-    source VARCHAR(128) NOT NULL
+    source VARCHAR(128) NOT NULL,
+    events INTEGER
 );
 
 CREATE INDEX metaoutput_net_realtime ON net_realtime(_time, netId);
@@ -184,7 +185,8 @@ SELECT
     net_realtime.source,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.organization
+    net_sessions.organization,
+    net_realtime.events
 FROM net_realtime
 LEFT JOIN net_sessions ON net_sessions.netId = net_realtime.netId;
 

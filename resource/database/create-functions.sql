@@ -126,14 +126,15 @@ CREATE PROCEDURE net_realtime_register(
     IN __mode VARCHAR(64),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
-    IN __action VARCHAR(64))
+    IN __action VARCHAR(64),
+    IN __events INTEGER)
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     DELETE FROM net_realtime WHERE _time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-    INSERT INTO net_realtime(netId, mode, action, project, source)
-    VALUE (__netId, __mode, __action, __project, __source);
+    INSERT INTO net_realtime(netId, mode, action, project, source, events)
+    VALUE (__netId, __mode, __action, __project, __source, __events);
 
     SET SQL_SAFE_UPDATES = 1;
 END;%%
@@ -340,7 +341,7 @@ BEGIN
                 VALUE (__netId, __source, __project, __action, __message, __stack);
             END IF;
 
-            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action);
+            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, null);
         ELSE
             INSERT INTO trace_sessions (_time, netId, source, project, action, message, stack)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __message, __stack);
@@ -362,15 +363,15 @@ CREATE PROCEDURE app_session_register(
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
     IN __userId VARCHAR(64),
-    IN __eventCount INTEGER)
+    IN __events INTEGER)
 BEGIN
     IF (NOT ISNULL(__userId)) THEN
         SET @_context = 0;
         SET @_isFound = false;
         SET __action = UPPER(__action);
 
-        IF (ISNULL(__eventCount) OR (__eventCount = 0)) THEN
-            SET __eventCount = 1;
+        IF (ISNULL(__events) OR (__events = 0)) THEN
+            SET __events = 1;
         END IF;
 
         SELECT MAX(eventCount) FROM app_sessions WHERE (userId = __userId) INTO @_context;
@@ -401,13 +402,13 @@ BEGIN
                 INSERT INTO app_sessions (netId, userId, action, source, project)
                 VALUE (__netId, __userId, __action, __source, __project);
 
-                IF (NOT ISNULL(@_context) AND NOT ISNULL(__eventCount) AND (__eventCount < @_context)) THEN
-                    SET __eventCount = @_context + 1;
+                IF (NOT ISNULL(@_context) AND NOT ISNULL(__events) AND (__events < @_context)) THEN
+                    SET __events = @_context + 1;
                 END IF;
 
                 SET @_isFound = true;
 
-                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action);
+                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, __events);
             END IF;
         ELSE
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
@@ -434,8 +435,8 @@ BEGIN
                 INSERT INTO app_sessions (_time, netId, userId, action, source, project)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __userId, __action, __source, __project);
 
-                IF (NOT ISNULL(@_context) AND NOT ISNULL(__eventCount) AND (__eventCount < @_context)) THEN
-                    SET __eventCount = @_context;
+                IF (NOT ISNULL(@_context) AND NOT ISNULL(__events) AND (__events < @_context)) THEN
+                    SET __events = @_context;
                 END IF;
 
                 SET @_isFound = true;
@@ -445,7 +446,7 @@ BEGIN
         IF (@_isFound = true) THEN
             SET SQL_SAFE_UPDATES = 0;
             UPDATE app_sessions
-            SET eventCount = __eventCount
+            SET eventCount = __events
             WHERE (userId = __userId);
             SET SQL_SAFE_UPDATES = 1;
         END IF;
@@ -575,7 +576,7 @@ BEGIN
             INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (__netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
 
-            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action);
+            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action, null);
         ELSE
             INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
@@ -618,7 +619,7 @@ BEGIN
                 INSERT INTO dev_sessions (netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (__netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
 
-                CALL net_realtime_register(__netId, "DEVELOPMENT", __source, __project, __action);
+                CALL net_realtime_register(__netId, "DEVELOPMENT", __source, __project, __action, null);
             ELSE
                 INSERT INTO dev_sessions (_time, netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
@@ -641,13 +642,13 @@ CREATE PROCEDURE watch_session_register(
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
     IN __url VARCHAR(256),
-    IN __eventCount INTEGER)
+    IN __events INTEGER)
 BEGIN
     IF (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1)) THEN
         SET @__isFound = null;
 
-        IF (ISNULL(__eventCount) OR (__eventCount < 1)) THEN
-            SET __eventCount = 1;
+        IF (ISNULL(__events) OR (__events < 1)) THEN
+            SET __events = 1;
         END IF;
 
         IF (ISNULL(__project)) THEN
@@ -700,13 +701,13 @@ BEGIN
                     UPDATE watch_sessions
                     SET
                         _time = CURRENT_TIMESTAMP(),
-                        eventCount = eventCount + __eventCount
+                        eventCount = eventCount + __events
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
                 ELSE
                     UPDATE watch_sessions
                     SET
                         _time = CURRENT_TIMESTAMP(),
-                        eventCount = eventCount + __eventCount
+                        eventCount = eventCount + __events
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (_time > DATE_SUB(NOW(), INTERVAL 1 DAY));
                 END IF;
             ELSE
@@ -714,13 +715,13 @@ BEGIN
                     UPDATE watch_sessions
                     SET
                         _time = __time,
-                        eventCount = eventCount + __eventCount
+                        eventCount = eventCount + __events
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND ISNULL(url) AND (DATE(_time) = DATE(__time));
                 ELSE
                     UPDATE watch_sessions
                     SET
                         _time = __time,
-                        eventCount = eventCount + __eventCount
+                        eventCount = eventCount + __events
                     WHERE (netId = __netId) AND (action = __action) AND (project = __project) AND (source = __source) AND (url = __url) AND (DATE(_time) = DATE(__time));
                 END IF;
             END IF;
@@ -729,12 +730,12 @@ BEGIN
         ELSE
             IF (ISNULL(__time)) THEN
                 INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
-                VALUE (__netId, __source, __project, __action, __url, __eventCount);
+                VALUE (__netId, __source, __project, __action, __url, __events);
 
-                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action);
+                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __events);
             ELSE
                 INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
-                VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __eventCount);
+                VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __events);
             END IF;
         END IF;
     END IF;
