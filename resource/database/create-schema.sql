@@ -184,10 +184,7 @@ SELECT
     net_realtime.source,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.organization,
-    net_sessions.os,
-    net_sessions.resolution,
-    net_sessions.language
+    net_sessions.organization
 FROM net_realtime
 LEFT JOIN net_sessions ON net_sessions.netId = net_realtime.netId;
 
