@@ -127,14 +127,15 @@ CREATE PROCEDURE net_realtime_register(
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
+    IN __message TEXT,
     IN __events INTEGER)
 BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     DELETE FROM net_realtime WHERE _time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-    INSERT INTO net_realtime(netId, mode, action, project, source, events)
-    VALUE (__netId, __mode, __action, __project, __source, __events);
+    INSERT INTO net_realtime(netId, mode, action, project, source, message, events)
+    VALUE (__netId, __mode, __action, __project, __source, __message, __events);
 
     SET SQL_SAFE_UPDATES = 1;
 END;%%
@@ -341,7 +342,7 @@ BEGIN
                 VALUE (__netId, __source, __project, __action, __message, __stack);
             END IF;
 
-            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, null);
+            CALL net_realtime_register(__netId, "TRACE", __source, __project, __action, __message, null);
         ELSE
             INSERT INTO trace_sessions (_time, netId, source, project, action, message, stack)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __message, __stack);
@@ -408,7 +409,7 @@ BEGIN
 
                 SET @_isFound = true;
 
-                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, __events);
+                CALL net_realtime_register(__netId, "APPLICATION", __source, __project, __action, null, __events);
             END IF;
         ELSE
             IF (NOT EXISTS(SELECT _id FROM app_sessions WHERE (userId = __userId) AND (DATE(_time) = DATE(__time)) LIMIT 1)) THEN
@@ -576,7 +577,7 @@ BEGIN
             INSERT INTO review_sessions (netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (__netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
 
-            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action, null);
+            CALL net_realtime_register(__netId, "REVIEW", __source, __project, __action, __message, null);
         ELSE
             INSERT INTO review_sessions (_time, netId, source, project, action, user, avatar, email, url, rating, message)
             VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __user, __avatar, __email, __url, __rating, __message);
@@ -619,7 +620,7 @@ BEGIN
                 INSERT INTO dev_sessions (netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (__netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
 
-                CALL net_realtime_register(__netId, "DEVELOPMENT", __source, __project, __action, null);
+                CALL net_realtime_register(__netId, "DEVELOPMENT", __source, __project, __action, __message, null);
             ELSE
                 INSERT INTO dev_sessions (_time, netId, action, source, project, branch, user, avatar, url, message)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __action, __source, __project, __branch, __user, __avatar, __url, __message);
@@ -732,7 +733,7 @@ BEGIN
                 INSERT INTO watch_sessions (netId, source, project, action, url, eventCount)
                 VALUE (__netId, __source, __project, __action, __url, __events);
 
-                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __events);
+                CALL net_realtime_register(__netId, "WATCH", __source, __project, __action, __url, __events);
             ELSE
                 INSERT INTO watch_sessions (_time, netId, source, project, action, url, eventCount)
                 VALUE (STR_TO_DATE(__time, "%Y-%m-%dT%TZ"), __netId, __source, __project, __action, __url, __events);
