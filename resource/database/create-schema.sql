@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     netId VARCHAR(16),
-    mode VARCHAR(64) NOT NULL,
+    channel VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
     source VARCHAR(128) NOT NULL,
@@ -181,7 +181,7 @@ CREATE VIEW net_realtime_view AS
 SELECT
     net_realtime._time,
     net_realtime.netId,
-    net_realtime.mode,
+    net_realtime.channel,
     net_realtime.action,
     net_realtime.project,
     net_realtime.source,

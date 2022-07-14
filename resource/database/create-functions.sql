@@ -123,7 +123,7 @@ DROP PROCEDURE IF EXISTS net_realtime_register;
 DELIMITER %%
 CREATE PROCEDURE net_realtime_register(
     IN __netId VARCHAR(16),
-    IN __mode VARCHAR(64),
+    IN __channel VARCHAR(64),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
@@ -135,8 +135,8 @@ BEGIN
 
     DELETE FROM net_realtime WHERE _time < DATE_SUB(NOW(), INTERVAL 1 HOUR);
 
-    INSERT INTO net_realtime(netId, mode, action, project, source, url, message, events)
-    VALUE (__netId, __mode, __action, __project, __source, __url, __message, __events);
+    INSERT INTO net_realtime(netId, channel, action, project, source, url, message, events)
+    VALUE (__netId, __channel, __action, __project, __source, __url, __message, __events);
 
     SET SQL_SAFE_UPDATES = 1;
 END;%%
