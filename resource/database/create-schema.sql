@@ -168,6 +168,7 @@ CREATE TABLE IF NOT EXISTS net_realtime(
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
     source VARCHAR(128) NOT NULL,
+    url VARCHAR(256),
     message TEXT,
     events INTEGER
 );
@@ -187,6 +188,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_realtime.url,
     net_realtime.message,
     net_realtime.events
 FROM net_realtime
