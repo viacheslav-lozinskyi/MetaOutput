@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS net_sessions(
     country VARCHAR(64),
     city VARCHAR(64),
     organization VARCHAR(128),
+    coordinates VARCHAR(32),
     browser VARCHAR(64),
     os VARCHAR(64),
     resolution VARCHAR(64),
@@ -113,7 +114,8 @@ SELECT
     review_sessions.message,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.organization
+    net_sessions.organization,
+    net_sessions.coordinates
 FROM review_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = review_sessions.netId;
 
@@ -149,6 +151,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_sessions.coordinates,
     net_sessions.browser,
     net_sessions.os,
     net_sessions.resolution,
@@ -188,6 +191,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_sessions.coordinates,
     net_realtime.url,
     net_realtime.message,
     net_realtime.events
@@ -224,6 +228,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_sessions.coordinates,
     net_sessions.os,
     net_sessions.resolution,
     net_sessions.language,
@@ -276,7 +281,8 @@ SELECT
     dev_sessions.message,
     net_sessions.country,
     net_sessions.city,
-    net_sessions.organization
+    net_sessions.organization,
+    net_sessions.coordinates
 FROM dev_sessions
 LEFT JOIN net_sessions ON net_sessions.netId = dev_sessions.netId;
 
@@ -310,6 +316,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_sessions.coordinates,
     net_sessions.os,
     net_sessions.resolution,
     net_sessions.language,
@@ -337,6 +344,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_sessions.coordinates,
     net_sessions.os,
     net_sessions.resolution,
     net_sessions.language,
@@ -384,6 +392,7 @@ SELECT
     net_sessions.country,
     net_sessions.city,
     net_sessions.organization,
+    net_sessions.coordinates,
     net_sessions.browser,
     net_sessions.os,
     net_sessions.resolution,

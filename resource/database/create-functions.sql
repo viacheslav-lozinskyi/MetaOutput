@@ -153,6 +153,7 @@ CREATE PROCEDURE net_session_register(
     IN __country VARCHAR(64),
     IN __city VARCHAR(64),
     IN __organization VARCHAR(128),
+    IN __coordinates VARCHAR(32),
     IN __browser VARCHAR(64),
     IN __os VARCHAR(64),
     IN __resolution VARCHAR(64),
@@ -181,6 +182,10 @@ BEGIN
 
         IF (NOT ISNULL(__organization) AND (__organization = "")) THEN
             SET __organization = null;
+        END IF;
+        
+        IF (NOT ISNULL(__coordinates) AND (__coordinates = "")) THEN
+            SET __coordinates = null;
         END IF;
 
         IF (NOT ISNULL(__browser) AND (__browser = "")) THEN
@@ -221,12 +226,12 @@ BEGIN
                 SELECT campaignGroup FROM net_campaigns WHERE @__context LIKE pattern LIMIT 1 INTO __campaignGroup;
             END IF;
 
-            INSERT INTO net_sessions (netId, country, city, organization, browser, os, resolution, language, ref, campaignGroup, campaignTerm, campaignContent)
-            VALUE (__netId, __country, __city, __organization, __browser, __os, __resolution, __language, __ref, UPPER(__campaignGroup), LOWER(__campaignTerm), LOWER(__campaignContent));
+            INSERT INTO net_sessions (netId, country, city, organization, coordinates, browser, os, resolution, language, ref, campaignGroup, campaignTerm, campaignContent)
+            VALUE (__netId, __country, __city, __organization, __coordinates, __browser, __os, __resolution, __language, __ref, UPPER(__campaignGroup), LOWER(__campaignTerm), LOWER(__campaignContent));
         ELSE
             SET SQL_SAFE_UPDATES = 0;
 
-            IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__organization) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
+            IF (ISNULL(__country) OR ISNULL(__city) OR ISNULL(__organization) OR ISNULL(__coordinates) OR ISNULL(__os) OR ISNULL(__resolution) OR ISNULL(__language)) THEN
                 IF (NOT ISNULL(__country)) THEN
                     UPDATE net_sessions
                     SET country = __country
@@ -242,6 +247,12 @@ BEGIN
                 IF (NOT ISNULL(__organization)) THEN
                     UPDATE net_sessions
                     SET organization = __organization
+                    WHERE netId = __netId;
+                END IF;
+                
+                IF (NOT ISNULL(__coordinates)) THEN
+                    UPDATE net_sessions
+                    SET coordinates = __coordinates
                     WHERE netId = __netId;
                 END IF;
 
@@ -268,6 +279,7 @@ BEGIN
                     country = __country,
                     city = __city,
                     organization = __organization,
+                    coordinates = __coordinates,
                     os = __os,
                     resolution = __resolution,
                     language = __language
@@ -848,6 +860,7 @@ CALL campaign_session_register(null, "METAOUTPUT", "view-site", "metaoutput.net"
 
 CALL net_detector_register("MetaOutput", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2019");
 CALL net_detector_register("MetaOutput", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaOutput-2022");
+CALL net_detector_register("MetaOutput", "https://gallery.microchip.com/packages/METAOUTPUT.8D7BA738-B76A-4061-A7B4-766A68FD23B0");
 CALL net_detector_register("MetaProject", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject");
 CALL net_detector_register("MetaProject", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject-2022");
 CALL net_detector_register("Preview-AUDIO", "https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-AUDIO");
