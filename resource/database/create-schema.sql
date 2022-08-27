@@ -192,6 +192,11 @@ SELECT
     net_sessions.city,
     net_sessions.organization,
     net_sessions.coordinates,
+    net_sessions.browser,
+    net_sessions.os,
+    net_sessions.resolution,
+    net_sessions.language,
+    net_sessions.ref,
     net_realtime.url,
     net_realtime.message,
     net_realtime.events
