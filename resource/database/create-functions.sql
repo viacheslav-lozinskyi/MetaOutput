@@ -315,6 +315,9 @@ CREATE PROCEDURE trace_session_register(
 BEGIN
     IF (NOT ISNULL(__message)) THEN
         SET __action = UPPER(__action);
+        SET __source = UPPER(__source);
+        SET __source = REPLACE(__source, ' ', '-');
+        SET __source = REPLACE(__source, '\t', '-');
         SET __message = REPLACE(__message, '|||', '\n');
         SET __message = REPLACE(__message, '\r\n', '\n');
         SET __message = REPLACE(__message, '\r', '\n');
@@ -383,6 +386,9 @@ BEGIN
         SET @_context = 0;
         SET @_isFound = false;
         SET __action = UPPER(__action);
+        SET __source = UPPER(__source);
+        SET __source = REPLACE(__source, ' ', '-');
+        SET __source = REPLACE(__source, '\t', '-');
 
         IF (ISNULL(__events) OR (__events = 0)) THEN
             SET __events = 1;
@@ -485,13 +491,13 @@ CREATE PROCEDURE campaign_session_register(
     IN __logo TEXT)
 BEGIN
     IF (NOT ISNULL(__name) AND NOT ISNULL(__source) AND NOT ISNULL(__medium)) THEN
-        SET __name = LOWER(__name);
+        SET __name = UPPER(__name);
         SET __name = REPLACE(__name, ' ', '-');
         SET __name = REPLACE(__name, '\t', '-');
-        SET __source = LOWER(__source);
+        SET __source = UPPER(__source);
         SET __source = REPLACE(__source, ' ', '-');
         SET __source = REPLACE(__source, '\t', '-');
-        SET __medium = LOWER(__medium);
+        SET __medium = UPPER(__medium);
         SET __medium = REPLACE(__medium, ' ', '-');
         SET __medium = REPLACE(__medium, '\t', '-');
 
@@ -555,6 +561,9 @@ BEGIN
     IF (NOT ISNULL(__user) AND NOT ISNULL(__source) AND NOT ISNULL(__project)) THEN
         SET @_context = __rating;
         SET __action = UPPER(__action);
+        SET __source = UPPER(__source);
+        SET __source = REPLACE(__source, ' ', '-');
+        SET __source = REPLACE(__source, '\t', '-');
 
         IF (NOT ISNULL(__rating)) THEN
             SET __rating = 1;
@@ -618,6 +627,9 @@ CREATE PROCEDURE dev_session_register(
     IN __message VARCHAR(1024))
 BEGIN
     SET __action = UPPER(__action);
+    SET __source = UPPER(__source);
+    SET __source = REPLACE(__source, ' ', '-');
+    SET __source = REPLACE(__source, '\t', '-');
 
     IF (INSTR(__action, "DELETED") > 0) THEN
         SET __action = REPLACE(__action, "DELETED", "CREATED");
@@ -660,6 +672,9 @@ CREATE PROCEDURE watch_session_register(
 BEGIN
     IF (NOT EXISTS(SELECT _id FROM net_filters WHERE (type = "URL") AND (__url LIKE value) LIMIT 1)) THEN
         SET @__isFound = null;
+        SET __source = UPPER(__source);
+        SET __source = REPLACE(__source, ' ', '-');
+        SET __source = REPLACE(__source, '\t', '-');
 
         IF (ISNULL(__events) OR (__events < 1)) THEN
             SET __events = 1;
