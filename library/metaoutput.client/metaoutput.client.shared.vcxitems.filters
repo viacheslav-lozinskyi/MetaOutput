@@ -44,6 +44,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp">
       <Filter>extension</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp">
+      <Filter>atom</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
