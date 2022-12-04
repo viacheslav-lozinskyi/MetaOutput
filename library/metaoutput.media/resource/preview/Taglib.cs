@@ -15,89 +15,98 @@ namespace resource
                 if (File.Exists(file))
                 {
                     var a_Context = TagLib.File.Create(file, TagLib.ReadStyle.Average);
-                    if (a_Context?.Properties?.MediaTypes != null)
+                    try
                     {
-                        var a_Size = 4;
-                        if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
+                        if (a_Context?.Properties?.MediaTypes != null)
                         {
-                            a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                            a_Size = Math.Min(a_Size, a_Context.Properties.VideoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                            a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
-                        }
-                        if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Photo))
-                        {
-                            a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                            a_Size = Math.Min(a_Size, a_Context.Properties.PhotoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                            a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
-                        }
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.HEADER, level, "[[[Info]]]");
+                            var a_Size = 4;
+                            if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[File Name]]]", url);
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[File Size]]]", a_Context.FileAbstraction?.ReadStream?.Length.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", a_Context.Properties?.MediaTypes.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Raw Format]]]", a_Context.MimeType?.ToUpper()?.Replace("TAGLIB/", ""));
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Tag Types]]]", a_Context.TagTypes.ToString());
-                            }
-                        }
-                        for (var i = 0; i < a_Size; i++)
-                        {
-                            context.
-                                SetForeground(NAME.COLOR.TRANSPARENT).
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
-                        }
-                        {
-                            var a_Context1 = "[[[Metadata]]]";
-                            if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Audio))
-                            {
-                                a_Context1 = "[[[Duration]]]: " + ((double)a_Context.Properties.Duration.TotalMilliseconds / 1000.0).ToString(CultureInfo.InvariantCulture) + " [[[seconds]]]";
+                                a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                a_Size = Math.Min(a_Size, a_Context.Properties.VideoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                             }
                             if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Photo))
                             {
-                                a_Context1 = "[[[Size]]]: " + a_Context.Properties.PhotoWidth.ToString() + " x " + a_Context.Properties.PhotoHeight.ToString();
+                                a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                a_Size = Math.Min(a_Size, a_Context.Properties.PhotoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                             }
-                            if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
                             {
-                                a_Context1 = "[[[Size]]]: " + a_Context.Properties.VideoWidth.ToString() + " x " + a_Context.Properties.VideoHeight.ToString();
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", a_Context.FileAbstraction?.ReadStream?.Length.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", a_Context.Properties?.MediaTypes.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", a_Context.MimeType?.ToUpper()?.Replace("TAGLIB/", ""));
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Tag Types]]]", a_Context.TagTypes.ToString());
+                                }
                             }
-                            if (a_Context.PossiblyCorrupt)
+                            for (var i = 0; i < a_Size; i++)
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level, a_Context1);
+                                context.
+                                    SetForeground(NAME.COLOR.TRANSPARENT).
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level);
                             }
-                            else
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOOTER, level, a_Context1);
+                                var a_Context1 = "[[[Metadata]]]";
+                                if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Audio))
+                                {
+                                    a_Context1 = "[[[Duration]]]: " + ((double)a_Context.Properties.Duration.TotalMilliseconds / 1000.0).ToString(CultureInfo.InvariantCulture) + " [[[seconds]]]";
+                                }
+                                if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Photo))
+                                {
+                                    a_Context1 = "[[[Size]]]: " + a_Context.Properties.PhotoWidth.ToString() + " x " + a_Context.Properties.PhotoHeight.ToString();
+                                }
+                                if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
+                                {
+                                    a_Context1 = "[[[Size]]]: " + a_Context.Properties.VideoWidth.ToString() + " x " + a_Context.Properties.VideoHeight.ToString();
+                                }
+                                if (a_Context.PossiblyCorrupt)
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, a_Context1);
+                                }
+                                else
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, a_Context1);
+                                }
                             }
-                        }
-                        if ((a_Context.Tag != null) && (a_Context.Tag?.IsEmpty == false))
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOLDER, level + 1, "[[[Tags]]]");
+                            if ((a_Context.Tag != null) && (a_Context.Tag?.IsEmpty == false))
                             {
-                                __Execute(context, a_Context, a_Context.Tag, level + 2);
-                                __Execute(context, a_Context.Tag?.AlbumArtists, level + 2, "[[[Artists]]]");
-                                __Execute(context, a_Context.Tag?.Composers, level + 2, "[[[Composers]]]");
-                                __Execute(context, a_Context.Tag?.Genres, level + 2, "[[[Genres]]]");
-                                __Execute(context, a_Context.Tag?.Performers, level + 2, "[[[Performers]]]");
-                                __Execute(context, a_Context, a_Context.Tag?.Pictures, level + 2);
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Tags]]]");
+                                {
+                                    __Execute(context, a_Context, a_Context.Tag, level + 2);
+                                    __Execute(context, a_Context.Tag?.AlbumArtists, level + 2, "[[[Artists]]]");
+                                    __Execute(context, a_Context.Tag?.Composers, level + 2, "[[[Composers]]]");
+                                    __Execute(context, a_Context.Tag?.Genres, level + 2, "[[[Genres]]]");
+                                    __Execute(context, a_Context.Tag?.Performers, level + 2, "[[[Performers]]]");
+                                    __Execute(context, a_Context, a_Context.Tag?.Pictures, level + 2);
+                                }
+                            }
+                            {
+                                __Execute(context, a_Context, a_Context.Properties.Codecs, level + 1, url, (a_Context.Properties.MediaTypes == TagLib.MediaTypes.Photo) ? file : "");
+                            }
+                            if (a_Context.PossiblyCorrupt && (a_Context.CorruptionReasons != null))
+                            {
+                                __Execute(context, a_Context.CorruptionReasons, level + 1, "[[[Diagnostics]]]", url);
                             }
                         }
-                        {
-                            __Execute(context, a_Context, a_Context.Properties.Codecs, level + 1, url, (a_Context.Properties.MediaTypes == TagLib.MediaTypes.Photo) ? file : "");
-                        }
-                        if (a_Context.PossiblyCorrupt && (a_Context.CorruptionReasons != null))
-                        {
-                            __Execute(context, a_Context.CorruptionReasons, level + 1, "[[[Diagnostics]]]", url);
-                        }
-                        {
-                            a_Context.Dispose();
-                        }
+                    }
+                    catch (Exception)
+                    {
+                        a_Context.Dispose();
+                        throw;
+                    }
+                    if (a_Context != null)
+                    {
+                        a_Context.Dispose();
                     }
                 }
                 else
                 {
                     context.
-                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level, "[[[File not found]]]").
-                        SendPreview(NAME.TYPE.ERROR, url);
+                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, "[[[File not found]]]").
+                        SendPreview(NAME.EVENT.ERROR, url);
                 }
             }
 
@@ -118,20 +127,20 @@ namespace resource
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (node.IsEmpty == false))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, "[[[Common]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Common]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Title]]]", node.Title);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Subtitle]]]", node.Subtitle);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Description]]]", node.Description);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Album]]]", node.Album);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Comment]]]", node.Comment);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Copyright]]]", node.Copyright);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Conductor]]]", node.Conductor);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Publisher]]]", node.Publisher);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Lyrics]]]", node.Lyrics);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Grouping]]]", node.Grouping);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Remixed By]]]", node.RemixedBy);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Initial Key]]]", node.InitialKey);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Title]]]", node.Title);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Subtitle]]]", node.Subtitle);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Description]]]", node.Description);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Album]]]", node.Album);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Comment]]]", node.Comment);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Copyright]]]", node.Copyright);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Conductor]]]", node.Conductor);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Publisher]]]", node.Publisher);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Lyrics]]]", node.Lyrics);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Grouping]]]", node.Grouping);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Remixed By]]]", node.RemixedBy);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Initial Key]]]", node.InitialKey);
                         }
                     }
                     if ((node.Disc != 0) ||
@@ -140,27 +149,27 @@ namespace resource
                         (node.TrackCount != 0) ||
                         (node.Year != 0))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, "[[[Track]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Track]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Disc]]]", node.Disc.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Disc Count]]]", node.DiscCount.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Track]]]", node.Track.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Track Count]]]", node.TrackCount.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Year]]]", node.Year.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc]]]", node.Disc.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc Count]]]", node.DiscCount.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track]]]", node.Track.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track Count]]]", node.TrackCount.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Year]]]", node.Year.ToString());
                         }
                     }
                     if ((string.IsNullOrEmpty(node.AmazonId) == false))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, "[[[Amazon Id]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Amazon Id]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Amazon Id]]]", node.AmazonId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Amazon Id]]]", node.AmazonId);
                         }
                     }
                     if ((string.IsNullOrEmpty(node.MusicIpId) == false))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, "[[[MusicIp Id]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[MusicIp Id]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[MusicIp Id]]]", node.MusicIpId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[MusicIp Id]]]", node.MusicIpId);
                         }
                     }
                     if ((string.IsNullOrEmpty(node.MusicBrainzReleaseGroupId) == false) ||
@@ -173,17 +182,17 @@ namespace resource
                         (string.IsNullOrEmpty(node.MusicBrainzReleaseId) == false) ||
                         (string.IsNullOrEmpty(node.MusicBrainzArtistId) == false))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, "[[[Music Brainz]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Music Brainz]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Release Group Id]]]", node.MusicBrainzReleaseGroupId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Release Country]]]", node.MusicBrainzReleaseCountry);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Release Type]]]", node.MusicBrainzReleaseType);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Release Status]]]", node.MusicBrainzReleaseStatus);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Disc Id]]]", node.MusicBrainzDiscId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Track Id]]]", node.MusicBrainzTrackId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Release Artist Id]]]", node.MusicBrainzReleaseArtistId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Release Id]]]", node.MusicBrainzReleaseId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, "[[[Artist Id]]]", node.MusicBrainzArtistId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Group Id]]]", node.MusicBrainzReleaseGroupId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Country]]]", node.MusicBrainzReleaseCountry);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Type]]]", node.MusicBrainzReleaseType);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Status]]]", node.MusicBrainzReleaseStatus);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc Id]]]", node.MusicBrainzDiscId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track Id]]]", node.MusicBrainzTrackId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Artist Id]]]", node.MusicBrainzReleaseArtistId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Id]]]", node.MusicBrainzReleaseId);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Artist Id]]]", node.MusicBrainzArtistId);
                         }
                     }
                 }
@@ -193,7 +202,7 @@ namespace resource
             {
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (node.Length > 0))
                 {
-                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Pictures]]]");
+                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Pictures]]]");
                     for (var i = 0; i < node.Length; i++)
                     {
                         if (node[i] != null)
@@ -201,7 +210,7 @@ namespace resource
                             context.
                                 SetComment(__GetString(node[i].Type), "[[[Type]]]").
                                 SetUrl(node[i].Filename).
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, node[i].Description);
+                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, node[i].Description);
                         }
                     }
                 }
@@ -212,7 +221,7 @@ namespace resource
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (__IsEmpty(node) == false))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOLDER, level, "[[[Codecs]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level, "[[[Codecs]]]");
                     }
                     foreach (var a_Context in node)
                     {
@@ -220,7 +229,7 @@ namespace resource
                         {
                             context.
                                 SetComment(a_Context.MediaTypes.ToString(), "[[[Media Types]]]").
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FILE, level + 1, a_Context.Description);
+                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FILE, level + 1, a_Context.Description);
                             if (a_Context is TagLib.Mpeg.AudioHeader)
                             {
                                 __Execute(context, tagLib, (TagLib.Mpeg.AudioHeader)a_Context, level + 2);
@@ -255,34 +264,34 @@ namespace resource
                 if (GetState() != NAME.STATE.CANCEL)
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Channel Mode]]]", node.ChannelMode.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.IsOriginal, "[[[ORIGINAL]]]") + __GetFlag(node.IsCopyrighted, "[[[COPYRIGHTED]]]") + __GetFlag(node.IsPadded, "[[[PADDED]]]") + __GetFlag(node.IsProtected, "[[[PROTECTED]]]"));
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Frame Length]]]", node.AudioFrameLength.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Layer]]]", node.AudioLayer.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Version]]]", node.Version.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channel Mode]]]", node.ChannelMode.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.IsOriginal, "[[[ORIGINAL]]]") + __GetFlag(node.IsCopyrighted, "[[[COPYRIGHTED]]]") + __GetFlag(node.IsPadded, "[[[PADDED]]]") + __GetFlag(node.IsProtected, "[[[PROTECTED]]]"));
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Frame Length]]]", node.AudioFrameLength.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Layer]]]", node.AudioLayer.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Version]]]", node.Version.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "Xing");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "Xing");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.XingHeader.Present, "[[[PRESENT]]]"));
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Total Frames]]]", node.XingHeader.TotalFrames.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Total Size]]]", node.XingHeader.TotalSize.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.XingHeader.Present, "[[[PRESENT]]]"));
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Frames]]]", node.XingHeader.TotalFrames.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Size]]]", node.XingHeader.TotalSize.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "VBRI");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "VBRI");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.VBRIHeader.Present, "[[[PRESENT]]]"));
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Total Frames]]]", node.VBRIHeader.TotalFrames.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Total Size]]]", node.VBRIHeader.TotalSize.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.VBRIHeader.Present, "[[[PRESENT]]]"));
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Frames]]]", node.VBRIHeader.TotalFrames.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Size]]]", node.VBRIHeader.TotalSize.ToString());
                         }
                     }
                 }
@@ -293,19 +302,19 @@ namespace resource
                 if (GetState() != NAME.STATE.CANCEL)
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Bitrate]]]", node.VideoBitrate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Frame Rate]]]", node.VideoFrameRate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.VideoBitrate.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Frame Rate]]]", node.VideoFrameRate.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Size]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
                         }
                     }
                 }
@@ -316,13 +325,13 @@ namespace resource
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
                         }
                     }
                 }
@@ -338,32 +347,32 @@ namespace resource
                         {
                             var a_Context = Image.FromFile(file);
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Pixel Format]]]", Native.GetPixelFormat(a_Context));
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Pixel Format]]]", Native.GetPixelFormat(a_Context));
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Size]]]");
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", a_Context.Width.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", a_Context.Height.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", a_Context.Width.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", a_Context.Height.ToString());
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Physical Size]]]");
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Physical Size]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Resolution]]]");
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Resolution]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
                                 }
                             }
                             {
@@ -374,20 +383,21 @@ namespace resource
                     }
                     catch (Exception)
                     {
+                        // Exception can be ignoerd
                     }
                     {
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
                             }
                         }
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Size]]]");
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", node.PhotoWidth.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", node.PhotoHeight.ToString());
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.PhotoWidth.ToString());
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.PhotoHeight.ToString());
                             }
                         }
                     }
@@ -399,17 +409,17 @@ namespace resource
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Header]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Size]]]");
+                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
                         }
                     }
                 }
@@ -419,12 +429,12 @@ namespace resource
             {
                 if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (node.Length > 0))
                 {
-                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, group);
+                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, group);
                     for (var i = 0; i < node.Length; i++)
                     {
                         if (node[i] != null)
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 1, node[i]);
+                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, node[i]);
                         }
                     }
                 }
@@ -436,20 +446,20 @@ namespace resource
                 {
                     context.
                         SetComment(__GetArraySize(node)).
-                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level, group).
-                        SendPreview(NAME.TYPE.ERROR, url);
+                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, group).
+                        SendPreview(NAME.EVENT.ERROR, url);
                     foreach (var a_Context in node)
                     {
                         if (a_Context != null)
                         {
                             context.
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level + 1, a_Context);
+                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level + 1, a_Context);
                         }
                     }
                 }
             }
 
-            internal static string __GetArraySize(IEnumerable<string> value)
+            private static string __GetArraySize(IEnumerable<string> value)
             {
                 var a_Result = 0;
                 foreach (var a_Context in value)

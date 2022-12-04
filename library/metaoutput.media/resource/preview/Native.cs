@@ -17,15 +17,16 @@ namespace resource
                     if (Path.GetExtension(file).ToLower() == ".cur")
                     {
                         var a_Context = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        try
                         {
                             var a_Context1 = new Cursor(a_Context);
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.HEADER, level, "[[[Info]]]");
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[File Name]]]", url);
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[File Size]]]", a_Context.Length.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", "Cursor");
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Raw Format]]]", "CUR");
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", a_Context.Length.ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", "Cursor");
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", "CUR");
                                 }
                             }
                             {
@@ -38,34 +39,39 @@ namespace resource
                                 {
                                     context.
                                         SetForeground(NAME.COLOR.TRANSPARENT).
-                                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level);
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOOTER, level, "[[[Size]]]: " + a_Context1.Size.Width.ToString() + " x " + a_Context1.Size.Height.ToString());
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, "[[[Size]]]: " + a_Context1.Size.Width.ToString() + " x " + a_Context1.Size.Height.ToString());
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOLDER, level + 1, "[[[Codecs]]]");
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Codecs]]]");
                                     {
                                         context.
                                             SetComment("[[[Cursor]]]", "[[[Media Type]]]").
-                                            Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FILE, level + 2, "CUR [[[File]]]");
+                                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FILE, level + 2, "CUR [[[File]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Size]]]");
+                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Size]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Width]]]", a_Context1.Size.Width.ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Height]]]", a_Context1.Size.Height.ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", a_Context1.Size.Width.ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", a_Context1.Size.Height.ToString());
                                             }
                                         }
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Hotspot]]]");
+                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Hotspot]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "X", ((int)a_Context1.HotSpot.X).ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "Y", ((int)a_Context1.HotSpot.Y).ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "X", ((int)a_Context1.HotSpot.X).ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "Y", ((int)a_Context1.HotSpot.Y).ToString());
                                             }
                                         }
                                     }
                                 }
                             }
+                        }
+                        catch (Exception)
+                        {
+                            a_Context.Dispose();
+                            throw;
                         }
                         {
                             a_Context.Dispose();
@@ -74,75 +80,83 @@ namespace resource
                     else
                     {
                         var a_Context = Image.FromFile(file);
+                        try
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.HEADER, level, "[[[Info]]]");
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[File Name]]]", url);
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[File Size]]]", (new FileInfo(file).Length).ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Media Types]]]", GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]");
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 1, "[[[Raw Format]]]", GetImageFormat(a_Context));
-                            }
-                        }
-                        {
-                            var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                            {
-                                a_Size = Math.Min(a_Size, a_Context.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
-                            }
-                            for (var i = 0; i < a_Size; i++)
-                            {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level);
-                            }
-                        }
-                        {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOOTER, level, "[[[Size]]]: " + a_Context.Width.ToString() + " x " + a_Context.Height.ToString());
-                            if (a_Context.PropertyItems?.Length > 0)
-                            {
-                                // TODO: Implement it
-                                //context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOLDER, level + 1, "[[[Tags]]]");
-                                //foreach (var a_Context1 in a_Context.PropertyItems)
-                                //{
-                                //    context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 2, __GetPropertyName(a_Context1), __GetPropertyValue(a_Context1));
-                                //}
-                            }
-                            {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FOLDER, level + 1, "[[[Codecs]]]");
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
                                 {
-                                    context.
-                                        SetComment(GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]", "[[[Media Type]]]").
-                                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.FILE, level + 2, GetImageFormat(a_Context) + " [[[File]]]");
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", (new FileInfo(file).Length).ToString());
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]");
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", GetImageFormat(a_Context));
+                                }
+                            }
+                            {
+                                var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                {
+                                    a_Size = Math.Min(a_Size, a_Context.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                    a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                }
+                                for (var i = 0; i < a_Size; i++)
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level);
+                                }
+                            }
+                            {
+                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, "[[[Size]]]: " + a_Context.Width.ToString() + " x " + a_Context.Height.ToString());
+                                if (a_Context.PropertyItems?.Length > 0)
+                                {
+                                    // TODO: Implement it
+                                    //context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Tags]]]");
+                                    //foreach (var a_Context1 in a_Context.PropertyItems)
+                                    //{
+                                    //    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, __GetPropertyName(a_Context1), __GetPropertyValue(a_Context1));
+                                    //}
+                                }
+                                {
+                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Codecs]]]");
                                     {
-                                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Header]]]");
+                                        context.
+                                            SetComment(GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]", "[[[Media Type]]]").
+                                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FILE, level + 2, GetImageFormat(a_Context) + " [[[File]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Pixel Format]]]", GetPixelFormat(a_Context));
+                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Header]]]");
+                                            {
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Pixel Format]]]", GetPixelFormat(a_Context));
+                                            }
                                         }
-                                    }
-                                    {
-                                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Size]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Width]]]", a_Context.Width.ToString());
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Height]]]", a_Context.Height.ToString());
+                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Size]]]");
+                                            {
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", a_Context.Width.ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", a_Context.Height.ToString());
+                                            }
                                         }
-                                    }
-                                    {
-                                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Physical Size]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
+                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Physical Size]]]");
+                                            {
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
+                                            }
                                         }
-                                    }
-                                    {
-                                        context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 3, "[[[Resolution]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PARAMETER, level + 4, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
+                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Resolution]]]");
+                                            {
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
+                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
+                                            }
                                         }
-                                    }
-                                    {
-                                        Send(context, a_Context.Palette, level + 3, url);
+                                        {
+                                            Send(context, a_Context.Palette, level + 3, url);
+                                        }
                                     }
                                 }
                             }
+                        }
+                        catch (Exception)
+                        {
+                            a_Context.Dispose();
+                            throw;
                         }
                         {
                             a_Context.Dispose();
@@ -152,8 +166,8 @@ namespace resource
                 else
                 {
                     context.
-                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.ERROR, level, "[[[File not found]]]").
-                        SendPreview(NAME.TYPE.ERROR, url);
+                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, "[[[File not found]]]").
+                        SendPreview(NAME.EVENT.ERROR, url);
                 }
             }
 
@@ -170,40 +184,40 @@ namespace resource
                         context.
                             SetComment("[[[Found]]]: " + palette.Entries.Length.ToString(), "").
                             SetControl(NAME.CONTROL.TABLE).
-                            Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level, "[[[Palette]]]");
+                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Palette]]]");
                         {
                             context.
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.HEADER, level + 1);
+                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level + 1);
                             {
                                 context.
                                     SetAlignment(NAME.ALIGNMENT.RIGHT).
                                     SetSize(50).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 2, "[[[Index]]]");
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "[[[Index]]]");
                                 context.
-                                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 2, "[[[Color]]]");
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "[[[Color]]]");
                             }
                         }
                         for (var i = 0; i < a_Size; i++)
                         {
                             context.
-                                Send(NAME.SOURCE.PREVIEW, NAME.TYPE.PREVIEW, level + 1);
+                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level + 1);
                             {
                                 context.
                                     SetAlignment(NAME.ALIGNMENT.RIGHT).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 2, (i + 1).ToString("D3"));
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, (i + 1).ToString("D3"));
                             }
                             {
                                 context.
                                     SetBackground(palette.Entries[i].ToArgb()).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.TYPE.OBJECT, level + 2, "#" + palette.Entries[i].ToArgb().ToString("X8"));
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "#" + palette.Entries[i].ToArgb().ToString("X8"));
                             }
                         }
                     }
                     if (a_Size < palette.Entries?.Length)
                     {
                         context.
-                            Send(NAME.SOURCE.PREVIEW, NAME.TYPE.WARNING, level + 1, "...").
-                            SendPreview(NAME.TYPE.WARNING, url);
+                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.WARNING, level + 1, "...").
+                            SendPreview(NAME.EVENT.WARNING, url);
                     }
                 }
             }

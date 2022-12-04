@@ -9,6 +9,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright (c) 2020-2022 by Viacheslav Lozinskyi")]
 [assembly: AssemblyTrademark("MetaOutput")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("1.0.3")]
-[assembly: AssemblyFileVersion("1.0.3")]
+[assembly: AssemblyVersion("1.0.4")]
+[assembly: AssemblyFileVersion("1.0.4")]
 [assembly: ComVisible(false)]

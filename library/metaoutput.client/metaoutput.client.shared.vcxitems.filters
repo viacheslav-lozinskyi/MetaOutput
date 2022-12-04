@@ -27,7 +27,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnySource.cpp">
       <Filter>extension</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)atom\Trace.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyExport.hpp">
@@ -45,5 +44,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp">
       <Filter>extension</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp" />
   </ItemGroup>
 </Project>

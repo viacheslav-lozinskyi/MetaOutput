@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>MetaOutput.Client</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <title>MetaOutput.Client</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
@@ -14,17 +14,16 @@
     <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
     <license type="expression">MIT</license>
     <releaseNotes>
-- Specification of extension::AnyProxy is added
+- TYPE is renamed to EVENT
 - Specification of MetaOutput.Client library is improved
-- Problem with certificate subscription is solved
 - Script files are updated
     </releaseNotes>
-    <copyright>Copyright (c) 2020-2021 by Viacheslav Lozinskyi. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2020-2022 by Viacheslav Lozinskyi. All rights reserved.</copyright>
     <tags>MetaOutput, client, preview, viewer, native</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
       <group targetFramework="native">
-        <dependency id="MetaPlatform" version="[1.0.9, 2)" />
+        <dependency id="MetaPlatform" version="[1.1.0, 2)" />
       </group>
     </dependencies>
     <packageTypes>

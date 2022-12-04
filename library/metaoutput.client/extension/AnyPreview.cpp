@@ -21,7 +21,7 @@ void extension::AnyPreview::Connect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -46,7 +46,7 @@ void extension::AnyPreview::Disconnect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -76,7 +76,7 @@ void extension::AnyPreview::Register(MP_STRING extension, MP_PTR(AnyPreview) con
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -92,8 +92,8 @@ bool extension::AnyPreview::Execute(MP_STRING url)
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
         atom::Trace::GetInstance()->
-            Send(NAME::SOURCE::STATUS, NAME::TYPE::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
-            SendPreview(NAME::TYPE::EXCEPTION, url);
+            Send(NAME::SOURCE::STATUS, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
+            SendPreview(NAME::EVENT::EXCEPTION, url);
     }
     return false;
 }
@@ -131,7 +131,7 @@ bool extension::AnyPreview::Send(MP_STRING pipeName, MP_STRING value)
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
         a_Result = false;
     }
     return a_Result;
@@ -244,7 +244,7 @@ MP_STRING extension::AnyPreview::GetProperty(MP_STRING name)
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
-            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
         }
     }
     return a_Result;
@@ -295,7 +295,7 @@ void extension::AnyPreview::SetState(MP_STRING value)
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -381,7 +381,7 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
             {
                 context->
                     SetUrlPreview(a_Context)->
-                    SendPreview(NAME::TYPE::INFO, url);
+                    SendPreview(NAME::EVENT::INFO, url);
             }
             if (GetState() != NAME::STATE::CANCEL)
             {
@@ -392,21 +392,21 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
                     context->
-                        Send(NAME::SOURCE::STATUS, NAME::TYPE::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_TYPE_NAME_OBJECT(ex) + " [" + MP_EXCEPTION_MESSAGE_GET(ex) + "]")->
-                        SendPreview(NAME::TYPE::WARNING, url);
+                        Send(NAME::SOURCE::STATUS, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_TYPE_NAME_OBJECT(ex) + " [" + MP_EXCEPTION_MESSAGE_GET(ex) + "]")->
+                        SendPreview(NAME::EVENT::WARNING, url);
                 }
             }
             if (GetState() == NAME::STATE::CANCEL)
             {
                 context->
-                    Send(NAME::SOURCE::STATUS, NAME::TYPE::WARNING, 0, "[[[PREVIEW.FAILED]]]: [[[Execution is terminated]]], [" + url + "]")->
-                    SendPreview(NAME::TYPE::WARNING, url);
+                    Send(NAME::SOURCE::STATUS, NAME::EVENT::WARNING, 0, "[[[PREVIEW.FAILED]]]: [[[Execution is terminated]]], [" + url + "]")->
+                    SendPreview(NAME::EVENT::WARNING, url);
             }
         }
         else
         {
             context->
-                Send(NAME::SOURCE::STATUS, NAME::TYPE::ERROR, 0, "[[[PREVIEW.FAILED]]]: [[[File not found]]], [" + url + "]");
+                Send(NAME::SOURCE::STATUS, NAME::EVENT::ERROR, 0, "[[[PREVIEW.FAILED]]]: [[[File not found]]], [" + url + "]");
         }
         {
             SetState(NAME::STATE::WAIT);
@@ -419,8 +419,8 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
         }
         {
             context->
-                Send(NAME::SOURCE::STATUS, NAME::TYPE::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
-                SendPreview(NAME::TYPE::EXCEPTION, url);
+                Send(NAME::SOURCE::STATUS, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
+                SendPreview(NAME::EVENT::EXCEPTION, url);
         }
     }
 }
@@ -480,14 +480,14 @@ void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
                             catch (MP_PTR(MP_EXCEPTION) ex)
                             {
                                 MP_THREAD_MUTEX_UNLOCK(__GetMutex());
-                                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+                                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
                             }
                         }
                     }
                 }
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
-                    MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+                    MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
                     break;
                 }
             }
@@ -498,7 +498,7 @@ void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
-            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
         }
     }
 }
@@ -518,7 +518,7 @@ void extension::AnyPreview::MP_WEB_CLIENT_CALLBACK_PROGRESS(__DownloadProgress, 
         {
             atom::Trace::GetInstance()->
                 SetProgress(MP_WEB_CLIENT_CALLBACK_PROGRESS_RECEIVED_PERSENT_GET(params))->
-                SendPreview(NAME::TYPE::INFO, MP_WEB_CLIENT_CALLBACK_DOWNLOAD_URL_GET(a_Context));
+                SendPreview(NAME::EVENT::INFO, MP_WEB_CLIENT_CALLBACK_DOWNLOAD_URL_GET(a_Context));
         }
         if ((MP_WEB_CLIENT_CALLBACK_PROGRESS_RECEIVED_PERSENT_GET(params) <= 3) && (MP_WEB_CLIENT_CALLBACK_PROGRESS_TOTAL_SIZE_GET(params) > 10000000))
         {

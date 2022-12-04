@@ -21,7 +21,7 @@ void extension::AnyExport::Connect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -46,7 +46,7 @@ void extension::AnyExport::Disconnect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -76,7 +76,7 @@ void extension::AnyExport::Register(MP_STRING extension, MP_PTR(AnyExport) conte
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -94,7 +94,7 @@ void extension::AnyExport::Execute(MP_STRING url, MP_STRING from)
         atom::Trace::GetInstance()->
             Clear()->
             SetUrl(url)->
-            Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
+            Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
     }
 }
 
@@ -140,7 +140,7 @@ void extension::AnyExport::__Execute(MP_PTR(AnyExport) sender, MP_PTR(atom::Trac
             context->
                 Clear()->
                 SetUrl(url)->
-                Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::WARNING, 0, "[[[Execution is terminated]]]...");
+                Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::WARNING, 0, "[[[Execution is terminated]]]...");
         }
         {
             SetState(NAME::STATE::WAIT);
@@ -155,7 +155,7 @@ void extension::AnyExport::__Execute(MP_PTR(AnyExport) sender, MP_PTR(atom::Trac
             context->
                 Clear()->
                 SetUrl(url)->
-                Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
+                Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
         }
     }
 }
@@ -211,14 +211,14 @@ void extension::AnyExport::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
                             catch (MP_PTR(MP_EXCEPTION) ex)
                             {
                                 MP_THREAD_MUTEX_UNLOCK(__GetMutex());
-                                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+                                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
                             }
                         }
                     }
                 }
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
-                    MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+                    MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
                     break;
                 }
             }
@@ -229,7 +229,7 @@ void extension::AnyExport::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
-            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
         }
     }
 }

@@ -19,6 +19,7 @@ namespace atom
                 MP_CONSTANT_INTEGER(PREVIEW_MIN_WIDTH, 200);
                 MP_CONSTANT_INTEGER(PREVIEW_PAGE_INDENT, 10);
                 MP_CONSTANT_INTEGER(PREVIEW_PAGE_BREAK, 7);
+                MP_CONSTANT_INTEGER(MAX_BUFFER_SIZE, 100 * 1024 * 1024);
             };
             MP_CLASS PIPE
             {
@@ -231,8 +232,8 @@ namespace atom
                 MP_CONSTANT_STRING(TRANSFORM_REMOVE, "TRANSFORM.REMOVE");
                 MP_CONSTANT_STRING(TRANSLATION_APPEND, "TRANSLATION.APPEND");
                 MP_CONSTANT_STRING(TRANSLATION_REMOVE, "TRANSLATION.REMOVE");
-                MP_CONSTANT_STRING(TYPE_APPEND, "TYPE.APPEND");
-                MP_CONSTANT_STRING(TYPE_REMOVE, "TYPE.REMOVE");
+                MP_CONSTANT_STRING(EVENT_APPEND, "EVENT.APPEND");
+                MP_CONSTANT_STRING(EVENT_REMOVE, "EVENT.REMOVE");
                 MP_CONSTANT_STRING(VARIABLE_APPEND, "VARIABLE.APPEND");
                 MP_CONSTANT_STRING(VARIABLE_REMOVE, "VARIABLE.REMOVE");
             };
@@ -484,22 +485,31 @@ namespace atom
         public:
             MP_CLASS EVENT
             {
-                MP_CONSTANT_STRING(KEY_DOWN_ALT, "KEY.DOWN.ALT");
-                MP_CONSTANT_STRING(KEY_DOWN_CONTROL, "KEY.DOWN.CONTROL");
-                MP_CONSTANT_STRING(KEY_DOWN_SHIFT, "KEY.DOWN.SHIFT");
-                MP_CONSTANT_STRING(KEY_DOWN_WIN, "KEY.DOWN.WIN");
-                MP_CONSTANT_STRING(KEY_UP_ALT, "KEY.UP.ALT");
-                MP_CONSTANT_STRING(KEY_UP_CONTROL, "KEY.UP.CONTROL");
-                MP_CONSTANT_STRING(KEY_UP_SHIFT, "KEY.UP.SHIFT");
-                MP_CONSTANT_STRING(KEY_UP_WIN, "KEY.UP.WIN");
-                MP_CONSTANT_STRING(MOUSE_DOWN_LEFT, "MOUSE.DOWN.LEFT");
-                MP_CONSTANT_STRING(MOUSE_DOWN_MIDDLE, "MOUSE.DOWN.MIDDLE");
-                MP_CONSTANT_STRING(MOUSE_DOWN_RIGHT, "MOUSE.DOWN.RIGHT");
-                MP_CONSTANT_STRING(MOUSE_MOVE_X, "MOUSE.MOVE.X");
-                MP_CONSTANT_STRING(MOUSE_MOVE_Y, "MOUSE.MOVE.Y");
-                MP_CONSTANT_STRING(MOUSE_UP_LEFT, "MOUSE.UP.LEFT");
-                MP_CONSTANT_STRING(MOUSE_UP_MIDDLE, "MOUSE.UP.MIDDLE");
-                MP_CONSTANT_STRING(MOUSE_UP_RIGHT, "MOUSE.UP.RIGHT");
+                MP_CONSTANT_STRING(CLASS, "CLASS");
+                MP_CONSTANT_STRING(CRITICAL, "CRITICAL");
+                MP_CONSTANT_STRING(DEBUG, "DEBUG");
+                MP_CONSTANT_STRING(ERROR, "ERROR");
+                MP_CONSTANT_STRING(EXCEPTION, "EXCEPTION");
+                MP_CONSTANT_STRING(FILE, "FILE");
+                MP_CONSTANT_STRING(FOLDER, "FOLDER");
+                MP_CONSTANT_STRING(FOOTER, "FOOTER");
+                MP_CONSTANT_STRING(FUNCTION, "FUNCTION");
+                MP_CONSTANT_STRING(HEADER, "HEADER");
+                MP_CONSTANT_STRING(HINT, "HINT");
+                MP_CONSTANT_STRING(INFO, "INFO");
+                MP_CONSTANT_STRING(MESSAGE, "MESSAGE");
+                MP_CONSTANT_STRING(OBJECT, "OBJECT");
+                MP_CONSTANT_STRING(PARAMETER, "PARAMETER");
+                MP_CONSTANT_STRING(PREVIEW, "PREVIEW");
+                MP_CONSTANT_STRING(PROJECT, "PROJECT");
+                MP_CONSTANT_STRING(REQUEST, "REQUEST");
+                MP_CONSTANT_STRING(RESPONSE, "RESPONSE");
+                MP_CONSTANT_STRING(TEXT, "TEXT");
+                MP_CONSTANT_STRING(TRANSFORM, "TRANSFORM");
+                MP_CONSTANT_STRING(TRANSLATION, "TRANSLATION");
+                MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
+                MP_CONSTANT_STRING(VARIABLE, "VARIABLE");
+                MP_CONSTANT_STRING(WARNING, "WARNING");
             };
         public:
             MP_CLASS FONT_STATE
@@ -510,6 +520,30 @@ namespace atom
                 MP_CONSTANT_STRING(NONE, "");
                 MP_CONSTANT_STRING(STRIKEOUT, "STRIKEOUT");
                 MP_CONSTANT_STRING(UNDERSCORE, "UNDERSCORE");
+            };
+        public:
+            MP_CLASS KEY_EVENT
+            {
+                MP_CONSTANT_STRING(DOWN_ALT, "KEY.DOWN.ALT");
+                MP_CONSTANT_STRING(DOWN_CONTROL, "KEY.DOWN.CONTROL");
+                MP_CONSTANT_STRING(DOWN_SHIFT, "KEY.DOWN.SHIFT");
+                MP_CONSTANT_STRING(DOWN_WIN, "KEY.DOWN.WIN");
+                MP_CONSTANT_STRING(UP_ALT, "KEY.UP.ALT");
+                MP_CONSTANT_STRING(UP_CONTROL, "KEY.UP.CONTROL");
+                MP_CONSTANT_STRING(UP_SHIFT, "KEY.UP.SHIFT");
+                MP_CONSTANT_STRING(UP_WIN, "KEY.UP.WIN");
+            };
+        public:
+            MP_CLASS MOUSE_EVENT
+            {
+                MP_CONSTANT_STRING(DOWN_LEFT, "MOUSE.DOWN.LEFT");
+                MP_CONSTANT_STRING(DOWN_MIDDLE, "MOUSE.DOWN.MIDDLE");
+                MP_CONSTANT_STRING(DOWN_RIGHT, "MOUSE.DOWN.RIGHT");
+                MP_CONSTANT_STRING(MOVE_X, "MOUSE.MOVE.X");
+                MP_CONSTANT_STRING(MOVE_Y, "MOUSE.MOVE.Y");
+                MP_CONSTANT_STRING(UP_LEFT, "MOUSE.UP.LEFT");
+                MP_CONSTANT_STRING(UP_MIDDLE, "MOUSE.UP.MIDDLE");
+                MP_CONSTANT_STRING(UP_RIGHT, "MOUSE.UP.RIGHT");
             };
         public:
             MP_CLASS METADATA
@@ -570,6 +604,7 @@ namespace atom
                 MP_CONSTANT_STRING(HELP, "HELP");
                 MP_CONSTANT_STRING(LOG, "LOG");
                 MP_CONSTANT_STRING(METADATA, "METADATA");
+                MP_CONSTANT_STRING(METAREPORT, "METAREPORT");
                 MP_CONSTANT_STRING(NETWORK, "NETWORK");
                 MP_CONSTANT_STRING(NOTIFICATION, "NOTIFICATION");
                 MP_CONSTANT_STRING(PERFORMANCE, "PERFORMANCE");
@@ -646,6 +681,7 @@ namespace atom
                 MP_CONSTANT_STRING(CONTROL, "CONTROL");
                 MP_CONSTANT_STRING(CONTROL_HINT, "CONTROL.HINT");
                 MP_CONSTANT_STRING(DATE, "DATE");
+                MP_CONSTANT_STRING(EVENT, "EVENT");
                 MP_CONSTANT_STRING(FIND_COMMENT, "FIND.COMMENT");
                 MP_CONSTANT_STRING(FIND_COMMENT_ABSENT, "FIND.COMMENT.ABSENT");
                 MP_CONSTANT_STRING(FIND_COMMENT_BEGIN, "FIND.COMMENT.BEGIN");
@@ -684,7 +720,6 @@ namespace atom
                 MP_CONSTANT_STRING(SOURCE_PREVIEW, "SOURCE.PREVIEW");
                 MP_CONSTANT_STRING(TIME, "TIME");
                 MP_CONSTANT_STRING(TIME_DETECT, "TIME.DETECT");
-                MP_CONSTANT_STRING(TYPE, "TYPE");
                 MP_CONSTANT_STRING(URL, "URL");
                 MP_CONSTANT_STRING(URL_CHECKSUM, "URL.CHECKSUM");
                 MP_CONSTANT_STRING(URL_DETECT, "URL.DETECT");
@@ -698,35 +733,6 @@ namespace atom
                 MP_CONSTANT_STRING(VALUE, "VALUE");
                 MP_CONSTANT_STRING(VALUE_DETECT, "VALUE.DETECT");
             };
-        public:
-            MP_CLASS TYPE
-            {
-                MP_CONSTANT_STRING(CLASS, "CLASS");
-                MP_CONSTANT_STRING(CRITICAL, "CRITICAL");
-                MP_CONSTANT_STRING(DEBUG, "DEBUG");
-                MP_CONSTANT_STRING(ERROR, "ERROR");
-                MP_CONSTANT_STRING(EXCEPTION, "EXCEPTION");
-                MP_CONSTANT_STRING(FILE, "FILE");
-                MP_CONSTANT_STRING(FOLDER, "FOLDER");
-                MP_CONSTANT_STRING(FOOTER, "FOOTER");
-                MP_CONSTANT_STRING(FUNCTION, "FUNCTION");
-                MP_CONSTANT_STRING(HEADER, "HEADER");
-                MP_CONSTANT_STRING(HINT, "HINT");
-                MP_CONSTANT_STRING(INFO, "INFO");
-                MP_CONSTANT_STRING(MESSAGE, "MESSAGE");
-                MP_CONSTANT_STRING(OBJECT, "OBJECT");
-                MP_CONSTANT_STRING(PARAMETER, "PARAMETER");
-                MP_CONSTANT_STRING(PREVIEW, "PREVIEW");
-                MP_CONSTANT_STRING(PROJECT, "PROJECT");
-                MP_CONSTANT_STRING(REQUEST, "REQUEST");
-                MP_CONSTANT_STRING(RESPONSE, "RESPONSE");
-                MP_CONSTANT_STRING(TEXT, "TEXT");
-                MP_CONSTANT_STRING(TRANSFORM, "TRANSFORM");
-                MP_CONSTANT_STRING(TRANSLATION, "TRANSLATION");
-                MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
-                MP_CONSTANT_STRING(VARIABLE, "VARIABLE");
-                MP_CONSTANT_STRING(WARNING, "WARNING");
-            };
         };
     public:
         Trace();
@@ -738,12 +744,12 @@ namespace atom
         static MP_STRING GetUrlPreview(MP_STRING url, MP_STRING extension);
     public:
         MP_PTR(Trace) Clear();
-        MP_PTR(Trace) Send(MP_STRING source, MP_STRING type, MP_INT level);
-        MP_PTR(Trace) Send(MP_STRING source, MP_STRING type, MP_INT level, MP_STRING content);
-        MP_PTR(Trace) Send(MP_STRING source, MP_STRING type, MP_INT level, MP_STRING content, MP_STRING value);
+        MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level);
+        MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level, MP_STRING content);
+        MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level, MP_STRING content, MP_STRING value);
         MP_PTR(Trace) SendTml(MP_STRING value);
         MP_PTR(Trace) SendTml(MP_STRING value, MP_STRING source);
-        MP_PTR(Trace) SendPreview(MP_STRING type, MP_STRING url);
+        MP_PTR(Trace) SendPreview(MP_STRING event, MP_STRING url);
     public:
         MP_PTR(Trace) SetAlignment(MP_STRING value);
         MP_PTR(Trace) SetBackground(MP_INT value);
@@ -755,6 +761,7 @@ namespace atom
         MP_PTR(Trace) SetContent(MP_STRING value);
         MP_PTR(Trace) SetControl(MP_STRING name);
         MP_PTR(Trace) SetControl(MP_STRING name, MP_STRING hint);
+        MP_PTR(Trace) SetCount(MP_INT value);
         MP_PTR(Trace) SetDate(MP_INT year, MP_INT month, MP_INT day);
         MP_PTR(Trace) SetFontName(MP_STRING value);
         MP_PTR(Trace) SetFontSize(MP_INT value);
@@ -786,8 +793,8 @@ namespace atom
     private:
         static MP_STRING __GetFirstLine(MP_STRING value, bool isAnyText);
         static MP_STRING __GetMultiLine(MP_STRING value, bool isAnyText);
+        static MP_STRING __GetEvent(MP_STRING value);
         static MP_STRING __GetSource(MP_STRING value);
-        static MP_STRING __GetType(MP_STRING value);
         static MP_STRING __GetColor(MP_INT value);
         static MP_STRING __GetLevel(MP_INT value);
         static MP_STRING __GetTml(MP_STRING value, MP_STRING source);
@@ -810,6 +817,7 @@ namespace atom
         MP_STRING m_Content;
         MP_STRING m_ContentHint;
         MP_STRING m_Control;
+        MP_STRING m_Count;
         MP_STRING m_Date;
         MP_STRING m_FontName;
         MP_STRING m_FontSize;

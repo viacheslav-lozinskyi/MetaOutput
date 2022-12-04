@@ -62,7 +62,7 @@ MP_STRING atom::Trace::GetFailState(MP_STRING applicationName)
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
     return a_Result;
 }
@@ -129,7 +129,7 @@ MP_STRING atom::Trace::GetUrlPreview(MP_STRING url, MP_STRING extension)
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
     return "";
 }
@@ -149,6 +149,7 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
             m_Content = "";
             m_ContentHint = "";
             m_Control = "";
+            m_Count = "";
             m_Date = "";
             m_FontName = "";
             m_FontSize = "";
@@ -168,12 +169,13 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
         }
         catch (MP_PTR(MP_EXCEPTION))
         {
+            // Any exceptions here may be ignored
         }
     }
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT level)
+MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT level)
 {
     if (this != nullptr)
     {
@@ -219,7 +221,7 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT l
                             {
                                 m_StackTrace += ")" +
                                     __GetSource(source) +
-                                    " @@@TYPE " + NAME::TYPE::FUNCTION +
+                                    " @@@EVENT " + NAME::EVENT::FUNCTION +
                                     " @@@COMMENT <" + MP_STACKFRAME_MODULE_NAME_GET(a_Context1) + ">" +
                                     " @@@COMMENT.HINT <[[[Module Name]]]>" +
                                     " @@@URL <<<" + MP_STACKFRAME_FILE_LINE_GET(a_Context1) + ":" + MP_STACKFRAME_FILE_POSITION_GET(a_Context1) + ">>> " + MP_STACKFRAME_FILE_NAME_GET(a_Context1) + "\n";
@@ -231,9 +233,9 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT l
                     MP_STACKTRACE_FINALIZE(a_Context);
                 }
             }
-            catch (MP_PTR(MP_EXCEPTION))
+            catch (MP_PTR(MP_EXCEPTION) ex)
             {
-                m_StackTrace += "\n" + __GetLevel(level) + "[[[Stack trace not calculated correctly]]] @@@SOURCE DIAGNOSTIC @@@TYPE WARNING";
+                m_StackTrace += "\n" + __GetLevel(level) + ex->Message + " @@@SOURCE DIAGNOSTIC @@@EVENT WARNING";
             }
             {
                 m_StackTrace += "\n";
@@ -248,12 +250,13 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT l
             {
                 {
                     a_Context += __GetSource(source);
-                    a_Context += __GetType(type);
+                    a_Context += __GetEvent(event);
                     a_Context += m_Command;
                     a_Context += m_ContentHint;
                     a_Context += m_Comment;
                     a_Context += m_Condition;
                     a_Context += m_Control;
+                    a_Context += m_Count;
                     a_Context += m_Date;
                     a_Context += m_Time;
                     a_Context += m_Background;
@@ -307,25 +310,25 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT l
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT level, MP_STRING content)
+MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT level, MP_STRING content)
 {
     if ((this != nullptr) && (level >= 0))
     {
         return
             SetContent(content)->
-            Send(source, type, level);
+            Send(source, event, level);
     }
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING type, MP_INT level, MP_STRING content, MP_STRING value)
+MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT level, MP_STRING content, MP_STRING value)
 {
     if ((this != nullptr) && (level >= 0))
     {
         return
             SetContent(content)->
             SetValue(value)->
-            Send(source, type, level);
+            Send(source, event, level);
     }
     return this;
 }
@@ -348,7 +351,7 @@ MP_PTR(atom::Trace) atom::Trace::SendTml(MP_STRING value, MP_STRING source)
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::SendPreview(MP_STRING type, MP_STRING url)
+MP_PTR(atom::Trace) atom::Trace::SendPreview(MP_STRING event, MP_STRING url)
 {
     if (this != nullptr)
     {
@@ -360,7 +363,7 @@ MP_PTR(atom::Trace) atom::Trace::SendPreview(MP_STRING type, MP_STRING url)
         {
             this->
                 SetCommand(NAME::COMMAND::MESSAGE_RESEND, url)->
-                Send(NAME::SOURCE::PREVIEW, type, 0);
+                Send(NAME::SOURCE::PREVIEW, event, 0);
         }
     }
     return this;
@@ -515,6 +518,15 @@ MP_PTR(atom::Trace) atom::Trace::SetControl(MP_STRING name, MP_STRING hint)
     return this;
 }
 
+MP_PTR(atom::Trace) atom::Trace::SetCount(MP_INT value)
+{
+    if ((this != nullptr) && (value > 0))
+    {
+        m_Count = " @@@COUNT " + MP_CONVERT_STRING_FROM_INT(value, 0);
+    }
+    return this;
+}
+
 MP_PTR(atom::Trace) atom::Trace::SetDate(MP_INT year, MP_INT month, MP_INT day)
 {
     if (this != nullptr)
@@ -551,7 +563,7 @@ MP_PTR(atom::Trace) atom::Trace::SetFontSize(MP_INT value)
 
 MP_PTR(atom::Trace) atom::Trace::SetFontState(MP_STRING name)
 {
-    if (this != nullptr)
+    if ((this != nullptr) && (name != nullptr))
     {
         auto a_Context = __GetFirstLine(name, false);
         if (MP_STRING_EMPTY(a_Context))
@@ -595,7 +607,7 @@ MP_PTR(atom::Trace) atom::Trace::SetProgress(MP_DOUBLE value, MP_STRING hint)
     {
         m_Progress = " @@@PROGRESS " + MP_CONVERT_STRING_FROM_DOUBLE(value);
     }
-    if (this != nullptr)
+    if ((this != nullptr) && (hint != nullptr))
     {
         m_Progress += " @@@PROGRESS.HINT " + __GetMultiLine(hint, true);
     }
@@ -628,7 +640,7 @@ MP_PTR(atom::Trace) atom::Trace::SetTml(MP_STRING value)
 {
     if (this != nullptr)
     {
-        m_Tml = value;
+        m_Tml = value != nullptr ? value : "";
     }
     return this;
 }
@@ -854,7 +866,7 @@ MP_PTR(atom::Trace) atom::Trace::__SendTml(MP_STRING value)
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
-            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
         }
     }
     return this;
@@ -932,20 +944,20 @@ MP_STRING atom::Trace::__GetMultiLine(MP_STRING value, bool isAnyText)
     return "";
 }
 
+MP_STRING atom::Trace::__GetEvent(MP_STRING value)
+{
+    if ((MP_STRING_EMPTY(value) == false))
+    {
+        return " @@@EVENT " + __GetFirstLine(value, false);
+    }
+    return "";
+}
+
 MP_STRING atom::Trace::__GetSource(MP_STRING value)
 {
     if ((MP_STRING_EMPTY(value) == false))
     {
         return " @@@SOURCE " + __GetFirstLine(value, false);
-    }
-    return "";
-}
-
-MP_STRING atom::Trace::__GetType(MP_STRING value)
-{
-    if ((MP_STRING_EMPTY(value) == false))
-    {
-        return " @@@TYPE " + __GetFirstLine(value, false);
     }
     return "";
 }
@@ -1139,9 +1151,16 @@ MP_STRING atom::Trace::__GetTml(MP_STRING value, MP_STRING source)
     if ((MP_STRING_EMPTY(value) == false) && (MP_STRING_EMPTY(source) == false))
     {
         auto a_Context = value;
+        if (MP_STRING_CONTAINS(a_Context, "\r\n"))
         {
             a_Context = MP_STRING_REPLACE(a_Context, "\r\n", "\n");
+        }
+        if (MP_STRING_CONTAINS(a_Context, "\r"))
+        {
             a_Context = MP_STRING_REPLACE(a_Context, "\r", "\n");
+        }
+        if (MP_STRING_CONTAINS(a_Context, "\t"))
+        {
             a_Context = MP_STRING_REPLACE(a_Context, "\t", " ");
         }
         if (source == NAME::SOURCE::CONSOLE)
@@ -1155,28 +1174,36 @@ MP_STRING atom::Trace::__GetTml(MP_STRING value, MP_STRING source)
                 auto a_TextBuffer = MP_STRING_BUFFER_GET(a_Context);
                 auto a_TextSize = MP_STRING_SIZE_GET(a_Context);
                 auto a_Context1 = (MP_STRING)"";
+                if (a_TextSize > CONSTANT::OUTPUT::MAX_BUFFER_SIZE)
                 {
+                    return "[[[Too big input]]] TML @@@SOURCE METAOUTPUT @@@EVENT CRITICAL";
+                }
+                if (a_TextSize > 0)
+                {
+                    MP_STRING_RESERVE_SET(a_Result, (a_TextSize * 2) + 1);
                     MP_STRING_RESERVE_SET(a_Context1, a_TextSize);
                 }
                 for (auto i = 0; i < a_TextSize; i++)
                 {
-                    if ((a_TextBuffer[i] == '\n') || ((i + 1) == a_TextSize))
+                    auto a_Context2 = a_TextBuffer[i];
+                    if ((a_Context2 == '\n') || ((i + 1) == a_TextSize))
                     {
                         if (MP_STRING_EMPTY(a_Context1))
                         {
                             continue;
                         }
-                        if (a_TextBuffer[i] != '\n')
+                        if (a_Context2 != '\n')
                         {
-                            a_Result += a_TextBuffer[i];
+                            a_Result += a_Context2;
+                            a_Context1 += a_Context2;
                         }
                         if (MP_STRING_CONTAINS(a_Context1, "@@@SOURCE ") == false)
                         {
                             a_Result += " @@@SOURCE " + source;
                         }
-                        if (a_TextBuffer[i] == '\n')
+                        if (a_Context2 == '\n')
                         {
-                            a_Result += a_TextBuffer[i];
+                            a_Result += a_Context2;
                         }
                         {
                             a_Context1 = "";
@@ -1184,8 +1211,8 @@ MP_STRING atom::Trace::__GetTml(MP_STRING value, MP_STRING source)
                     }
                     else
                     {
-                        a_Result += a_TextBuffer[i];
-                        a_Context1 += a_TextBuffer[i];
+                        a_Result += a_Context2;
+                        a_Context1 += a_Context2;
                     }
                 }
             }

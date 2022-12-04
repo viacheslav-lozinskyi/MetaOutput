@@ -6,7 +6,7 @@
 @echo ==========================================================================
 
 @echo --- Package Preparation... -----------------------------------------------
-@echo Before compilation of "MetaOutput.Core" project is necessary to remove "packages" folder. @@@TYPE WARNING
+@echo Before compilation of "MetaOutput.Core" project is necessary to remove "packages" folder. @@@EVENT WARNING
 
 @set CONFIGURATION=Release
 @if "%1" == "" goto :continue1

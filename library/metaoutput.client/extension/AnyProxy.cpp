@@ -17,7 +17,7 @@ void extension::AnyProxy::Connect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -42,7 +42,7 @@ void extension::AnyProxy::Disconnect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -68,7 +68,7 @@ void extension::AnyProxy::Register(MP_PTR(AnyProxy) context)
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -98,7 +98,7 @@ bool extension::AnyProxy::Execute(MP_STRING command, MP_STRING param)
         atom::Trace::GetInstance()->
             Clear()->
             SetComment(command + " (" + param + ")", "[[[Command]]] ([[[Params]]])")->
-            Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
+            Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
     }
     return false;
 }
@@ -129,7 +129,7 @@ bool extension::AnyProxy::ReadMetadata(MP_STRING name, MP_REF(MP_STRING) value)
         atom::Trace::GetInstance()->
             Clear()->
             SetComment(name, "[[[Variable name]]]")->
-            Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
+            Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
     }
     return false;
 }
@@ -160,7 +160,7 @@ bool extension::AnyProxy::ReadVariable(MP_STRING name, MP_REF(MP_STRING) value)
         atom::Trace::GetInstance()->
             Clear()->
             SetComment(name, "[[[Variable name]]]")->
-            Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
+            Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
     }
     return false;
 }
@@ -191,7 +191,7 @@ bool extension::AnyProxy::WriteVariable(MP_STRING name, MP_STRING value)
         atom::Trace::GetInstance()->
             Clear()->
             SetComment(name, "[[[Variable name]]]")->
-            Send(NAME::SOURCE::DIAGNOSTIC, NAME::TYPE::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
+            Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
     }
     return false;
 }

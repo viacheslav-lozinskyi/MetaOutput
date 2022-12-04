@@ -17,7 +17,7 @@ void extension::AnySource::Connect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -36,7 +36,7 @@ void extension::AnySource::Disconnect()
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -65,7 +65,7 @@ void extension::AnySource::Register(MP_STRING name, MP_PTR(AnySource) context)
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
 }
 
@@ -88,7 +88,7 @@ void extension::AnySource::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
             }
             catch (MP_PTR(MP_EXCEPTION) ex)
             {
-                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@TYPE EXCEPTION");
+                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
             }
             {
                 MP_THREAD_SLEEP(50);
