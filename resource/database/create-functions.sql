@@ -793,19 +793,19 @@ BEGIN
     SET SQL_SAFE_UPDATES = 0;
 
     IF ISNULL(__daysIgnore) THEN
-        DELETE FROM net_sessions WHERE (netId LIKE "%TEST-%");
-        DELETE FROM app_sessions WHERE (netId LIKE "%TEST-%") OR (userId LIKE "TEST-%");
-        DELETE FROM dev_sessions WHERE (netId LIKE "%TEST-%");
-        DELETE FROM review_sessions WHERE (netId LIKE "%TEST-%");
-        DELETE FROM trace_sessions WHERE (netId LIKE "%TEST-%");
-        DELETE FROM watch_sessions WHERE (netId LIKE "%TEST-%");
+        DELETE FROM net_sessions WHERE (netId LIKE "urn:fake:netid:TEST%");
+        DELETE FROM app_sessions WHERE (netId LIKE "urn:fake:netid:TEST%") OR (userId LIKE "urn:fake:userid:%");
+        DELETE FROM dev_sessions WHERE (netId LIKE "urn:fake:netid:TEST%");
+        DELETE FROM review_sessions WHERE (netId LIKE "urn:fake:netid:TEST%");
+        DELETE FROM trace_sessions WHERE (netId LIKE "urn:fake:netid:TEST%");
+        DELETE FROM watch_sessions WHERE (netId LIKE "urn:fake:netid:TEST%");
     ELSE
-        DELETE FROM net_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM app_sessions WHERE ((netId LIKE "%TEST-%") OR (userId LIKE "TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM dev_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM review_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM trace_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
-        DELETE FROM watch_sessions WHERE ((netId LIKE "%TEST-%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM net_sessions WHERE ((netId LIKE "urn:fake:netid:TEST%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM app_sessions WHERE ((netId LIKE "urn:fake:netid:TEST%") OR (userId LIKE "urn:fake:userid:%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM dev_sessions WHERE ((netId LIKE "urn:fake:netid:TEST%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM review_sessions WHERE ((netId LIKE "urn:fake:netid:TEST%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM trace_sessions WHERE ((netId LIKE "urn:fake:netid:TEST%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
+        DELETE FROM watch_sessions WHERE ((netId LIKE "urn:fake:netid:TEST%")) AND (_time < DATE_SUB(NOW(), INTERVAL __daysIgnore DAY));
     END IF;
 
     SET SQL_SAFE_UPDATES = 1;
