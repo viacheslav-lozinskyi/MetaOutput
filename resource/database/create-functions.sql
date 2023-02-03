@@ -7,6 +7,16 @@ USE metaoutput;
 
 
 
+#ALTER TABLE net_sessions MODIFY COLUMN netId  VARCHAR(32);
+#ALTER TABLE dev_sessions MODIFY COLUMN netId  VARCHAR(32);
+#ALTER TABLE app_sessions MODIFY COLUMN netId  VARCHAR(32);
+#ALTER TABLE net_realtime MODIFY COLUMN netId  VARCHAR(32);
+#ALTER TABLE review_sessions MODIFY COLUMN netId  VARCHAR(32);
+#ALTER TABLE trace_sessions MODIFY COLUMN netId  VARCHAR(32);
+#ALTER TABLE watch_sessions MODIFY COLUMN netId  VARCHAR(32);
+
+
+
 # #############################################################################
 # CREATING PROCEDURES #########################################################
 # #############################################################################
@@ -122,7 +132,7 @@ DROP PROCEDURE IF EXISTS net_realtime_register;
 
 DELIMITER %%
 CREATE PROCEDURE net_realtime_register(
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __channel VARCHAR(64),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
@@ -149,7 +159,7 @@ DROP PROCEDURE IF EXISTS net_session_register;
 
 DELIMITER %%
 CREATE PROCEDURE net_session_register(
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __country VARCHAR(64),
     IN __city VARCHAR(64),
     IN __organization VARCHAR(128),
@@ -306,7 +316,7 @@ DROP PROCEDURE IF EXISTS trace_session_register;
 DELIMITER %%
 CREATE PROCEDURE trace_session_register(
     IN __time VARCHAR(32),
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(32),
@@ -375,7 +385,7 @@ DROP PROCEDURE IF EXISTS app_session_register;
 DELIMITER %%
 CREATE PROCEDURE app_session_register(
     IN __time VARCHAR(32),
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
@@ -547,7 +557,7 @@ DROP PROCEDURE IF EXISTS review_session_register;
 DELIMITER %%
 CREATE PROCEDURE review_session_register(
     IN __time VARCHAR(32),
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(32),
@@ -616,7 +626,7 @@ DROP PROCEDURE IF EXISTS dev_session_register;
 DELIMITER %%
 CREATE PROCEDURE dev_session_register(
     IN __time VARCHAR(32),
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),
@@ -663,7 +673,7 @@ DROP PROCEDURE IF EXISTS watch_session_register;
 DELIMITER %%
 CREATE PROCEDURE watch_session_register(
     IN __time VARCHAR(32),
-    IN __netId VARCHAR(16),
+    IN __netId VARCHAR(32),
     IN __source VARCHAR(128),
     IN __project VARCHAR(128),
     IN __action VARCHAR(64),

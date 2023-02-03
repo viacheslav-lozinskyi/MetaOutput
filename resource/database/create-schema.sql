@@ -56,7 +56,7 @@ CREATE INDEX metaoutput_net_filters ON net_filters(type, value);
 # #############################################################################
 CREATE TABLE IF NOT EXISTS net_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    netId VARCHAR(16) NOT NULL,
+    netId VARCHAR(32) NOT NULL,
     country VARCHAR(64),
     city VARCHAR(64),
     organization VARCHAR(128),
@@ -80,7 +80,7 @@ CREATE INDEX metaoutput_net_sessions ON net_sessions(netId, campaignId);
 CREATE TABLE IF NOT EXISTS review_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16) NOT NULL,
+    netId VARCHAR(32) NOT NULL,
     action VARCHAR(32) NOT NULL,
     source VARCHAR(128) NOT NULL,
     project VARCHAR(128) NOT NULL,
@@ -125,7 +125,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = review_sessions.netId;
 CREATE TABLE IF NOT EXISTS trace_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16),
+    netId VARCHAR(32),
     action VARCHAR(32) NOT NULL,
     source VARCHAR(128) NOT NULL,
     project VARCHAR(128) NOT NULL,
@@ -166,7 +166,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = trace_sessions.netId;
 CREATE TABLE IF NOT EXISTS net_realtime(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16),
+    netId VARCHAR(32),
     channel VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
@@ -209,7 +209,7 @@ LEFT JOIN net_sessions ON net_sessions.netId = net_realtime.netId;
 CREATE TABLE IF NOT EXISTS app_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16) NOT NULL,
+    netId VARCHAR(32) NOT NULL,
     userId VARCHAR(64) NOT NULL,
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
@@ -256,7 +256,7 @@ LEFT JOIN net_campaigns ON net_sessions.campaignGroup = net_campaigns.campaignGr
 CREATE TABLE IF NOT EXISTS dev_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16),
+    netId VARCHAR(32),
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
     source VARCHAR(128) NOT NULL,
@@ -372,7 +372,7 @@ WHERE NOT ISNULL(net_sessions.campaignGroup);
 CREATE TABLE IF NOT EXISTS watch_sessions(
     _id INTEGER AUTO_INCREMENT PRIMARY KEY,
     _time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    netId VARCHAR(16) NOT NULL,
+    netId VARCHAR(32) NOT NULL,
     action VARCHAR(64) NOT NULL,
     project VARCHAR(128) NOT NULL,
     source VARCHAR(128) NOT NULL,
