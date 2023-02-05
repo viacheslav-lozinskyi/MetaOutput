@@ -38,7 +38,7 @@ void extension::AnyPreview::Disconnect()
                     MP_VECTOR_DELETE(s_Items, 0);
                 }
                 {
-                    extension::AnyPipe::Send(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
+                    extension::AnyPipe::Execute(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
                 }
             }
         }
@@ -93,7 +93,7 @@ bool extension::AnyPreview::Execute(MP_STRING url)
     {
         if ((GetState() != NAME::STATE::EXECUTE) && (MP_STRING_EMPTY(url) == false))
         {
-            return extension::AnyPipe::Send("urn:metaoutput:preview:" + MP_STRING_LOWER(GetExtension(url)), url);
+            return extension::AnyPipe::Execute("urn:metaoutput:preview:" + MP_STRING_LOWER(GetExtension(url)), url);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)

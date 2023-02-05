@@ -38,7 +38,7 @@ void extension::AnyExport::Disconnect()
                     MP_VECTOR_DELETE(s_Items, 0);
                 }
                 {
-                    extension::AnyPipe::Send(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
+                    extension::AnyPipe::Execute(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
                 }
             }
         }
@@ -100,7 +100,7 @@ bool extension::AnyExport::Execute(MP_STRING url, MP_STRING from)
                 if (s_Items[i]->m_Name == a_Name)
                 {
                     s_Items[i]->m_From = from;
-                    extension::AnyPipe::Send(a_Name, url);
+                    extension::AnyPipe::Execute(a_Name, url);
                     return true;
                 }
             }

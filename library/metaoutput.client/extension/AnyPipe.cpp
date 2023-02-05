@@ -35,7 +35,7 @@ void extension::AnyPipe::Disconnect()
                     MP_VECTOR_DELETE(s_Items, 0);
                 }
                 {
-                    Send(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
+                    Execute(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
                 }
             }
         }
@@ -84,7 +84,7 @@ bool extension::AnyPipe::Register(MP_STRING name, MP_PTR(AnyPipe) context)
     return false;
 }
 
-bool extension::AnyPipe::Send(MP_STRING name, MP_STRING value)
+bool extension::AnyPipe::Execute(MP_STRING name, MP_STRING value)
 {
     auto a_Result = false;
     try

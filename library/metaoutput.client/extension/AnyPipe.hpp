@@ -16,7 +16,7 @@ namespace extension
         static void Connect();
         static void Disconnect();
         static bool Register(MP_STRING name, MP_PTR(AnyPipe) context);
-        static bool Send(MP_STRING name, MP_STRING value);
+        static bool Execute(MP_STRING name, MP_STRING value);
     public:
         static MP_STRING GetPipeName(MP_STRING value);
     protected:

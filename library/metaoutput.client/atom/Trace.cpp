@@ -1361,7 +1361,7 @@ void atom::Trace::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
             }
             else
             {
-                extension::AnyPipe::Send("", a_Context);
+                extension::AnyPipe::Execute("", a_Context);
             }
         }
     }
