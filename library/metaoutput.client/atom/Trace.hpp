@@ -634,6 +634,44 @@ namespace atom
                 MP_CONSTANT_STRING(WAIT, "");
             };
         public:
+            MP_CLASS TYPE
+            {
+                MP_CONSTANT_STRING(UNKNOWN, "");
+                MP_CONSTANT_STRING(MSTR, "MSTR");
+                MP_CONSTANT_STRING(GIF, "GIF");
+                MP_CONSTANT_STRING(BMP, "BMP");
+                MP_CONSTANT_STRING(ICO, "ICO");
+                MP_CONSTANT_STRING(JPG, "JPG");
+                MP_CONSTANT_STRING(PNG, "PNG");
+                MP_CONSTANT_STRING(SVG, "SVG");
+                MP_CONSTANT_STRING(TIF, "TIF");
+                MP_CONSTANT_STRING(AAC, "AAC");
+                MP_CONSTANT_STRING(MKA, "MKA");
+                MP_CONSTANT_STRING(MP3, "MP3");
+                MP_CONSTANT_STRING(WAV, "WAV");
+                MP_CONSTANT_STRING(WMA, "WMA");
+                MP_CONSTANT_STRING(AVI, "AVI");
+                MP_CONSTANT_STRING(MKV, "MKV");
+                MP_CONSTANT_STRING(MOV, "MOV");
+                MP_CONSTANT_STRING(MP4, "MP4");
+                MP_CONSTANT_STRING(MPG, "MPG");
+                MP_CONSTANT_STRING(WMV, "WMV");
+                MP_CONSTANT_STRING(CSS, "CSS");
+                MP_CONSTANT_STRING(CSV, "CSV");
+                MP_CONSTANT_STRING(DLL, "DLL");
+                MP_CONSTANT_STRING(EXE, "EXE");
+                MP_CONSTANT_STRING(HTML, "HTML");
+                MP_CONSTANT_STRING(INI, "INI");
+                MP_CONSTANT_STRING(JSON, "JSON");
+                MP_CONSTANT_STRING(MD, "MD");
+                MP_CONSTANT_STRING(PDF, "PDF");
+                MP_CONSTANT_STRING(SQL, "SQL");
+                MP_CONSTANT_STRING(TML, "TML");
+                MP_CONSTANT_STRING(XML, "XML");
+                MP_CONSTANT_STRING(YAML, "YAML");
+                MP_CONSTANT_STRING(ZIP, "ZIP");
+            };
+        public:
             MP_CLASS TRANSFORM
             {
                 MP_CONSTANT_STRING(ALIGNMENT, "ALIGNMENT");
@@ -774,9 +812,9 @@ namespace atom
         MP_PTR(Trace) SetFontSize(MP_INT value);
         MP_PTR(Trace) SetFontState(MP_STRING name);
         MP_PTR(Trace) SetForeground(MP_INT value);
+        MP_PTR(Trace) SetMargin(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetPadding(MP_INT value);
         MP_PTR(Trace) SetPipe(MP_STRING value);
-        MP_PTR(Trace) SetPosition(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value, MP_STRING hint);
         MP_PTR(Trace) SetSize(MP_INT value);
@@ -796,7 +834,8 @@ namespace atom
         MP_PTR(Trace) SetUrlSample(MP_STRING value);
         MP_PTR(Trace) SetUrlSample(MP_STRING value, MP_STRING hint);
         MP_PTR(Trace) SetValue(MP_STRING value);
-        MP_PTR(Trace) SetValue(MP_PTR(MP_STREAM) value, MP_STRING format);
+        MP_PTR(Trace) SetValue(MP_STRING value, MP_STRING type);
+        MP_PTR(Trace) SetValue(MP_PTR(MP_STREAM) value, MP_STRING type);
     private:
         MP_PTR(Trace) __SendTml(MP_STRING value);
     private:
@@ -835,9 +874,9 @@ namespace atom
         MP_STRING m_FontSize;
         MP_STRING m_FontState;
         MP_STRING m_Foreground;
+        MP_STRING m_Margin;
         MP_STRING m_Padding;
         MP_STRING m_Pipe;
-        MP_STRING m_Position;
         MP_STRING m_Progress;
         MP_STRING m_Size;
         MP_STRING m_StackTrace;

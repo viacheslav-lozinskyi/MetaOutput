@@ -156,9 +156,9 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
             m_FontSize = "";
             m_FontState = "";
             m_Foreground = "";
+            m_Margin = "";
             m_Padding = "";
             m_Pipe = "";
-            m_Position = "";
             m_Progress = "";
             m_Size = "";
             m_StackTrace = "";
@@ -268,9 +268,9 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT 
                     a_Context += m_FontName;
                     a_Context += m_FontSize;
                     a_Context += m_FontState;
+                    a_Context += m_Margin;
                     a_Context += m_Padding;
                     a_Context += m_Pipe;
-                    a_Context += m_Position;
                     a_Context += m_Progress;
                     a_Context += m_Alignment;
                     a_Context += m_Size;
@@ -626,6 +626,15 @@ MP_PTR(atom::Trace) atom::Trace::SetForeground(MP_INT value)
     return this;
 }
 
+MP_PTR(atom::Trace) atom::Trace::SetMargin(MP_INT x, MP_INT y)
+{
+    if (this != nullptr)
+    {
+        m_Margin = " @@@MARGIN.X " + MP_CONVERT_STRING_FROM_INT(x, 0) + " @@@MARGIN.Y " + MP_CONVERT_STRING_FROM_INT(y, 0);
+    }
+    return this;
+}
+
 MP_PTR(atom::Trace) atom::Trace::SetPadding(MP_INT value)
 {
     if ((this != nullptr) && (value > 0))
@@ -644,15 +653,6 @@ MP_PTR(atom::Trace) atom::Trace::SetPipe(MP_STRING value)
         {
             m_Pipe = " @@@PIPE " + a_Context;
         }
-    }
-    return this;
-}
-
-MP_PTR(atom::Trace) atom::Trace::SetPosition(MP_INT x, MP_INT y)
-{
-    if (this != nullptr)
-    {
-        m_Position = " @@@POSITION.X " + MP_CONVERT_STRING_FROM_INT(x, 0) + " @@@POSITION.Y " + MP_CONVERT_STRING_FROM_INT(y, 0);
     }
     return this;
 }
@@ -885,22 +885,33 @@ MP_PTR(atom::Trace) atom::Trace::SetValue(MP_STRING value)
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::SetValue(MP_PTR(MP_STREAM) value, MP_STRING format)
+MP_PTR(atom::Trace) atom::Trace::SetValue(MP_STRING value, MP_STRING type)
 {
     if ((this != nullptr) && (value != nullptr))
     {
-        MP_PTR(MP_STREAM) a_Context;
+        if (MP_STRING_EMPTY(type))
         {
-            MP_STREAM_INITIALIZE(a_Context);
-            MP_CONVERT_STREAM_TO_ZIP_STREAM(value, a_Context);
-        }
-        if (MP_STRING_EMPTY(format))
-        {
-            m_Value = " @@@VALUE.ZIP " + MP_CONVERT_STREAM_TO_BASE64(a_Context);
+            m_Value = " @@@VALUE.BASE64 " + MP_CONVERT_STRING_TO_BASE64(value);
         }
         else
         {
-            m_Value = " @@@VALUE.ZIP " + CONSTANT::TML::GROUP_BEGIN + format + CONSTANT::TML::GROUP_END + " " + MP_CONVERT_STREAM_TO_BASE64(a_Context);
+            m_Value = " @@@VALUE.BASE64 " + MP_CONVERT_STRING_TO_BASE64(value) + " @@@VALUE.TYPE " + type;
+        }
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetValue(MP_PTR(MP_STREAM) value, MP_STRING type)
+{
+    if ((this != nullptr) && (value != nullptr))
+    {
+        if (MP_STRING_EMPTY(type))
+        {
+            m_Value = " @@@VALUE.BASE64 " + MP_CONVERT_STREAM_TO_BASE64(value);
+        }
+        else
+        {
+            m_Value = " @@@VALUE.BASE64 " + MP_CONVERT_STREAM_TO_BASE64(value) + " @@@VALUE.TYPE " + type;
         }
     }
     return this;
