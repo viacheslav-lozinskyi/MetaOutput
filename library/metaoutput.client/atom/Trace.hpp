@@ -271,6 +271,7 @@ namespace atom
                 MP_CONSTANT_STRING(PANEL, "PANEL");
                 MP_CONSTANT_STRING(PICTURE, "PICTURE");
                 MP_CONSTANT_STRING(RADIOBOX, "RADIOBOX");
+                MP_CONSTANT_STRING(SCROLLBOX, "SCROLLBOX");
                 MP_CONSTANT_STRING(TABLE, "TABLE");
                 MP_CONSTANT_STRING(TEXT, "TEXT");
                 MP_CONSTANT_STRING(TEXTBOX, "TEXTBOX");
@@ -634,48 +635,11 @@ namespace atom
                 MP_CONSTANT_STRING(WAIT, "");
             };
         public:
-            MP_CLASS TYPE
-            {
-                MP_CONSTANT_STRING(UNKNOWN, "");
-                MP_CONSTANT_STRING(MSTR, "MSTR");
-                MP_CONSTANT_STRING(GIF, "GIF");
-                MP_CONSTANT_STRING(BMP, "BMP");
-                MP_CONSTANT_STRING(ICO, "ICO");
-                MP_CONSTANT_STRING(JPG, "JPG");
-                MP_CONSTANT_STRING(PNG, "PNG");
-                MP_CONSTANT_STRING(SVG, "SVG");
-                MP_CONSTANT_STRING(TIF, "TIF");
-                MP_CONSTANT_STRING(AAC, "AAC");
-                MP_CONSTANT_STRING(MKA, "MKA");
-                MP_CONSTANT_STRING(MP3, "MP3");
-                MP_CONSTANT_STRING(WAV, "WAV");
-                MP_CONSTANT_STRING(WMA, "WMA");
-                MP_CONSTANT_STRING(AVI, "AVI");
-                MP_CONSTANT_STRING(MKV, "MKV");
-                MP_CONSTANT_STRING(MOV, "MOV");
-                MP_CONSTANT_STRING(MP4, "MP4");
-                MP_CONSTANT_STRING(MPG, "MPG");
-                MP_CONSTANT_STRING(WMV, "WMV");
-                MP_CONSTANT_STRING(CSS, "CSS");
-                MP_CONSTANT_STRING(CSV, "CSV");
-                MP_CONSTANT_STRING(DLL, "DLL");
-                MP_CONSTANT_STRING(EXE, "EXE");
-                MP_CONSTANT_STRING(HTML, "HTML");
-                MP_CONSTANT_STRING(INI, "INI");
-                MP_CONSTANT_STRING(JSON, "JSON");
-                MP_CONSTANT_STRING(MD, "MD");
-                MP_CONSTANT_STRING(PDF, "PDF");
-                MP_CONSTANT_STRING(SQL, "SQL");
-                MP_CONSTANT_STRING(TML, "TML");
-                MP_CONSTANT_STRING(XML, "XML");
-                MP_CONSTANT_STRING(YAML, "YAML");
-                MP_CONSTANT_STRING(ZIP, "ZIP");
-            };
-        public:
             MP_CLASS TRANSFORM
             {
                 MP_CONSTANT_STRING(ALIGNMENT, "ALIGNMENT");
                 MP_CONSTANT_STRING(BACKGROUND, "BACKGROUND");
+                MP_CONSTANT_STRING(BORDER, "BORDER");
                 MP_CONSTANT_STRING(COMMENT, "COMMENT");
                 MP_CONSTANT_STRING(COMMENT_DETECT, "COMMENT.DETECT");
                 MP_CONSTANT_STRING(COMMENT_HINT, "COMMENT.HINT");
@@ -723,6 +687,7 @@ namespace atom
                 MP_CONSTANT_STRING(CONTENT_VALUE_BEFORE, "CONTENT.VALUE.BEFORE");
                 MP_CONSTANT_STRING(CONTROL, "CONTROL");
                 MP_CONSTANT_STRING(CONTROL_HINT, "CONTROL.HINT");
+                MP_CONSTANT_STRING(COUNT, "COUNT");
                 MP_CONSTANT_STRING(DATE, "DATE");
                 MP_CONSTANT_STRING(EVENT, "EVENT");
                 MP_CONSTANT_STRING(FIND_COMMENT, "FIND.COMMENT");
@@ -754,13 +719,16 @@ namespace atom
                 MP_CONSTANT_STRING(LEVEL_NEXT, "LEVEL.NEXT");
                 MP_CONSTANT_STRING(LEVEL_PREV, "LEVEL.PREV");
                 MP_CONSTANT_STRING(LEVEL_ROOT, "LEVEL.ROOT");
+                MP_CONSTANT_STRING(MARGIN_X, "MARGIN.X");
+                MP_CONSTANT_STRING(MARGIN_Y, "MARGIN.Y");
                 MP_CONSTANT_STRING(PIPE, "PIPE");
                 MP_CONSTANT_STRING(PROGRESS, "PROGRESS");
                 MP_CONSTANT_STRING(PROGRESS_DETECT, "PROGRESS.DETECT");
                 MP_CONSTANT_STRING(PROGRESS_HINT, "PROGRESS.HINT");
                 MP_CONSTANT_STRING(SIZE, "SIZE");
+                MP_CONSTANT_STRING(SIZE_X, "SIZE.X");
+                MP_CONSTANT_STRING(SIZE_Y, "SIZE.Y");
                 MP_CONSTANT_STRING(SOURCE, "SOURCE");
-                MP_CONSTANT_STRING(SOURCE_PREVIEW, "SOURCE.PREVIEW");
                 MP_CONSTANT_STRING(TIME, "TIME");
                 MP_CONSTANT_STRING(TIME_DETECT, "TIME.DETECT");
                 MP_CONSTANT_STRING(URL, "URL");
@@ -774,7 +742,46 @@ namespace atom
                 MP_CONSTANT_STRING(URL_SAMPLE, "URL.SAMPLE");
                 MP_CONSTANT_STRING(URL_SAMPLE_HINT, "URL.SAMPLE.HINT");
                 MP_CONSTANT_STRING(VALUE, "VALUE");
+                MP_CONSTANT_STRING(VALUE_TYPE, "VALUE.TYPE");
                 MP_CONSTANT_STRING(VALUE_DETECT, "VALUE.DETECT");
+            };
+        public:
+            MP_CLASS TYPE
+            {
+                MP_CONSTANT_STRING(UNKNOWN, "");
+                MP_CONSTANT_STRING(MSTR, "MSTR");
+                MP_CONSTANT_STRING(GIF, "GIF");
+                MP_CONSTANT_STRING(BMP, "BMP");
+                MP_CONSTANT_STRING(ICO, "ICO");
+                MP_CONSTANT_STRING(JPG, "JPG");
+                MP_CONSTANT_STRING(PNG, "PNG");
+                MP_CONSTANT_STRING(SVG, "SVG");
+                MP_CONSTANT_STRING(TIF, "TIF");
+                MP_CONSTANT_STRING(AAC, "AAC");
+                MP_CONSTANT_STRING(MKA, "MKA");
+                MP_CONSTANT_STRING(MP3, "MP3");
+                MP_CONSTANT_STRING(WAV, "WAV");
+                MP_CONSTANT_STRING(WMA, "WMA");
+                MP_CONSTANT_STRING(AVI, "AVI");
+                MP_CONSTANT_STRING(MKV, "MKV");
+                MP_CONSTANT_STRING(MOV, "MOV");
+                MP_CONSTANT_STRING(MP4, "MP4");
+                MP_CONSTANT_STRING(MPG, "MPG");
+                MP_CONSTANT_STRING(WMV, "WMV");
+                MP_CONSTANT_STRING(CSS, "CSS");
+                MP_CONSTANT_STRING(CSV, "CSV");
+                MP_CONSTANT_STRING(DLL, "DLL");
+                MP_CONSTANT_STRING(EXE, "EXE");
+                MP_CONSTANT_STRING(HTML, "HTML");
+                MP_CONSTANT_STRING(INI, "INI");
+                MP_CONSTANT_STRING(JSON, "JSON");
+                MP_CONSTANT_STRING(MD, "MD");
+                MP_CONSTANT_STRING(PDF, "PDF");
+                MP_CONSTANT_STRING(SQL, "SQL");
+                MP_CONSTANT_STRING(TML, "TML");
+                MP_CONSTANT_STRING(XML, "XML");
+                MP_CONSTANT_STRING(YAML, "YAML");
+                MP_CONSTANT_STRING(ZIP, "ZIP");
             };
         };
     public:
