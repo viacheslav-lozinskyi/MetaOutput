@@ -12,7 +12,7 @@ namespace atom
         public:
             MP_CLASS OUTPUT
             {
-                MP_CONSTANT_STRING(MUTEX, "METAOUTPUT.EXECUTE.MUTEX");
+                MP_CONSTANT_STRING(MUTEX, "urn:metaoutput:mutex:EXECUTE");
                 MP_CONSTANT_INTEGER(PREVIEW_FOREGROUND, Trace::NAME::COLOR::ORCHID);
                 MP_CONSTANT_INTEGER(PREVIEW_ITEM_HEIGHT, 19);
                 MP_CONSTANT_INTEGER(PREVIEW_MIN_SIZE, 2);
@@ -21,14 +21,20 @@ namespace atom
                 MP_CONSTANT_INTEGER(PREVIEW_PAGE_BREAK, 7);
                 MP_CONSTANT_INTEGER(MAX_BUFFER_SIZE, 100 * 1024 * 1024);
             };
+        public:
+            MP_CLASS PADDING
+            {
+                MP_CONSTANT_INTEGER(DEFAULT, 5);
+            };
+        public:
             MP_CLASS PIPE
             {
-                MP_CONSTANT_STRING(MUTEX, "METAOUTPUT.PIPE.MUTEX");
-                MP_CONSTANT_STRING(NAME, "METAOUTPUT.PIPE");
+                MP_CONSTANT_STRING(MUTEX, "urn:metaoutput:mutex:PIPE");
                 MP_CONSTANT_STRING(TERMINATE_REQUEST, "<<<METAOUTPUT.PIPE.TERMINATE>>>");
                 MP_CONSTANT_INTEGER(BUFFER_SIZE, 256 * 1024);
                 MP_CONSTANT_INTEGER(TIMEOUT, 500);
             };
+        public:
             MP_CLASS TML
             {
                 MP_CONSTANT_STRING(ATTRIBUTE, "@@@");
@@ -262,7 +268,6 @@ namespace atom
                 MP_CONSTANT_STRING(EDITBOX, "EDITBOX");
                 MP_CONSTANT_STRING(COMBOBOX, "COMBOBOX");
                 MP_CONSTANT_STRING(LABEL, "LABEL");
-                MP_CONSTANT_STRING(NONE, "");
                 MP_CONSTANT_STRING(PANEL, "PANEL");
                 MP_CONSTANT_STRING(PICTURE, "PICTURE");
                 MP_CONSTANT_STRING(RADIOBOX, "RADIOBOX");
@@ -486,6 +491,7 @@ namespace atom
             MP_CLASS EVENT
             {
                 MP_CONSTANT_STRING(CLASS, "CLASS");
+                MP_CONSTANT_STRING(CONTROL, "CONTROL");
                 MP_CONSTANT_STRING(CRITICAL, "CRITICAL");
                 MP_CONSTANT_STRING(DEBUG, "DEBUG");
                 MP_CONSTANT_STRING(ERROR, "ERROR");
@@ -752,7 +758,9 @@ namespace atom
         MP_PTR(Trace) SendPreview(MP_STRING event, MP_STRING url);
     public:
         MP_PTR(Trace) SetAlignment(MP_STRING value);
+        MP_PTR(Trace) SetAlignment(MP_STRING value1, MP_STRING value2);
         MP_PTR(Trace) SetBackground(MP_INT value);
+        MP_PTR(Trace) SetBorder(MP_INT value);
         MP_PTR(Trace) SetCommand(MP_STRING name);
         MP_PTR(Trace) SetCommand(MP_STRING name, MP_STRING value);
         MP_PTR(Trace) SetComment(MP_STRING value);
@@ -767,9 +775,13 @@ namespace atom
         MP_PTR(Trace) SetFontSize(MP_INT value);
         MP_PTR(Trace) SetFontState(MP_STRING name);
         MP_PTR(Trace) SetForeground(MP_INT value);
+        MP_PTR(Trace) SetPadding(MP_INT value);
+        MP_PTR(Trace) SetPipe(MP_STRING value);
+        MP_PTR(Trace) SetPosition(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value, MP_STRING hint);
         MP_PTR(Trace) SetSize(MP_INT value);
+        MP_PTR(Trace) SetSize(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetTime(MP_INT hour, MP_INT minute, MP_INT second, MP_INT miliSecond);
         MP_PTR(Trace) SetTml(MP_STRING value);
         MP_PTR(Trace) SetTransform(MP_STRING name, MP_STRING value);
@@ -780,8 +792,6 @@ namespace atom
         MP_PTR(Trace) SetUrl(MP_STRING value, MP_STRING hint, MP_INT line, MP_INT position);
         MP_PTR(Trace) SetUrlInfo(MP_STRING value);
         MP_PTR(Trace) SetUrlInfo(MP_STRING value, MP_STRING hint);
-        MP_PTR(Trace) SetUrlPipe(MP_STRING value);
-        MP_PTR(Trace) SetUrlPreview(MP_STRING value);
         MP_PTR(Trace) SetUrlSample(MP_STRING value);
         MP_PTR(Trace) SetUrlSample(MP_STRING value, MP_STRING hint);
         MP_PTR(Trace) SetValue(MP_STRING value);
@@ -811,6 +821,7 @@ namespace atom
     private:
         MP_STRING m_Alignment;
         MP_STRING m_Background;
+        MP_STRING m_Border;
         MP_STRING m_Command;
         MP_STRING m_Comment;
         MP_STRING m_Condition;
@@ -823,6 +834,9 @@ namespace atom
         MP_STRING m_FontSize;
         MP_STRING m_FontState;
         MP_STRING m_Foreground;
+        MP_STRING m_Padding;
+        MP_STRING m_Pipe;
+        MP_STRING m_Position;
         MP_STRING m_Progress;
         MP_STRING m_Size;
         MP_STRING m_StackTrace;
@@ -830,8 +844,6 @@ namespace atom
         MP_STRING m_Tml;
         MP_STRING m_Url;
         MP_STRING m_UrlInfo;
-        MP_STRING m_UrlPipe;
-        MP_STRING m_UrlPreview;
         MP_STRING m_UrlSample;
         MP_STRING m_Value;
     };

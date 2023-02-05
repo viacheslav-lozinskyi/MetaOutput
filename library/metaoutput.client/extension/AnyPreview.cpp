@@ -2,8 +2,7 @@
 #include "../All.hpp"
 
 #ifndef MP_PLATFORM_CLI
-MP_PTR(MP_THREAD_MUTEX) extension::AnyPreview::s_Mutex = nullptr;
-MP_PTR(MP_VECTOR(extension::AnyPreview::Item)) extension::AnyPreview::s_Items = nullptr;
+MP_PTR(MP_VECTOR(extension::AnyPreview)) extension::AnyPreview::s_Items = nullptr;
 #endif
 
 // extension::AnyPreview ######################################################
@@ -13,7 +12,7 @@ void extension::AnyPreview::Connect()
     {
         if (s_Items == nullptr)
         {
-            s_Items = MP_NEW MP_VECTOR(Item);
+            s_Items = MP_NEW MP_VECTOR(AnyPreview);
         }
         {
             SetState(NAME::STATE::WAIT);
@@ -39,7 +38,7 @@ void extension::AnyPreview::Disconnect()
                     MP_VECTOR_DELETE(s_Items, 0);
                 }
                 {
-                    Send(a_Context->m_Name, atom::Trace::CONSTANT::PIPE::TERMINATE_REQUEST);
+                    extension::AnyPipe::Send(a_Context->m_Name, CONSTANT::PIPE::TERMINATE_REQUEST);
                 }
             }
         }
@@ -50,34 +49,42 @@ void extension::AnyPreview::Disconnect()
     }
 }
 
-void extension::AnyPreview::Register(MP_STRING extension, MP_PTR(AnyPreview) context)
+bool extension::AnyPreview::Register(MP_STRING extension, MP_PTR(AnyPreview) context)
 {
     try
     {
         if ((s_Items != nullptr) && (context != nullptr) && (MP_STRING_EMPTY(extension) == false))
         {
-            auto a_Context = MP_NEW Item();
             {
-                a_Context->m_Name = "PREVIEW." + GetName(extension);
-                a_Context->m_Context = MP_NEW atom::Trace();
-                a_Context->m_Extension = context;
-                a_Context->m_Thread = nullptr;
+                context->m_Name = "urn:metaoutput:preview:" + MP_STRING_LOWER(extension);
+                context->m_Context = MP_NEW atom::Trace();
+                context->m_Thread = nullptr;
+            }
+            for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
+            {
+                if (s_Items[i]->m_Name == context->m_Name)
+                {
+                    return false;
+                }
             }
             {
-                MP_THREAD_INITIALIZE(a_Context->m_Thread, __ThreadExecute);
-                MP_THREAD_NAME_SET(a_Context->m_Thread, "METAOUTPUT.PREVIEW: " + extension);
-                MP_THREAD_APARTMENT_SET(a_Context->m_Thread, MP_THREAD_APARTMENT_STA);
-                MP_THREAD_START(a_Context->m_Thread, a_Context);
+                MP_THREAD_MUTEX_INITIALIZE(context->m_Mutex, CONSTANT::OUTPUT::MUTEX, false);
+                MP_THREAD_INITIALIZE(context->m_Thread, __ThreadExecute);
+                MP_THREAD_NAME_SET(context->m_Thread, context->m_Name);
+                MP_THREAD_APARTMENT_SET(context->m_Thread, MP_THREAD_APARTMENT_STA);
+                MP_THREAD_START(context->m_Thread, context);
             }
             {
-                MP_VECTOR_APPEND(s_Items, a_Context);
+                MP_VECTOR_APPEND(s_Items, context);
             }
+            return true;
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
         MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
+    return false;
 }
 
 bool extension::AnyPreview::Execute(MP_STRING url)
@@ -86,7 +93,7 @@ bool extension::AnyPreview::Execute(MP_STRING url)
     {
         if ((GetState() != NAME::STATE::EXECUTE) && (MP_STRING_EMPTY(url) == false))
         {
-            return Send("PREVIEW" + MP_STRING_UPPER(GetExtension(url)), url);
+            return extension::AnyPipe::Send("urn:metaoutput:preview:" + MP_STRING_LOWER(GetExtension(url)), url);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
@@ -96,45 +103,6 @@ bool extension::AnyPreview::Execute(MP_STRING url)
             SendPreview(NAME::EVENT::EXCEPTION, url);
     }
     return false;
-}
-
-bool extension::AnyPreview::Send(MP_STRING value)
-{
-    if (MP_STRING_EMPTY(value) == false)
-    {
-        return Send("", value);
-    }
-    return false;
-}
-
-bool extension::AnyPreview::Send(MP_STRING pipeName, MP_STRING value)
-{
-    auto a_Result = false;
-    try
-    {
-        auto a_Context1 = (MP_PTR(MP_PIPE_CLIENT))nullptr;
-        auto a_Context2 = (MP_PTR(MP_PIPE_WRITESTREAM))nullptr;
-        {
-            MP_PIPE_CLIENT_INITIALIZE(a_Context1, GetPipeName(pipeName), MP_PIPE_DIRECTION_OUT);
-            MP_PIPE_CLIENT_CONNECT(a_Context1, atom::Trace::CONSTANT::PIPE::TIMEOUT);
-            MP_PIPE_WRITESTREAM_INITIALIZE(a_Context2, a_Context1);
-        }
-        if (MP_PIPE_CLIENT_CONNECTED(a_Context1))
-        {
-            MP_PIPE_WRITESTREAM_WRITE(a_Context2, value);
-            a_Result = true;
-        }
-        {
-            MP_PIPE_WRITESTREAM_FINALIZE(a_Context2);
-            MP_PIPE_CLIENT_FINALIZE(a_Context1);
-        }
-    }
-    catch (MP_PTR(MP_EXCEPTION) ex)
-    {
-        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
-        a_Result = false;
-    }
-    return a_Result;
 }
 
 // Public ##############
@@ -152,32 +120,6 @@ MP_STRING extension::AnyPreview::GetExtension(MP_STRING url)
         }
     }
     return "";
-}
-
-MP_STRING extension::AnyPreview::GetName(MP_STRING value)
-{
-    if (MP_STRING_EMPTY(value) == false)
-    {
-        auto a_Result = "." + MP_STRING_UPPER(value);
-        {
-            a_Result = MP_STRING_REPLACE(a_Result, "..", ".");
-        }
-        return a_Result;
-    }
-    return "";
-}
-
-MP_STRING extension::AnyPreview::GetPipeName(MP_STRING name)
-{
-    auto a_Result = atom::Trace::CONSTANT::PIPE::NAME;
-    {
-        a_Result += "." + MP_CONVERT_STRING_FROM_INT(MP_PROCESS_ID_GET(MP_PROCESS_CURRENT_GET()), 0);
-    }
-    if (MP_STRING_EMPTY(name) == false)
-    {
-        a_Result += GetName(name);
-    }
-    return a_Result;
 }
 
 MP_STRING extension::AnyPreview::GetFinalText(MP_STRING value)
@@ -254,7 +196,19 @@ MP_INT extension::AnyPreview::GetProperty(MP_STRING name, bool isVerified)
 {
     if (MP_STRING_EMPTY(name) == false)
     {
-        auto a_Result = __GetInteger(extension::AnyPreview::GetProperty(name));
+        auto a_Result = 0;
+        auto a_Context = extension::AnyPreview::GetProperty(name);
+        if (MP_STRING_EMPTY(a_Context) == false)
+        {
+            try
+            {
+                a_Result = MP_CONVERT_STRING_TO_INT(a_Context);
+            }
+            catch (MP_PTR(MP_EXCEPTION))
+            {
+                // This exception can be ignored
+            }
+        }
         if (isVerified)
         {
             if (name == NAME::PROPERTY::PREVIEW_DOCUMENT_SIZE)
@@ -263,7 +217,7 @@ MP_INT extension::AnyPreview::GetProperty(MP_STRING name, bool isVerified)
             }
             if (name == NAME::PROPERTY::PREVIEW_MEDIA_SIZE)
             {
-                return MP_MAX(a_Result, atom::Trace::CONSTANT::OUTPUT::PREVIEW_MIN_SIZE);
+                return MP_MAX(a_Result, CONSTANT::OUTPUT::PREVIEW_MIN_SIZE);
             }
             if (name == NAME::PROPERTY::PREVIEW_TABLE_SIZE)
             {
@@ -271,7 +225,7 @@ MP_INT extension::AnyPreview::GetProperty(MP_STRING name, bool isVerified)
             }
             if (name == NAME::PROPERTY::PREVIEW_WIDTH)
             {
-                return MP_MAX(a_Result, atom::Trace::CONSTANT::OUTPUT::PREVIEW_MIN_WIDTH);
+                return MP_MAX(a_Result, CONSTANT::OUTPUT::PREVIEW_MIN_WIDTH);
             }
         }
         return a_Result;
@@ -302,32 +256,6 @@ void extension::AnyPreview::SetState(MP_STRING value)
 // Protected ###########
 void extension::AnyPreview::_Execute(MP_PTR(atom::Trace), MP_INT, MP_STRING, MP_STRING)
 {
-}
-
-// Private #############
-MP_PTR(MP_THREAD_MUTEX) extension::AnyPreview::__GetMutex()
-{
-    if (s_Mutex == nullptr)
-    {
-        MP_THREAD_MUTEX_INITIALIZE(s_Mutex, atom::Trace::CONSTANT::OUTPUT::MUTEX, false);
-    }
-    return s_Mutex;
-}
-
-// Private #############
-MP_INT extension::AnyPreview::__GetInteger(MP_STRING value)
-{
-    if (MP_STRING_EMPTY(value) == false)
-    {
-        try
-        {
-            return MP_CONVERT_STRING_TO_INT(value);
-        }
-        catch (MP_PTR(MP_EXCEPTION))
-        {
-        }
-    }
-    return 0;
 }
 
 // Private #############
@@ -380,7 +308,7 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
             if (GetState() != NAME::STATE::CANCEL)
             {
                 context->
-                    SetUrlPreview(a_Context)->
+                    //SetUrlPreview(a_Context)->
                     SendPreview(NAME::EVENT::INFO, url);
             }
             if (GetState() != NAME::STATE::CANCEL)
@@ -428,7 +356,7 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
 // Private #############
 void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
 {
-    auto a_Context = dynamic_cast<MP_PTR(Item)>(sender);
+    auto a_Context = dynamic_cast<MP_PTR(AnyPreview)>(sender);
     while (a_Context != nullptr)
     {
         try
@@ -436,7 +364,7 @@ void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
             auto a_Context1 = (MP_PTR(MP_PIPE_SERVER))nullptr;
             auto a_Context2 = (MP_PTR(MP_PIPE_READSTREAM))nullptr;
             {
-                MP_PIPE_SERVER_INITIALIZE(a_Context1, GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
+                MP_PIPE_SERVER_INITIALIZE(a_Context1, extension::AnyPipe::GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
                 MP_PIPE_READSTREAM_INITIALIZE(a_Context2, a_Context1);
             }
             while (a_Context != nullptr)
@@ -456,7 +384,7 @@ void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
                             {
                                 MP_PIPE_SERVER_DISCONNECT(a_Context1);
                             }
-                            if (a_Context3 == atom::Trace::CONSTANT::PIPE::TERMINATE_REQUEST)
+                            if (a_Context3 == CONSTANT::PIPE::TERMINATE_REQUEST)
                             {
                                 a_Context = nullptr;
                                 break;
@@ -464,22 +392,22 @@ void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
                             try
                             {
                                 {
-                                    MP_THREAD_MUTEX_LOCK(__GetMutex());
+                                    MP_THREAD_MUTEX_LOCK(a_Context->m_Mutex);
                                 }
                                 {
                                     __Execute(
-                                        a_Context->m_Extension,
+                                        a_Context,
                                         a_Context->m_Context,
                                         1,
                                         a_Context3);
                                 }
                                 {
-                                    MP_THREAD_MUTEX_UNLOCK(__GetMutex());
+                                    MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
                                 }
                             }
                             catch (MP_PTR(MP_EXCEPTION) ex)
                             {
-                                MP_THREAD_MUTEX_UNLOCK(__GetMutex());
+                                MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
                                 MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
                             }
                         }

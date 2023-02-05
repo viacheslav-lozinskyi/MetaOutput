@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>MetaOutput.Client</id>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <title>MetaOutput.Client</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
@@ -14,7 +14,11 @@
     <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
     <license type="expression">MIT</license>
     <releaseNotes>
-- TYPE is renamed to EVENT
+- Code refactoring
+- Specification of atom::Trace is improved
+- Specification of extension::AnyPipe is implemented
+- Specification of extension::AnyProxy is removed
+- Preview mechanism significantly changed
 - Specification of MetaOutput.Client library is improved
 - Script files are updated
     </releaseNotes>

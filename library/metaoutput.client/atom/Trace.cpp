@@ -143,6 +143,7 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
         {
             m_Alignment = "";
             m_Background = "";
+            m_Border = "";
             m_Command = "";
             m_Comment = "";
             m_Condition = "";
@@ -155,6 +156,9 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
             m_FontSize = "";
             m_FontState = "";
             m_Foreground = "";
+            m_Padding = "";
+            m_Pipe = "";
+            m_Position = "";
             m_Progress = "";
             m_Size = "";
             m_StackTrace = "";
@@ -162,8 +166,6 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
             m_Tml = "";
             m_Url = "";
             m_UrlInfo = "";
-            m_UrlPipe = "";
-            m_UrlPreview = "";
             m_UrlSample = "";
             m_Value = "";
         }
@@ -259,18 +261,20 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT 
                     a_Context += m_Count;
                     a_Context += m_Date;
                     a_Context += m_Time;
+                    a_Context += m_Border;
                     a_Context += m_Background;
                     a_Context += m_Foreground;
                     a_Context += m_FontName;
                     a_Context += m_FontSize;
                     a_Context += m_FontState;
+                    a_Context += m_Padding;
+                    a_Context += m_Pipe;
+                    a_Context += m_Position;
                     a_Context += m_Progress;
                     a_Context += m_Alignment;
                     a_Context += m_Size;
                     a_Context += m_Url;
                     a_Context += m_UrlInfo;
-                    a_Context += m_UrlPipe;
-                    a_Context += m_UrlPreview;
                     a_Context += m_UrlSample;
                     a_Context += m_Value;
                     a_Context += m_Tml;
@@ -372,13 +376,28 @@ MP_PTR(atom::Trace) atom::Trace::SendPreview(MP_STRING event, MP_STRING url)
 // Public ##############
 MP_PTR(atom::Trace) atom::Trace::SetAlignment(MP_STRING value)
 {
-    if ((this != nullptr) && (value != nullptr))
+    if ((this != nullptr) && (MP_STRING_EMPTY(value) == false))
     {
-        auto a_Context = __GetFirstLine(value, false);
-        if (MP_STRING_EMPTY(a_Context) == false)
-        {
-            m_Alignment = " @@@ALIGNMENT " + a_Context;
-        }
+        m_Alignment = " @@@ALIGNMENT " + __GetFirstLine(value, false);
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetAlignment(MP_STRING value1, MP_STRING value2)
+{
+    if ((this != nullptr) && (MP_STRING_EMPTY(value1) == false) && (MP_STRING_EMPTY(value2) == false))
+    {
+        m_Alignment = " @@@ALIGNMENT " + __GetFirstLine(value1, false) + " " + __GetFirstLine(value2, false);
+        return this;
+    }
+    if ((this != nullptr) && (MP_STRING_EMPTY(value1) == false))
+    {
+        m_Alignment = " @@@ALIGNMENT " + __GetFirstLine(value1, false);
+        return this;
+    }
+    if ((this != nullptr) && (MP_STRING_EMPTY(value2) == false))
+    {
+        m_Alignment = " @@@ALIGNMENT " + __GetFirstLine(value2, false);
     }
     return this;
 }
@@ -392,9 +411,18 @@ MP_PTR(atom::Trace) atom::Trace::SetBackground(MP_INT value)
     return this;
 }
 
+MP_PTR(atom::Trace) atom::Trace::SetBorder(MP_INT value)
+{
+    if ((this != nullptr) && (value != 0))
+    {
+        m_Border = " @@@BORDER " + __GetColor(value);
+    }
+    return this;
+}
+
 MP_PTR(atom::Trace) atom::Trace::SetCommand(MP_STRING name)
 {
-    if ((this != nullptr) && (name != nullptr))
+    if ((this != nullptr) && (MP_STRING_EMPTY(name) == false))
     {
         auto a_Context = MP_STRING_UPPER(__GetFirstLine(name, false));
         if (a_Context == NAME::COMMAND::MESSAGE_STACKTRACE)
@@ -412,7 +440,7 @@ MP_PTR(atom::Trace) atom::Trace::SetCommand(MP_STRING name)
 
 MP_PTR(atom::Trace) atom::Trace::SetCommand(MP_STRING name, MP_STRING value)
 {
-    if ((this != nullptr) && (name != nullptr))
+    if ((this != nullptr) && (MP_STRING_EMPTY(name) == false))
     {
         auto a_Context = MP_STRING_UPPER(__GetFirstLine(name, false));
         if (a_Context == NAME::COMMAND::MESSAGE_STACKTRACE)
@@ -481,7 +509,7 @@ MP_PTR(atom::Trace) atom::Trace::SetCondition(MP_STRING name, MP_STRING variable
 
 MP_PTR(atom::Trace) atom::Trace::SetContent(MP_STRING value)
 {
-    if ((this != nullptr) && (value != nullptr))
+    if ((this != nullptr) && (MP_STRING_EMPTY(value) == false))
     {
         auto a_Context = __GetMultiLine(value, true);
         if (MP_STRING_EMPTY(a_Context) == false)
@@ -596,6 +624,37 @@ MP_PTR(atom::Trace) atom::Trace::SetForeground(MP_INT value)
     return this;
 }
 
+MP_PTR(atom::Trace) atom::Trace::SetPadding(MP_INT value)
+{
+    if ((this != nullptr) && (value != 0))
+    {
+        m_Padding = " @@@PADDING " + value;
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetPipe(MP_STRING value)
+{
+    if ((this != nullptr) && (value != nullptr))
+    {
+        auto a_Context = __GetFirstLine(value, false);
+        if (MP_STRING_EMPTY(a_Context) == false)
+        {
+            m_Pipe = " @@@PIPE " + a_Context;
+        }
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetPosition(MP_INT x, MP_INT y)
+{
+    if (this != nullptr)
+    {
+        m_Position = " @@@POSITION.X " + MP_CONVERT_STRING_FROM_INT(x, 0) + " @@@POSITION.Y " + MP_CONVERT_STRING_FROM_INT(y, 0);
+    }
+    return this;
+}
+
 MP_PTR(atom::Trace) atom::Trace::SetProgress(MP_DOUBLE value)
 {
     return SetProgress(value, nullptr);
@@ -619,6 +678,15 @@ MP_PTR(atom::Trace) atom::Trace::SetSize(MP_INT value)
     if ((this != nullptr) && (value != 0))
     {
         m_Size = " @@@SIZE " + MP_CONVERT_STRING_FROM_INT(value, 0);
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetSize(MP_INT x, MP_INT y)
+{
+    if (this != nullptr)
+    {
+        m_Size = " @@@SIZE.X " + MP_CONVERT_STRING_FROM_INT(x, 0) + " @@@SIZE.Y " + MP_CONVERT_STRING_FROM_INT(y, 0);
     }
     return this;
 }
@@ -750,32 +818,6 @@ MP_PTR(atom::Trace) atom::Trace::SetUrlInfo(MP_STRING value, MP_STRING hint)
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::SetUrlPipe(MP_STRING value)
-{
-    if ((this != nullptr) && (value != nullptr))
-    {
-        auto a_Context = __GetFirstLine(value, false);
-        if (MP_STRING_EMPTY(a_Context) == false)
-        {
-            m_UrlPipe = " @@@PIPE " + a_Context;
-        }
-    }
-    return this;
-}
-
-MP_PTR(atom::Trace) atom::Trace::SetUrlPreview(MP_STRING value)
-{
-    if ((this != nullptr) && (value != nullptr))
-    {
-        auto a_Context = __GetFirstLine(value, false);
-        if (MP_STRING_EMPTY(a_Context) == false)
-        {
-            m_UrlPreview = " @@@URL.PREVIEW " + a_Context;
-        }
-    }
-    return this;
-}
-
 MP_PTR(atom::Trace) atom::Trace::SetUrlSample(MP_STRING value)
 {
     return SetUrlSample(value, nullptr);
@@ -877,7 +919,7 @@ MP_PTR(MP_THREAD_MUTEX) atom::Trace::__GetMutex()
 {
     if (s_Mutex == nullptr)
     {
-        MP_THREAD_MUTEX_INITIALIZE(s_Mutex, atom::Trace::CONSTANT::PIPE::MUTEX, false);
+        MP_THREAD_MUTEX_INITIALIZE(s_Mutex, CONSTANT::PIPE::MUTEX, false);
     }
     return s_Mutex;
 }
@@ -1291,7 +1333,7 @@ void atom::Trace::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
             }
             else
             {
-                extension::AnyPreview::Send(a_Context);
+                extension::AnyPipe::Send("", a_Context);
             }
         }
     }

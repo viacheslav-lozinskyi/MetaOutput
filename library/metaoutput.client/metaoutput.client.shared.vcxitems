@@ -20,7 +20,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyExport.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyImport.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPreview.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyProxy.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPipe.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnySource.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -28,7 +28,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyExport.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyImport.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPreview.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyProxy.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPipe.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp" />
   </ItemGroup>
 </Project>

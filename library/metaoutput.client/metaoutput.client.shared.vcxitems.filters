@@ -21,7 +21,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPreview.cpp">
       <Filter>extension</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyProxy.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPipe.cpp">
       <Filter>extension</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnySource.cpp">
@@ -38,7 +38,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPreview.hpp">
       <Filter>extension</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyProxy.hpp">
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPipe.hpp">
       <Filter>extension</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp">

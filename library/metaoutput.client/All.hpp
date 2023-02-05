@@ -9,7 +9,7 @@
 #include "atom/Trace.hpp"
 #include "extension/AnyExport.hpp"
 #include "extension/AnyImport.hpp"
+#include "extension/AnyPipe.hpp"
 #include "extension/AnyPreview.hpp"
-#include "extension/AnyProxy.hpp"
 #include "extension/AnySource.hpp"
 #endif
