@@ -19,18 +19,18 @@ namespace resource
                     {
                         if (a_Context?.Properties?.MediaTypes != null)
                         {
-                            var a_Size = 4;
+                            var a_Count = 4;
                             if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
                             {
-                                a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                                a_Size = Math.Min(a_Size, a_Context.Properties.VideoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                a_Count = Math.Min(a_Count, a_Context.Properties.VideoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                             }
                             if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Photo))
                             {
-                                a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                                a_Size = Math.Min(a_Size, a_Context.Properties.PhotoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                a_Count = Math.Min(a_Count, a_Context.Properties.PhotoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                             }
                             {
                                 context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
@@ -42,11 +42,12 @@ namespace resource
                                     context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Tag Types]]]", a_Context.TagTypes.ToString());
                                 }
                             }
-                            for (var i = 0; i < a_Size; i++)
                             {
                                 context.
+                                    SetControl(a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video) ? NAME.CONTROL.VIDEO : NAME.CONTROL.PICTURE).
                                     SetForeground(NAME.COLOR.TRANSPARENT).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level);
+                                    SetCount(a_Count).
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level);
                             }
                             {
                                 var a_Context1 = "[[[Metadata]]]";

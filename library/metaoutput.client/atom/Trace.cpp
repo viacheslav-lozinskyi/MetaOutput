@@ -166,6 +166,7 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
             m_Tml = "";
             m_Url = "";
             m_UrlInfo = "";
+            m_UrlPreview = "";
             m_UrlSample = "";
             m_Value = "";
         }
@@ -275,6 +276,7 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT 
                     a_Context += m_Size;
                     a_Context += m_Url;
                     a_Context += m_UrlInfo;
+                    a_Context += m_UrlPreview;
                     a_Context += m_UrlSample;
                     a_Context += m_Value;
                     a_Context += m_Tml;
@@ -813,6 +815,32 @@ MP_PTR(atom::Trace) atom::Trace::SetUrlInfo(MP_STRING value, MP_STRING hint)
         if (MP_STRING_EMPTY(a_Context) == false)
         {
             m_UrlInfo += " @@@URL.INFO.HINT " + a_Context;
+        }
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetUrlPreview(MP_STRING value)
+{
+    return SetUrlPreview(value, nullptr);
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetUrlPreview(MP_STRING value, MP_STRING hint)
+{
+    if ((this != nullptr) && (value != nullptr))
+    {
+        auto a_Context = __GetFirstLine(value, false);
+        if (MP_STRING_EMPTY(a_Context) == false)
+        {
+            m_UrlInfo = " @@@URL.PREVIEW " + a_Context;
+        }
+    }
+    if ((this != nullptr) && (hint != nullptr))
+    {
+        auto a_Context = __GetMultiLine(hint, true);
+        if (MP_STRING_EMPTY(a_Context) == false)
+        {
+            m_UrlInfo += " @@@URL.PREVIEW.HINT " + a_Context;
         }
     }
     return this;

@@ -30,16 +30,17 @@ namespace resource
                                 }
                             }
                             {
-                                var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Size = Math.Min(a_Size, a_Context1.Size.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                    a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                    a_Count = Math.Min(a_Count, a_Context1.Size.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                    a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
-                                for (var i = 0; i < a_Size; i++)
                                 {
                                     context.
+                                        SetControl(NAME.CONTROL.PICTURE).
                                         SetForeground(NAME.COLOR.TRANSPARENT).
-                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level);
+                                        SetCount(a_Count).
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level);
                                 }
                             }
                             {
@@ -92,14 +93,16 @@ namespace resource
                                 }
                             }
                             {
-                                var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
+                                var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Size = Math.Min(a_Size, a_Context.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                    a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                    a_Count = Math.Min(a_Count, a_Context.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                    a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
-                                for (var i = 0; i < a_Size; i++)
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level);
+                                    context.
+                                        SetControl(NAME.CONTROL.PICTURE).
+                                        SetCount(a_Count).
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level);
                                 }
                             }
                             {
@@ -175,10 +178,10 @@ namespace resource
             {
                 if ((palette != null) && (palette.Entries != null) && (palette.Entries.Length > 0))
                 {
-                    var a_Size = GetProperty(NAME.PROPERTY.PREVIEW_TABLE_SIZE, true);
+                    var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_TABLE_SIZE, true);
                     {
-                        a_Size = Math.Min(a_Size, palette.Entries.Length);
-                        a_Size = Math.Max(a_Size, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                        a_Count = Math.Min(a_Count, palette.Entries.Length);
+                        a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                     }
                     {
                         context.
@@ -197,10 +200,14 @@ namespace resource
                                     Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "[[[Color]]]");
                             }
                         }
-                        for (var i = 0; i < a_Size; i++)
                         {
                             context.
-                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PREVIEW, level + 1);
+                                SetControl(NAME.CONTROL.TABLE).
+                                SetCount(a_Count).
+                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level + 1);
+                        }
+                        for (var i = 0; i < a_Count; i++)
+                        {
                             {
                                 context.
                                     SetAlignment(NAME.ALIGNMENT.RIGHT).
@@ -213,7 +220,7 @@ namespace resource
                             }
                         }
                     }
-                    if (a_Size < palette.Entries?.Length)
+                    if (a_Count < palette.Entries?.Length)
                     {
                         context.
                             Send(NAME.SOURCE.PREVIEW, NAME.EVENT.WARNING, level + 1, "...").

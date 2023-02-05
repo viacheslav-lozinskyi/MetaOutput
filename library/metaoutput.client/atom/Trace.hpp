@@ -506,7 +506,6 @@ namespace atom
                 MP_CONSTANT_STRING(MESSAGE, "MESSAGE");
                 MP_CONSTANT_STRING(OBJECT, "OBJECT");
                 MP_CONSTANT_STRING(PARAMETER, "PARAMETER");
-                MP_CONSTANT_STRING(PREVIEW, "PREVIEW");
                 MP_CONSTANT_STRING(PROJECT, "PROJECT");
                 MP_CONSTANT_STRING(REQUEST, "REQUEST");
                 MP_CONSTANT_STRING(RESPONSE, "RESPONSE");
@@ -792,6 +791,8 @@ namespace atom
         MP_PTR(Trace) SetUrl(MP_STRING value, MP_STRING hint, MP_INT line, MP_INT position);
         MP_PTR(Trace) SetUrlInfo(MP_STRING value);
         MP_PTR(Trace) SetUrlInfo(MP_STRING value, MP_STRING hint);
+        MP_PTR(Trace) SetUrlPreview(MP_STRING value);
+        MP_PTR(Trace) SetUrlPreview(MP_STRING value, MP_STRING hint);
         MP_PTR(Trace) SetUrlSample(MP_STRING value);
         MP_PTR(Trace) SetUrlSample(MP_STRING value, MP_STRING hint);
         MP_PTR(Trace) SetValue(MP_STRING value);
@@ -844,6 +845,7 @@ namespace atom
         MP_STRING m_Tml;
         MP_STRING m_Url;
         MP_STRING m_UrlInfo;
+        MP_STRING m_UrlPreview;
         MP_STRING m_UrlSample;
         MP_STRING m_Value;
     };
