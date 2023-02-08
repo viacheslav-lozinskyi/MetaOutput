@@ -824,7 +824,6 @@ namespace atom
         MP_PTR(Trace) SetPipe(MP_STRING value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value, MP_STRING hint);
-        MP_PTR(Trace) SetSize(MP_INT value);
         MP_PTR(Trace) SetSize(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetTime(MP_INT hour, MP_INT minute, MP_INT second, MP_INT miliSecond);
         MP_PTR(Trace) SetTml(MP_STRING value);

@@ -186,37 +186,40 @@ namespace resource
                     {
                         context.
                             SetComment("[[[Found]]]: " + palette.Entries.Length.ToString(), "").
-                            SetControl(NAME.CONTROL.TABLE).
                             Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Palette]]]");
-                        {
-                            context.
-                                Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level + 1);
-                            {
-                                context.
-                                    SetAlignment(NAME.ALIGNMENT.RIGHT).
-                                    SetSize(50).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "[[[Index]]]");
-                                context.
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "[[[Color]]]");
-                            }
-                        }
                         {
                             context.
                                 SetControl(NAME.CONTROL.TABLE).
                                 SetCount(a_Count).
                                 Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level + 1);
-                        }
-                        for (var i = 0; i < a_Count; i++)
-                        {
                             {
                                 context.
-                                    SetAlignment(NAME.ALIGNMENT.RIGHT).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, (i + 1).ToString("D3"));
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level + 2);
+                                {
+                                    context.
+                                        SetAlignment(NAME.ALIGNMENT.RIGHT).
+                                        SetSize(50, 0).
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, "[[[Index]]]");
+                                    context.
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, "[[[Color]]]");
+                                }
                             }
                             {
                                 context.
-                                    SetBackground(palette.Entries[i].ToArgb()).
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 2, "#" + palette.Entries[i].ToArgb().ToString("X8"));
+                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 2);
+                                for (var i = 0; i < a_Count; i++)
+                                {
+                                    {
+                                        context.
+                                            SetAlignment(NAME.ALIGNMENT.RIGHT).
+                                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, (i + 1).ToString("D3"));
+                                    }
+                                    {
+                                        context.
+                                            SetBackground(palette.Entries[i].ToArgb()).
+                                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, "#" + palette.Entries[i].ToArgb().ToString("X8"));
+                                    }
+                                }
                             }
                         }
                     }

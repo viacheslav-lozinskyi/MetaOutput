@@ -675,15 +675,6 @@ MP_PTR(atom::Trace) atom::Trace::SetProgress(MP_DOUBLE value, MP_STRING hint)
     return this;
 }
 
-MP_PTR(atom::Trace) atom::Trace::SetSize(MP_INT value)
-{
-    if ((this != nullptr) && (value != 0))
-    {
-        m_Size = " @@@SIZE " + MP_CONVERT_STRING_FROM_INT(value, 0);
-    }
-    return this;
-}
-
 MP_PTR(atom::Trace) atom::Trace::SetSize(MP_INT x, MP_INT y)
 {
     if (this != nullptr)
