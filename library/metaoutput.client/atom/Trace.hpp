@@ -731,6 +731,11 @@ namespace atom
                 MP_CONSTANT_STRING(LEVEL_ROOT, "LEVEL.ROOT");
                 MP_CONSTANT_STRING(MARGIN_X, "MARGIN.X");
                 MP_CONSTANT_STRING(MARGIN_Y, "MARGIN.Y");
+                MP_CONSTANT_STRING(PADDING, "PADDING");
+                MP_CONSTANT_STRING(PADDING_MAX_X, "PADDING_MAX_X");
+                MP_CONSTANT_STRING(PADDING_MAX_Y, "PADDING_MAX_Y");
+                MP_CONSTANT_STRING(PADDING_MIN_X, "PADDING_MIN_X");
+                MP_CONSTANT_STRING(PADDING_MIN_Y, "PADDING_MIN_Y");
                 MP_CONSTANT_STRING(PIPE, "PIPE");
                 MP_CONSTANT_STRING(PROGRESS, "PROGRESS");
                 MP_CONSTANT_STRING(PROGRESS_DETECT, "PROGRESS.DETECT");
@@ -830,6 +835,7 @@ namespace atom
         MP_PTR(Trace) SetForeground(MP_INT value);
         MP_PTR(Trace) SetMargin(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetPadding(MP_INT value);
+        MP_PTR(Trace) SetPadding(MP_INT minX, MP_INT minY, MP_INT maxX, MP_INT maxY);
         MP_PTR(Trace) SetPipe(MP_STRING value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value, MP_STRING hint);

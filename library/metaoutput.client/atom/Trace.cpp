@@ -639,7 +639,28 @@ MP_PTR(atom::Trace) atom::Trace::SetPadding(MP_INT value)
 {
     if ((this != nullptr) && (value > 0))
     {
-        m_Padding = " @@@PADDING " + value;
+        m_Padding = " @@@PADDING " + MP_CONVERT_STRING_FROM_INT(value, 0);
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetPadding(MP_INT minX, MP_INT minY, MP_INT maxX, MP_INT maxY)
+{
+    if ((this != nullptr) && (minX > 0))
+    {
+        m_Padding = " @@@PADDING.MIN.X " + MP_CONVERT_STRING_FROM_INT(minX, 0);
+    }
+    if ((this != nullptr) && (minY > 0))
+    {
+        m_Padding = " @@@PADDING.MIN.Y " + MP_CONVERT_STRING_FROM_INT(minY, 0);
+    }
+    if ((this != nullptr) && (maxX > 0))
+    {
+        m_Padding = " @@@PADDING.MAX.X " + MP_CONVERT_STRING_FROM_INT(maxX, 0);
+    }
+    if ((this != nullptr) && (maxY > 0))
+    {
+        m_Padding = " @@@PADDING.MAX.Y " + MP_CONVERT_STRING_FROM_INT(maxY, 0);
     }
     return this;
 }

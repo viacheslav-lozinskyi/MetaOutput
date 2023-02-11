@@ -2,5 +2,7 @@
 library/metaoutput.client/obj
 library/metaoutput.media/obj
 /packages
+*.db
+*.suo
 *.user
 *.mp4
