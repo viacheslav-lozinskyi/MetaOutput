@@ -223,10 +223,6 @@ MP_INT extension::AnyPreview::GetProperty(MP_STRING name, bool isVerified)
             {
                 return MP_MAX(a_Result, 1);
             }
-            if (name == NAME::PROPERTY::PREVIEW_WIDTH)
-            {
-                return MP_MAX(a_Result, CONSTANT::OUTPUT::PREVIEW_MIN_WIDTH);
-            }
         }
         return a_Result;
     }

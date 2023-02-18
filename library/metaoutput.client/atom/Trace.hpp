@@ -491,6 +491,7 @@ namespace atom
         public:
             MP_CLASS EVENT
             {
+                MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
                 MP_CONSTANT_STRING(CLASS, "CLASS");
                 MP_CONSTANT_STRING(CONTROL, "CONTROL");
                 MP_CONSTANT_STRING(CRITICAL, "CRITICAL");
@@ -513,7 +514,6 @@ namespace atom
                 MP_CONSTANT_STRING(TEXT, "TEXT");
                 MP_CONSTANT_STRING(TRANSFORM, "TRANSFORM");
                 MP_CONSTANT_STRING(TRANSLATION, "TRANSLATION");
-                MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
                 MP_CONSTANT_STRING(VARIABLE, "VARIABLE");
                 MP_CONSTANT_STRING(WARNING, "WARNING");
             };
@@ -561,16 +561,15 @@ namespace atom
                 MP_CONSTANT_STRING(COUNTRY, "COUNTRY");
                 MP_CONSTANT_STRING(CREATE_TIME, "CREATE.TIME");
                 MP_CONSTANT_STRING(DESCRIPTION, "DESCRIPTION");
-                MP_CONSTANT_STRING(ID, "ID");
                 MP_CONSTANT_STRING(EMAIL, "EMAIL");
+                MP_CONSTANT_STRING(ID, "ID");
                 MP_CONSTANT_STRING(KEYWORDS, "KEYWORDS");
                 MP_CONSTANT_STRING(LATITUDE, "LATITUDE");
+                MP_CONSTANT_STRING(LICENSE, "LICENSE");
                 MP_CONSTANT_STRING(LOGO, "LOGO");
                 MP_CONSTANT_STRING(LONGITUDE, "LONGITUDE");
-                MP_CONSTANT_STRING(LICENSE, "LICENSE");
                 MP_CONSTANT_STRING(OWNERS, "OWNERS");
                 MP_CONSTANT_STRING(PATENTS, "PATENTS");
-                MP_CONSTANT_STRING(PATTERNS, "PATTERNS");
                 MP_CONSTANT_STRING(PRODUCT, "PRODUCT");
                 MP_CONSTANT_STRING(README, "README");
                 MP_CONSTANT_STRING(SITE, "SITE");
@@ -599,11 +598,11 @@ namespace atom
                 MP_CONSTANT_STRING(PREVIEW_MEDIA_SIZE, "METAOUTPUT/PREVIEW/MEDIA.SIZE");
                 MP_CONSTANT_STRING(PREVIEW_STATUS, "METAOUTPUT/PREVIEW/STATUS");
                 MP_CONSTANT_STRING(PREVIEW_TABLE_SIZE, "METAOUTPUT/PREVIEW/TABLE.SIZE");
-                MP_CONSTANT_STRING(PREVIEW_WIDTH, "METAOUTPUT/PREVIEW/WIDTH");
             };
         public:
             MP_CLASS SOURCE
             {
+                MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
                 MP_CONSTANT_STRING(ADVERTISEMENT, "ADVERTISEMENT");
                 MP_CONSTANT_STRING(ADVISE, "ADVISE");
                 MP_CONSTANT_STRING(ANALYZER, "ANALYZER");
@@ -634,7 +633,6 @@ namespace atom
                 MP_CONSTANT_STRING(TASK, "TASK");
                 MP_CONSTANT_STRING(TEST, "TEST");
                 MP_CONSTANT_STRING(THREAD, "THREAD");
-                MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
                 MP_CONSTANT_STRING(VARIABLE, "VARIABLE");
             };
         public:
@@ -764,37 +762,38 @@ namespace atom
             {
                 MP_CONSTANT_STRING(UNKNOWN, "");
                 MP_CONSTANT_STRING(MSTR, "MSTR");
-                MP_CONSTANT_STRING(GIF, "GIF");
-                MP_CONSTANT_STRING(BMP, "BMP");
-                MP_CONSTANT_STRING(ICO, "ICO");
-                MP_CONSTANT_STRING(JPG, "JPG");
-                MP_CONSTANT_STRING(PNG, "PNG");
-                MP_CONSTANT_STRING(SVG, "svg");
-                MP_CONSTANT_STRING(TIF, "TIF");
                 MP_CONSTANT_STRING(AAC, "AAC");
-                MP_CONSTANT_STRING(MKA, "MKA");
-                MP_CONSTANT_STRING(MP3, "MP3");
-                MP_CONSTANT_STRING(WAV, "WAV");
-                MP_CONSTANT_STRING(WMA, "WMA");
                 MP_CONSTANT_STRING(AVI, "AVI");
-                MP_CONSTANT_STRING(MKV, "MKV");
-                MP_CONSTANT_STRING(MOV, "MOV");
-                MP_CONSTANT_STRING(MP4, "MP4");
-                MP_CONSTANT_STRING(MPG, "MPG");
-                MP_CONSTANT_STRING(WMV, "WMV");
+                MP_CONSTANT_STRING(BMP, "BMP");
                 MP_CONSTANT_STRING(CSS, "css");
                 MP_CONSTANT_STRING(CSV, "csv");
                 MP_CONSTANT_STRING(DLL, "DLL");
                 MP_CONSTANT_STRING(EXE, "EXE");
-                MP_CONSTANT_STRING(HTML, "html");
+                MP_CONSTANT_STRING(GIF, "GIF");
+                MP_CONSTANT_STRING(HTML, "htm");
+                MP_CONSTANT_STRING(ICO, "ICO");
                 MP_CONSTANT_STRING(INI, "ini");
-                MP_CONSTANT_STRING(JSON, "json");
+                MP_CONSTANT_STRING(JPG, "JPG");
+                MP_CONSTANT_STRING(JSON, "jsn");
                 MP_CONSTANT_STRING(MD, "md");
+                MP_CONSTANT_STRING(MKA, "MKA");
+                MP_CONSTANT_STRING(MKV, "MKV");
+                MP_CONSTANT_STRING(MOV, "MOV");
+                MP_CONSTANT_STRING(MP3, "MP3");
+                MP_CONSTANT_STRING(MP4, "MP4");
+                MP_CONSTANT_STRING(MPG, "MPG");
                 MP_CONSTANT_STRING(PDF, "PDF");
+                MP_CONSTANT_STRING(PNG, "PNG");
                 MP_CONSTANT_STRING(SQL, "sql");
+                MP_CONSTANT_STRING(SVG, "svg");
+                MP_CONSTANT_STRING(TIF, "TIF");
                 MP_CONSTANT_STRING(TML, "tml");
+                MP_CONSTANT_STRING(TXT, "txt");
+                MP_CONSTANT_STRING(WAV, "WAV");
+                MP_CONSTANT_STRING(WMA, "WMA");
+                MP_CONSTANT_STRING(WMV, "WMV");
                 MP_CONSTANT_STRING(XML, "xml");
-                MP_CONSTANT_STRING(YAML, "yaml");
+                MP_CONSTANT_STRING(YAML, "yml");
                 MP_CONSTANT_STRING(ZIP, "ZIP");
             };
         };

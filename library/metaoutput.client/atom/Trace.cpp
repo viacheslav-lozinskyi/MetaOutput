@@ -36,16 +36,9 @@ MP_PTR(atom::Trace) atom::Trace::GetInstance()
 MP_STRING atom::Trace::GetFailState(MP_STRING applicationName)
 {
     auto a_Result = (MP_STRING)"";
-    auto a_Name = applicationName;
     try
     {
-        if (MP_STRING_EMPTY(a_Name) == false)
-        {
-            a_Name = MP_STRING_TRIM(a_Name);
-            a_Name = MP_STRING_LOWER(a_Name);
-            a_Name = MP_STRING_REPLACE(a_Name, " ", "-");
-        }
-        if (MP_STRING_EMPTY(a_Name) == false)
+        if (MP_STRING_EMPTY(MP_STRING_TRIM(applicationName)) == false)
         {
             MP_REGISTRY a_Context;
             {
@@ -53,7 +46,7 @@ MP_STRING atom::Trace::GetFailState(MP_STRING applicationName)
             }
             if (MP_STRING_EMPTY(MP_REGISTRY_GET(a_Context, "USER.ID", "")))
             {
-                a_Result = "https://www.metaoutput.net/download" + a_Name;
+                a_Result = "https://www.metaoutput.net/download";
             }
             {
                 MP_REGISTRY_FINALIZE(a_Context);
