@@ -231,7 +231,7 @@ MP_INT extension::AnyPreview::GetProperty(MP_STRING name, bool isVerified)
 
 MP_STRING extension::AnyPreview::GetState()
 {
-    return extension::AnyPreview::GetProperty(NAME::PROPERTY::PREVIEW_STATUS);
+    return extension::AnyPreview::GetProperty("METAOUTPUT/PREVIEW/STATE");
 }
 
 void extension::AnyPreview::SetState(MP_STRING value)
@@ -240,7 +240,7 @@ void extension::AnyPreview::SetState(MP_STRING value)
     try
     {
         MP_REGISTRY_INITIALIZE(a_Context, MP_REGISTRY_ROOT_CURRENT_USER, "Software\\MetaPlatform\\METAOUTPUT\\PREVIEW", false);
-        MP_REGISTRY_SET(a_Context, "STATUS", value);
+        MP_REGISTRY_SET(a_Context, "STATE", value);
         MP_REGISTRY_FINALIZE(a_Context);
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
