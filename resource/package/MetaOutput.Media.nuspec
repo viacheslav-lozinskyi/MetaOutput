@@ -9,7 +9,7 @@
     <description>Default previewers for the most popular media formats</description>
     <summary></summary>
     <language>en-US</language>
-    <iconUrl>https://www.metaoutput.net/_functions/watch?source=NUGET&project=MetaOutput.Media&action=VIEW&size=128x128&url=https://www.nuget.org/packages/MetaOutput.Media</iconUrl>
+    <iconUrl>https://www.metaoutput.net/_functions/watch?source=NUGET&amp;project=MetaOutput.Media&amp;action=VIEW&amp;size=128x128&amp;url=https://www.nuget.org/packages/MetaOutput.Media</iconUrl>
     <projectUrl>https://www.metaoutput.net/</projectUrl>
     <repository type="git" url="https://github.com/viacheslav-lozinskyi/MetaOutput" branch="master"/>
     <license type="expression">MIT</license>
