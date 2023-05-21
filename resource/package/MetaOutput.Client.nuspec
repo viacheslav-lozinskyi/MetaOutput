@@ -22,12 +22,12 @@
 - Specification of MetaOutput.Client library is improved
 - Script files are updated
     </releaseNotes>
-    <copyright>Copyright (c) 2020-2022 by Viacheslav Lozinskyi. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2020-2023 by Viacheslav Lozinskyi. All rights reserved.</copyright>
     <tags>MetaOutput, client, preview, viewer, native</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
       <group targetFramework="native">
-        <dependency id="MetaPlatform" version="[1.1.0, 2)" />
+        <dependency id="MetaPlatform" version="[1.1.1, 2)" />
       </group>
     </dependencies>
     <packageTypes>

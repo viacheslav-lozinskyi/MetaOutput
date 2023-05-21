@@ -7,7 +7,7 @@
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
     <description>Default previewers for the most popular media formats</description>
-    <summary></summary>
+    <summary>Default previewers for the most popular media formats</summary>
     <language>en-US</language>
     <iconUrl>https://www.metaoutput.net/_functions/watch?source=NUGET&amp;project=MetaOutput.Media&amp;action=VIEW&amp;size=128x128&amp;url=https://www.nuget.org/packages/MetaOutput.Media</iconUrl>
     <projectUrl>https://www.metaoutput.net/</projectUrl>
@@ -16,7 +16,7 @@
     <releaseNotes>
 - MetaOutput.Client library is updated
     </releaseNotes>
-    <copyright>Copyright (c) 2020-2022 by Viacheslav Lozinskyi. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2020-2023 by Viacheslav Lozinskyi. All rights reserved.</copyright>
     <tags>MetaOutput, media, taglib, preview, viewer, native</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
