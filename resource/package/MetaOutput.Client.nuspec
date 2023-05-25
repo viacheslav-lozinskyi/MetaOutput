@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>MetaOutput.Client</id>
-    <version>1.0.5</version>
+    <version>3.0.0</version>
     <title>MetaOutput.Client</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
@@ -17,6 +17,7 @@
 - Code refactoring
 - Specification of atom::Trace is improved
 - Specification of extension::AnyPipe is implemented
+- Specification of extension::AnyTerminal is implemented
 - Specification of extension::AnyProxy is removed
 - Preview mechanism significantly changed
 - Specification of MetaOutput.Client library is improved

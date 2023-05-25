@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="4.0">
     <id>MetaOutput.Media</id>
-    <version>1.0.5</version>
+    <version>3.0.0</version>
     <title>MetaOutput.Media</title>
     <authors>Viacheslav Lozinskyi</authors>
     <owners>Viacheslav Lozinskyi</owners>
