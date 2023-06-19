@@ -24,11 +24,11 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPipe.cpp">
       <Filter>extension</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnySource.cpp">
-      <Filter>extension</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp">
+      <Filter>atom</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyExport.hpp">
       <Filter>extension</Filter>
     </ClInclude>
@@ -40,12 +40,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPipe.hpp">
       <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnySource.hpp">
-      <Filter>extension</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp">
-      <Filter>atom</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

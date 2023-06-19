@@ -110,12 +110,12 @@ make_package.client.bat $(Configuration)
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(SolutionDir)\packages\MetaPlatform.1.1.0\build\MetaPlatform.targets" Condition="Exists('$(SolutionDir)\packages\MetaPlatform.1.1.0\build\MetaPlatform.targets')" />
+    <Import Project="$(SolutionDir)\packages\MetaPlatform.1.1.1\build\MetaPlatform.targets" Condition="Exists('$(SolutionDir)\packages\MetaPlatform.1.1.1\build\MetaPlatform.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\packages\MetaPlatform.1.1.0\build\MetaPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\MetaPlatform.1.1.0\build\MetaPlatform.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\MetaPlatform.1.1.1\build\MetaPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\MetaPlatform.1.1.1\build\MetaPlatform.targets'))" />
   </Target>
 </Project>

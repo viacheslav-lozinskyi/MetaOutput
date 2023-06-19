@@ -6,13 +6,16 @@ MP_PTR(MP_VECTOR(extension::AnyPipe)) extension::AnyPipe::s_Items = nullptr;
 #endif
 
 // extension::AnyPipe ######################################################
-void extension::AnyPipe::Connect()
+void extension::AnyPipe::Connect(MP_STRING application, MP_STRING extension)
 {
     try
     {
         if (s_Items == nullptr)
         {
             s_Items = MP_NEW MP_VECTOR(AnyPipe);
+        }
+        {
+            extension::AnyPipe::Validate(application, extension);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
@@ -54,7 +57,6 @@ bool extension::AnyPipe::Register(MP_STRING name, MP_PTR(AnyPipe) context)
         {
             {
                 context->m_Name = (MP_STRING_INDEXOF(name, "urn:") == 0 ? "" : "urn:metaoutput:pipe:") + MP_STRING_LOWER(name);
-                context->m_Context = MP_NEW atom::Trace();
                 context->m_Thread = nullptr;
             }
             for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
@@ -65,7 +67,6 @@ bool extension::AnyPipe::Register(MP_STRING name, MP_PTR(AnyPipe) context)
                 }
             }
             {
-                MP_THREAD_MUTEX_INITIALIZE(context->m_Mutex, CONSTANT::OUTPUT::MUTEX, false);
                 MP_THREAD_INITIALIZE(context->m_Thread, __ThreadExecute);
                 MP_THREAD_NAME_SET(context->m_Thread, context->m_Name);
                 MP_THREAD_APARTMENT_SET(context->m_Thread, MP_THREAD_APARTMENT_STA);
@@ -86,7 +87,6 @@ bool extension::AnyPipe::Register(MP_STRING name, MP_PTR(AnyPipe) context)
 
 bool extension::AnyPipe::Execute(MP_STRING name, MP_STRING value)
 {
-    auto a_Result = false;
     try
     {
         auto a_Context1 = (MP_PTR(MP_PIPE_CLIENT))nullptr;
@@ -99,19 +99,65 @@ bool extension::AnyPipe::Execute(MP_STRING name, MP_STRING value)
         if (MP_PIPE_CLIENT_CONNECTED(a_Context1))
         {
             MP_PIPE_WRITESTREAM_WRITE(a_Context2, value);
-            a_Result = true;
         }
         {
             MP_PIPE_WRITESTREAM_FINALIZE(a_Context2);
             MP_PIPE_CLIENT_FINALIZE(a_Context1);
         }
+        return true;
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
         MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
-        a_Result = false;
     }
-    return a_Result;
+    return false;
+}
+
+void extension::AnyPipe::Validate(MP_STRING application, MP_STRING extension)
+{
+    try
+    {
+        if (MP_STRING_EMPTY(application) == false)
+        {
+            MP_REGISTRY a_Context;
+            {
+                MP_REGISTRY_INITIALIZE(a_Context, MP_REGISTRY_ROOT_CURRENT_USER, "Software\\MetaPlatform\\APPLICATION\\", false);
+            }
+            if (MP_STRING_EMPTY(MP_REGISTRY_GET(a_Context, "USER.ID", "")))
+            {
+                MP_FILE_EXECUTE(CONSTANT::OUTPUT::REQUIREMENTS + "?application=" + application + "&extension=" + extension);
+            }
+            {
+                MP_REGISTRY_FINALIZE(a_Context);
+            }
+        }
+    }
+    catch (MP_PTR(MP_EXCEPTION) ex)
+    {
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+    }
+}
+
+// Public ##############
+bool extension::AnyPipe::IsButtonPressed(MP_STRING value)
+{
+    if (MP_STRING_EMPTY(value) == false)
+    {
+        auto a_Context = GetAttribute(value, NAME::ATTRIBUTE::MOUSE);
+        if (MP_STRING_CONTAINS(a_Context, value))
+        {
+            return true;
+        }
+    }
+    if (MP_STRING_EMPTY(value) == false)
+    {
+        auto a_Context = GetAttribute(value, NAME::ATTRIBUTE::KEYBOARD);
+        if (MP_STRING_CONTAINS(a_Context, value))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Public ##############
@@ -128,6 +174,11 @@ MP_STRING extension::AnyPipe::GetPipeName(MP_STRING name)
     }
 }
 
+MP_STRING extension::AnyPipe::GetAttribute(MP_STRING value, MP_STRING name)
+{
+    return atom::Trace::GetAttribute(value, name);
+}
+
 // Protected ###########
 void extension::AnyPipe::_Execute(MP_PTR(atom::Trace), MP_STRING, MP_STRING)
 {
@@ -137,17 +188,19 @@ void extension::AnyPipe::_Execute(MP_PTR(atom::Trace), MP_STRING, MP_STRING)
 void extension::AnyPipe::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
 {
     auto a_Context = dynamic_cast<MP_PTR(AnyPipe)>(sender);
-    while (a_Context != nullptr)
+    auto a_IsFound = a_Context == nullptr;
+    while (a_IsFound == false)
     {
         try
         {
             auto a_Context1 = (MP_PTR(MP_PIPE_SERVER))nullptr;
             auto a_Context2 = (MP_PTR(MP_PIPE_READSTREAM))nullptr;
+            auto a_Context3 = MP_NEW atom::Trace();
             {
-                MP_PIPE_SERVER_INITIALIZE(a_Context1, GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
+                MP_PIPE_SERVER_INITIALIZE(a_Context1, extension::AnyPipe::GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
                 MP_PIPE_READSTREAM_INITIALIZE(a_Context2, a_Context1);
             }
-            while (a_Context != nullptr)
+            while (a_IsFound == false)
             {
                 try
                 {
@@ -156,38 +209,25 @@ void extension::AnyPipe::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
                     }
                     if (MP_PIPE_SERVER_CONNECTED(a_Context1))
                     {
-                        auto a_Context3 = MP_PIPE_READSTREAM_READ(a_Context2);
+                        auto a_Context4 = MP_PIPE_READSTREAM_READ(a_Context2);
                         {
                             MP_PIPE_SERVER_DISCONNECT(a_Context1);
                         }
-                        if (a_Context3 == CONSTANT::PIPE::TERMINATE_REQUEST)
+                        if (a_Context4 == CONSTANT::PIPE::TERMINATE_REQUEST)
                         {
-                            a_Context = nullptr;
+                            a_IsFound = true;
                             break;
                         }
-                        try
+                        else
                         {
-                            {
-                                MP_THREAD_MUTEX_LOCK(a_Context->m_Mutex);
-                            }
-                            if (a_Context != nullptr)
-                            {
-                                a_Context->_Execute(a_Context->m_Context, a_Context->m_Name, a_Context3);
-                            }
-                            {
-                                MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
-                            }
-                        }
-                        catch (MP_PTR(MP_EXCEPTION) ex)
-                        {
-                            MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
-                            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+                            a_Context->_Execute(a_Context3->Clear(), a_Context->m_Name, a_Context4);
                         }
                     }
                 }
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
                     MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+                    MP_THREAD_SLEEP(CONSTANT::PIPE::TIMEOUT);
                     break;
                 }
             }
@@ -195,10 +235,14 @@ void extension::AnyPipe::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
                 MP_PIPE_READSTREAM_FINALIZE(a_Context2);
                 MP_PIPE_SERVER_FINALIZE(a_Context1);
             }
+            {
+                MP_DELETE a_Context3;
+            }
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
             MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+            break;
         }
     }
 }

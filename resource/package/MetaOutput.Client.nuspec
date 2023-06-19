@@ -17,7 +17,6 @@
 - Code refactoring
 - Specification of atom::Trace is improved
 - Specification of extension::AnyPipe is implemented
-- Specification of extension::AnyTerminal is implemented
 - Specification of extension::AnyProxy is removed
 - Preview mechanism significantly changed
 - Specification of MetaOutput.Client library is improved

@@ -6,7 +6,7 @@ MP_PTR(MP_VECTOR(extension::AnyExport)) extension::AnyExport::s_Items = nullptr;
 #endif
 
 // extension::AnyExport #######################################################
-void extension::AnyExport::Connect()
+void extension::AnyExport::Connect(MP_STRING application, MP_STRING extension)
 {
     try
     {
@@ -15,7 +15,10 @@ void extension::AnyExport::Connect()
             s_Items = MP_NEW MP_VECTOR(AnyExport);
         }
         {
-            SetState(NAME::STATE::WAIT);
+            extension::AnyPipe::Validate(application, extension);
+        }
+        {
+            SetState(NAME::STATE::WORK::WAIT);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
@@ -58,7 +61,6 @@ bool extension::AnyExport::Register(MP_STRING extension, MP_PTR(AnyExport) conte
             {
                 context->m_From = "";
                 context->m_Name = "urn:metaoutput:export:" + MP_STRING_LOWER(extension);
-                context->m_Context = MP_NEW atom::Trace();
                 context->m_Thread = nullptr;
             }
             for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
@@ -69,7 +71,6 @@ bool extension::AnyExport::Register(MP_STRING extension, MP_PTR(AnyExport) conte
                 }
             }
             {
-                MP_THREAD_MUTEX_INITIALIZE(context->m_Mutex, CONSTANT::OUTPUT::MUTEX, false);
                 MP_THREAD_INITIALIZE(context->m_Thread, __ThreadExecute);
                 MP_THREAD_NAME_SET(context->m_Thread, context->m_Name);
                 MP_THREAD_APARTMENT_SET(context->m_Thread, MP_THREAD_APARTMENT_STA);
@@ -92,7 +93,7 @@ bool extension::AnyExport::Execute(MP_STRING url, MP_STRING from)
 {
     try
     {
-        if ((GetState() != NAME::STATE::EXECUTE) && (MP_STRING_EMPTY(url) == false))
+        if ((GetState() != NAME::STATE::WORK::EXECUTE) && (MP_STRING_EMPTY(url) == false))
         {
             auto a_Name = "urn:metaoutput:export:" + MP_STRING_LOWER(extension::AnyPreview::GetExtension(url));
             for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
@@ -133,34 +134,35 @@ void extension::AnyExport::_Execute(MP_PTR(atom::Trace), MP_STRING, MP_STRING)
 }
 
 // Private #############
-void extension::AnyExport::__Execute(MP_PTR(AnyExport) sender, MP_PTR(atom::Trace) context, MP_STRING url, MP_STRING from)
+void extension::AnyExport::__Execute(MP_PTR(AnyExport) sender, MP_PTR(atom::Trace) trace, MP_STRING url, MP_STRING from)
 {
     try
     {
         {
-            SetState(NAME::STATE::EXECUTE);
+            SetState(NAME::STATE::WORK::EXECUTE);
         }
+        if (sender != nullptr)
         {
-            sender->_Execute(context, url, from);
+            sender->_Execute(trace, url, from);
         }
-        if (GetState() == NAME::STATE::CANCEL)
+        if (GetState() == NAME::STATE::WORK::CANCEL)
         {
-            context->
+            trace->
                 Clear()->
                 SetUrl(url)->
                 Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::WARNING, 0, "[[[Execution is terminated]]]...");
         }
         {
-            SetState(NAME::STATE::WAIT);
+            SetState(NAME::STATE::WORK::WAIT);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
         {
-            SetState(NAME::STATE::WAIT);
+            SetState(NAME::STATE::WORK::WAIT);
         }
         {
-            context->
+            trace->
                 Clear()->
                 SetUrl(url)->
                 Send(NAME::SOURCE::DIAGNOSTIC, NAME::EVENT::EXCEPTION, 0, MP_EXCEPTION_MESSAGE_GET(ex));
@@ -172,72 +174,75 @@ void extension::AnyExport::__Execute(MP_PTR(AnyExport) sender, MP_PTR(atom::Trac
 void extension::AnyExport::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
 {
     auto a_Context = dynamic_cast<MP_PTR(AnyExport)>(sender);
-    while (a_Context != nullptr)
+    auto a_IsFound = a_Context == nullptr;
+    while (a_IsFound == false)
     {
         try
         {
-            auto a_Context1 = (MP_PTR(MP_PIPE_SERVER))nullptr;
-            auto a_Context2 = (MP_PTR(MP_PIPE_READSTREAM))nullptr;
+            auto a_Context1 = (MP_PTR(MP_THREAD_MUTEX))nullptr;
+            auto a_Context2 = (MP_PTR(MP_PIPE_SERVER))nullptr;
+            auto a_Context3 = (MP_PTR(MP_PIPE_READSTREAM))nullptr;
+            auto a_Context4 = MP_NEW atom::Trace();
             {
-                MP_PIPE_SERVER_INITIALIZE(a_Context1, extension::AnyPipe::GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
-                MP_PIPE_READSTREAM_INITIALIZE(a_Context2, a_Context1);
+                MP_THREAD_MUTEX_INITIALIZE(a_Context1, CONSTANT::OUTPUT::MUTEX, false);
+                MP_PIPE_SERVER_INITIALIZE(a_Context2, extension::AnyPipe::GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
+                MP_PIPE_READSTREAM_INITIALIZE(a_Context3, a_Context2);
             }
-            while (a_Context != nullptr)
+            while (a_IsFound == false)
             {
                 try
                 {
                     {
-                        MP_PIPE_SERVER_CONNECT(a_Context1);
+                        MP_PIPE_SERVER_CONNECT(a_Context2);
                     }
-                    if (MP_PIPE_SERVER_CONNECTED(a_Context1))
+                    if (MP_PIPE_SERVER_CONNECTED(a_Context2))
                     {
+                        auto a_Context5 = MP_PIPE_READSTREAM_READ(a_Context3);
                         {
-                            SetState(NAME::STATE::CANCEL);
+                            MP_PIPE_SERVER_DISCONNECT(a_Context2);
                         }
+                        if (a_Context5 == CONSTANT::PIPE::TERMINATE_REQUEST)
                         {
-                            auto a_Context3 = MP_PIPE_READSTREAM_READ(a_Context2);
+                            a_IsFound = true;
+                            break;
+                        }
+                        try
+                        {
+                            MP_THREAD_MUTEX_LOCK(a_Context1);
                             {
-                                MP_PIPE_SERVER_DISCONNECT(a_Context1);
+                                __Execute(a_Context, a_Context4->Clear(), a_Context5, a_Context->m_From);
                             }
-                            if (a_Context3 == CONSTANT::PIPE::TERMINATE_REQUEST)
-                            {
-                                a_Context = nullptr;
-                                break;
-                            }
-                            try
-                            {
-                                {
-                                    MP_THREAD_MUTEX_LOCK(a_Context->m_Mutex);
-                                }
-                                {
-                                    __Execute(a_Context, a_Context->m_Context, a_Context3, a_Context->m_From);
-                                }
-                                {
-                                    MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
-                                }
-                            }
-                            catch (MP_PTR(MP_EXCEPTION) ex)
-                            {
-                                MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
-                                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
-                            }
+                            MP_THREAD_MUTEX_UNLOCK(a_Context1);
+                        }
+                        catch (MP_PTR(MP_EXCEPTION) ex)
+                        {
+                            MP_THREAD_MUTEX_UNLOCK(a_Context1);
+                            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+                            MP_THREAD_SLEEP(CONSTANT::PIPE::TIMEOUT);
+                            break;
                         }
                     }
                 }
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
                     MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+                    MP_THREAD_SLEEP(CONSTANT::PIPE::TIMEOUT);
                     break;
                 }
             }
             {
-                MP_PIPE_READSTREAM_FINALIZE(a_Context2);
-                MP_PIPE_SERVER_FINALIZE(a_Context1);
+                MP_PIPE_READSTREAM_FINALIZE(a_Context3);
+                MP_PIPE_SERVER_FINALIZE(a_Context2);
+                MP_THREAD_MUTEX_FINALIZE(a_Context1);
+            }
+            {
+                MP_DELETE a_Context4;
             }
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
             MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+            break;
         }
     }
 }

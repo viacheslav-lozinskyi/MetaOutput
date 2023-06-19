@@ -6,7 +6,7 @@ MP_PTR(MP_VECTOR(extension::AnyPreview)) extension::AnyPreview::s_Items = nullpt
 #endif
 
 // extension::AnyPreview ######################################################
-void extension::AnyPreview::Connect()
+void extension::AnyPreview::Connect(MP_STRING application, MP_STRING extension)
 {
     try
     {
@@ -15,7 +15,10 @@ void extension::AnyPreview::Connect()
             s_Items = MP_NEW MP_VECTOR(AnyPreview);
         }
         {
-            SetState(NAME::STATE::WAIT);
+            extension::AnyPipe::Validate(application, extension);
+        }
+        {
+            SetState(NAME::STATE::WORK::WAIT);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
@@ -57,7 +60,6 @@ bool extension::AnyPreview::Register(MP_STRING extension, MP_PTR(AnyPreview) con
         {
             {
                 context->m_Name = "urn:metaoutput:preview:" + MP_STRING_LOWER(extension);
-                context->m_Context = MP_NEW atom::Trace();
                 context->m_Thread = nullptr;
             }
             for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
@@ -68,7 +70,6 @@ bool extension::AnyPreview::Register(MP_STRING extension, MP_PTR(AnyPreview) con
                 }
             }
             {
-                MP_THREAD_MUTEX_INITIALIZE(context->m_Mutex, CONSTANT::OUTPUT::MUTEX, false);
                 MP_THREAD_INITIALIZE(context->m_Thread, __ThreadExecute);
                 MP_THREAD_NAME_SET(context->m_Thread, context->m_Name);
                 MP_THREAD_APARTMENT_SET(context->m_Thread, MP_THREAD_APARTMENT_STA);
@@ -91,7 +92,7 @@ bool extension::AnyPreview::Execute(MP_STRING url)
 {
     try
     {
-        if ((GetState() != NAME::STATE::EXECUTE) && (MP_STRING_EMPTY(url) == false))
+        if ((GetState() != NAME::STATE::WORK::EXECUTE) && (MP_STRING_EMPTY(url) == false))
         {
             return extension::AnyPipe::Execute("urn:metaoutput:preview:" + MP_STRING_LOWER(GetExtension(url)), url);
         }
@@ -99,7 +100,7 @@ bool extension::AnyPreview::Execute(MP_STRING url)
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
         atom::Trace::GetInstance()->
-            Send(NAME::SOURCE::STATUS, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
+            Send(NAME::SOURCE::ALERT, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
             SendPreview(NAME::EVENT::EXCEPTION, url);
     }
     return false;
@@ -213,15 +214,19 @@ MP_INT extension::AnyPreview::GetProperty(MP_STRING name, bool isVerified)
         {
             if (name == NAME::PROPERTY::PREVIEW_DOCUMENT_SIZE)
             {
-                return MP_MAX(a_Result, 1);
+                return MP_MAX(a_Result, 2);
+            }
+            if (name == NAME::PROPERTY::PREVIEW_BROWSER_SIZE)
+            {
+                return MP_MAX(a_Result, 10);
             }
             if (name == NAME::PROPERTY::PREVIEW_MEDIA_SIZE)
             {
-                return MP_MAX(a_Result, CONSTANT::OUTPUT::PREVIEW_MIN_SIZE);
+                return MP_MAX(a_Result, 2);
             }
             if (name == NAME::PROPERTY::PREVIEW_TABLE_SIZE)
             {
-                return MP_MAX(a_Result, 1);
+                return MP_MAX(a_Result, 100);
             }
         }
         return a_Result;
@@ -255,13 +260,13 @@ void extension::AnyPreview::_Execute(MP_PTR(atom::Trace), MP_INT, MP_STRING, MP_
 }
 
 // Private #############
-void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Trace) context, MP_INT level, MP_STRING url)
+void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Trace) trace, MP_INT level, MP_STRING url)
 {
     try
     {
         auto a_Context = atom::Trace::GetUrlFinal(url);
         {
-            SetState(NAME::STATE::EXECUTE);
+            SetState(NAME::STATE::WORK::EXECUTE);
         }
         try
         {
@@ -269,14 +274,14 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
             {
                 auto a_Context1 = (MP_PTR(MP_WEB_CLIENT))nullptr;
                 {
-                    a_Context = atom::Trace::GetUrlPreview(url);
+                    a_Context = atom::Trace::GetUrlTemp(url);
                 }
                 {
                     MP_WEB_CLIENT_INITIALIZE(a_Context1);
                     MP_WEB_CLIENT_DOWNLOAD_FILE_ASYNC(a_Context1, url, a_Context, __DownloadCompleted);
                     MP_WEB_CLIENT_ONPROGRESS_SET(a_Context1, __DownloadProgress);
                 }
-                while ((GetState() != NAME::STATE::CANCEL) && MP_WEB_CLIENT_ISWORKING(a_Context1))
+                while ((GetState() != NAME::STATE::WORK::CANCEL) && MP_WEB_CLIENT_ISWORKING(a_Context1))
                 {
                     MP_THREAD_SLEEP(50);
                 }
@@ -301,49 +306,52 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
         }
         if (MP_FILE_FOUND(a_Context) || MP_FOLDER_FOUND(a_Context) || MP_STRING_CONTAINS(url, "://") || MP_STRING_CONTAINS(url, ":\\\\"))
         {
-            if (GetState() != NAME::STATE::CANCEL)
+            if (GetState() != NAME::STATE::WORK::CANCEL)
             {
-                context->
-                    //SetUrlPreview(a_Context)->
+                trace->
+                    SetUrlPreview(a_Context)->
                     SendPreview(NAME::EVENT::INFO, url);
             }
-            if (GetState() != NAME::STATE::CANCEL)
+            if (GetState() != NAME::STATE::WORK::CANCEL)
             {
                 try
                 {
-                    sender->_Execute(context, level, url, a_Context);
+                    if (sender != nullptr)
+                    {
+                        sender->_Execute(trace, level, url, a_Context);
+                    }
                 }
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
-                    context->
-                        Send(NAME::SOURCE::STATUS, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_TYPE_NAME_OBJECT(ex) + " [" + MP_EXCEPTION_MESSAGE_GET(ex) + "]")->
+                    trace->
+                        Send(NAME::SOURCE::ALERT, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_TYPE_NAME_OBJECT(ex) + " [" + MP_EXCEPTION_MESSAGE_GET(ex) + "]")->
                         SendPreview(NAME::EVENT::WARNING, url);
                 }
             }
-            if (GetState() == NAME::STATE::CANCEL)
+            if (GetState() == NAME::STATE::WORK::CANCEL)
             {
-                context->
-                    Send(NAME::SOURCE::STATUS, NAME::EVENT::WARNING, 0, "[[[PREVIEW.FAILED]]]: [[[Execution is terminated]]], [" + url + "]")->
+                trace->
+                    Send(NAME::SOURCE::ALERT, NAME::EVENT::WARNING, 0, "[[[PREVIEW.FAILED]]]: [[[Execution is terminated]]], [" + url + "]")->
                     SendPreview(NAME::EVENT::WARNING, url);
             }
         }
         else
         {
-            context->
-                Send(NAME::SOURCE::STATUS, NAME::EVENT::ERROR, 0, "[[[PREVIEW.FAILED]]]: [[[File not found]]], [" + url + "]");
+            trace->
+                Send(NAME::SOURCE::ALERT, NAME::EVENT::ERROR, 0, "[[[PREVIEW.FAILED]]]: [[[File not found]]], [" + url + "]");
         }
         {
-            SetState(NAME::STATE::WAIT);
+            SetState(NAME::STATE::WORK::WAIT);
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
         {
-            SetState(NAME::STATE::WAIT);
+            SetState(NAME::STATE::WORK::WAIT);
         }
         {
-            context->
-                Send(NAME::SOURCE::STATUS, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
+            trace->
+                Send(NAME::SOURCE::ALERT, NAME::EVENT::EXCEPTION, 0, "[[[PREVIEW.FAILED]]]: " + MP_EXCEPTION_MESSAGE_GET(ex))->
                 SendPreview(NAME::EVENT::EXCEPTION, url);
         }
     }
@@ -353,76 +361,75 @@ void extension::AnyPreview::__Execute(MP_PTR(AnyPreview) sender, MP_PTR(atom::Tr
 void extension::AnyPreview::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
 {
     auto a_Context = dynamic_cast<MP_PTR(AnyPreview)>(sender);
-    while (a_Context != nullptr)
+    auto a_IsFound = a_Context == nullptr;
+    while (a_IsFound == false)
     {
         try
         {
-            auto a_Context1 = (MP_PTR(MP_PIPE_SERVER))nullptr;
-            auto a_Context2 = (MP_PTR(MP_PIPE_READSTREAM))nullptr;
+            auto a_Context1 = (MP_PTR(MP_THREAD_MUTEX))nullptr;
+            auto a_Context2 = (MP_PTR(MP_PIPE_SERVER))nullptr;
+            auto a_Context3 = (MP_PTR(MP_PIPE_READSTREAM))nullptr;
+            auto a_Context4 = MP_NEW atom::Trace();
             {
-                MP_PIPE_SERVER_INITIALIZE(a_Context1, extension::AnyPipe::GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
-                MP_PIPE_READSTREAM_INITIALIZE(a_Context2, a_Context1);
+                MP_THREAD_MUTEX_INITIALIZE(a_Context1, CONSTANT::OUTPUT::MUTEX, false);
+                MP_PIPE_SERVER_INITIALIZE(a_Context2, extension::AnyPipe::GetPipeName(a_Context->m_Name), MP_PIPE_DIRECTION_IN, 128);
+                MP_PIPE_READSTREAM_INITIALIZE(a_Context3, a_Context2);
             }
-            while (a_Context != nullptr)
+            while (a_IsFound == false)
             {
                 try
                 {
                     {
-                        MP_PIPE_SERVER_CONNECT(a_Context1);
+                        MP_PIPE_SERVER_CONNECT(a_Context2);
                     }
-                    if (MP_PIPE_SERVER_CONNECTED(a_Context1))
+                    if (MP_PIPE_SERVER_CONNECTED(a_Context2))
                     {
+                        auto a_Context5 = MP_PIPE_READSTREAM_READ(a_Context3);
                         {
-                            SetState(NAME::STATE::CANCEL);
+                            MP_PIPE_SERVER_DISCONNECT(a_Context2);
                         }
+                        if (a_Context5 == CONSTANT::PIPE::TERMINATE_REQUEST)
                         {
-                            auto a_Context3 = MP_PIPE_READSTREAM_READ(a_Context2);
+                            a_IsFound = true;
+                            break;
+                        }
+                        try
+                        {
+                            MP_THREAD_MUTEX_LOCK(a_Context1);
                             {
-                                MP_PIPE_SERVER_DISCONNECT(a_Context1);
+                                __Execute(a_Context, a_Context4->Clear(), 1, a_Context5);
                             }
-                            if (a_Context3 == CONSTANT::PIPE::TERMINATE_REQUEST)
-                            {
-                                a_Context = nullptr;
-                                break;
-                            }
-                            try
-                            {
-                                {
-                                    MP_THREAD_MUTEX_LOCK(a_Context->m_Mutex);
-                                }
-                                {
-                                    __Execute(
-                                        a_Context,
-                                        a_Context->m_Context,
-                                        1,
-                                        a_Context3);
-                                }
-                                {
-                                    MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
-                                }
-                            }
-                            catch (MP_PTR(MP_EXCEPTION) ex)
-                            {
-                                MP_THREAD_MUTEX_UNLOCK(a_Context->m_Mutex);
-                                MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
-                            }
+                            MP_THREAD_MUTEX_UNLOCK(a_Context1);
+                        }
+                        catch (MP_PTR(MP_EXCEPTION) ex)
+                        {
+                            MP_THREAD_MUTEX_UNLOCK(a_Context1);
+                            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+                            MP_THREAD_SLEEP(CONSTANT::PIPE::TIMEOUT);
+                            break;
                         }
                     }
                 }
                 catch (MP_PTR(MP_EXCEPTION) ex)
                 {
                     MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+                    MP_THREAD_SLEEP(CONSTANT::PIPE::TIMEOUT);
                     break;
                 }
             }
             {
-                MP_PIPE_READSTREAM_FINALIZE(a_Context2);
-                MP_PIPE_SERVER_FINALIZE(a_Context1);
+                MP_PIPE_READSTREAM_FINALIZE(a_Context3);
+                MP_PIPE_SERVER_FINALIZE(a_Context2);
+                MP_THREAD_MUTEX_FINALIZE(a_Context1);
+            }
+            {
+                MP_DELETE a_Context4;
             }
         }
         catch (MP_PTR(MP_EXCEPTION) ex)
         {
             MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+            break;
         }
     }
 }
@@ -446,7 +453,7 @@ void extension::AnyPreview::MP_WEB_CLIENT_CALLBACK_PROGRESS(__DownloadProgress, 
         }
         if ((MP_WEB_CLIENT_CALLBACK_PROGRESS_RECEIVED_PERSENT_GET(params) <= 3) && (MP_WEB_CLIENT_CALLBACK_PROGRESS_TOTAL_SIZE_GET(params) > 10000000))
         {
-            SetState(NAME::STATE::CANCEL);
+            SetState(NAME::STATE::WORK::CANCEL);
         }
     }
 }

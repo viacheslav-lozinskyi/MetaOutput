@@ -47,6 +47,7 @@ namespace resource
                                     SetControl(a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video) ? NAME.CONTROL.VIDEO : NAME.CONTROL.PICTURE).
                                     SetForeground(NAME.COLOR.TRANSPARENT).
                                     SetCount(a_Count).
+                                    SetUrlPreview(file).
                                     Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level);
                             }
                             {
@@ -125,7 +126,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.Tag node, int level)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (node.IsEmpty == false))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (node.IsEmpty == false))
                 {
                     {
                         context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Common]]]");
@@ -201,7 +202,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IPicture[] node, int level)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (node.Length > 0))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (node.Length > 0))
                 {
                     context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Pictures]]]");
                     for (var i = 0; i < node.Length; i++)
@@ -219,7 +220,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, IEnumerable<TagLib.ICodec> node, int level, string url, string file)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (__IsEmpty(node) == false))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (__IsEmpty(node) == false))
                 {
                     {
                         context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level, "[[[Codecs]]]");
@@ -262,7 +263,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.Mpeg.AudioHeader node, int level)
             {
-                if (GetState() != NAME.STATE.CANCEL)
+                if (GetState() != NAME.STATE.WORK.CANCEL)
                 {
                     {
                         context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
@@ -300,7 +301,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.Mpeg.VideoHeader node, int level)
             {
-                if (GetState() != NAME.STATE.CANCEL)
+                if (GetState() != NAME.STATE.WORK.CANCEL)
                 {
                     {
                         context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
@@ -323,7 +324,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IAudioCodec node, int level)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
                     {
                         context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
@@ -340,7 +341,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IPhotoCodec node, int level, string url, string file)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
                     try
                     {
@@ -407,7 +408,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IVideoCodec node, int level)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
                     {
                         context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
@@ -428,7 +429,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, string[] node, int level, string group)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null) && (node.Length > 0))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (node.Length > 0))
                 {
                     context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, group);
                     for (var i = 0; i < node.Length; i++)
@@ -443,7 +444,7 @@ namespace resource
 
             private static void __Execute(atom.Trace context, IEnumerable<string> node, int level, string group, string url)
             {
-                if ((GetState() != NAME.STATE.CANCEL) && (node != null))
+                if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
                     context.
                         SetComment(__GetArraySize(node)).

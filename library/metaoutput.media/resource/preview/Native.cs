@@ -10,6 +10,14 @@ namespace resource
     {
         public class Native : extension.AnyPreview
         {
+            public new class CONSTANT
+            {
+                public static int PALETTE_ITEM_LIMIT = 1024 * 4;
+                public static int PALETTE_ITEM_SIZE_X = 12;
+                public static int PALETTE_ITEM_SIZE_Y = 12;
+                public static int PALETTE_ROW_SIZE = 50;
+            }
+
             protected override void _Execute(atom.Trace context, int level, string url, string file)
             {
                 if (File.Exists(file))
@@ -32,14 +40,15 @@ namespace resource
                             {
                                 var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Count = Math.Min(a_Count, a_Context1.Size.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                    a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                    a_Count = Math.Min(a_Count, a_Context1.Size.Height / atom.Trace.CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                    a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
                                 {
                                     context.
                                         SetControl(NAME.CONTROL.PICTURE).
                                         SetForeground(NAME.COLOR.TRANSPARENT).
                                         SetCount(a_Count).
+                                        SetUrlPreview(file).
                                         Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level);
                                 }
                             }
@@ -95,13 +104,14 @@ namespace resource
                             {
                                 var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Count = Math.Min(a_Count, a_Context.Height / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                    a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                    a_Count = Math.Min(a_Count, a_Context.Height / atom.Trace.CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
+                                    a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
                                 {
                                     context.
                                         SetControl(NAME.CONTROL.PICTURE).
                                         SetCount(a_Count).
+                                        SetUrlPreview(file).
                                         Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level);
                                 }
                             }
@@ -178,56 +188,40 @@ namespace resource
             {
                 if ((palette != null) && (palette.Entries != null) && (palette.Entries.Length > 0))
                 {
-                    var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_TABLE_SIZE, true);
-                    {
-                        a_Count = Math.Min(a_Count, palette.Entries.Length);
-                        a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
-                    }
+                    var a_Count = Math.Min(palette.Entries.Length, CONSTANT.PALETTE_ITEM_LIMIT);
                     {
                         context.
                             SetComment("[[[Found]]]: " + palette.Entries.Length.ToString(), "").
                             Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Palette]]]");
                         {
                             context.
-                                SetControl(NAME.CONTROL.TABLE).
-                                SetCount(a_Count).
+                                SetControl(NAME.CONTROL.PANEL).
+                                SetAlignment(NAME.ALIGNMENT.CLIENT).
+                                SetCount(Math.Max(a_Count / CONSTANT.PALETTE_ROW_SIZE, 2)).
                                 Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level + 1);
+                            for (var i = 0; i < a_Count; i++)
                             {
-                                context.
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level + 2);
+                                if ((i % CONSTANT.PALETTE_ROW_SIZE) == 0)
                                 {
                                     context.
-                                        SetAlignment(NAME.ALIGNMENT.RIGHT).
-                                        SetSize(50, 0).
-                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, "[[[Index]]]");
-                                    context.
-                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, "[[[Color]]]");
+                                        SetControl(NAME.CONTROL.PANEL).
+                                        SetAlignment(NAME.ALIGNMENT.TOP).
+                                        SetSize(0, CONSTANT.PALETTE_ITEM_SIZE_Y).
+                                        SetPadding(0, 0, 0, 1).
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level + 2);
                                 }
-                            }
-                            {
-                                context.
-                                    Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 2);
-                                for (var i = 0; i < a_Count; i++)
+                                else
                                 {
-                                    {
-                                        context.
-                                            SetAlignment(NAME.ALIGNMENT.RIGHT).
-                                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, (i + 1).ToString("D3"));
-                                    }
-                                    {
-                                        context.
-                                            SetBackground(palette.Entries[i].ToArgb()).
-                                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.UNKNOWN, level + 3, "#" + palette.Entries[i].ToArgb().ToString("X8"));
-                                    }
+                                    context.
+                                        SetControl(NAME.CONTROL.PANEL, "#" + palette.Entries[i].ToArgb().ToString("X8"), null, atom.Trace.NAME.STATE.CONTROL.NONE).
+                                        SetAlignment(NAME.ALIGNMENT.LEFT).
+                                        SetBackground(palette.Entries[i].ToArgb()).
+                                        SetMargin(i % CONSTANT.PALETTE_ROW_SIZE, 0).
+                                        SetSize(CONSTANT.PALETTE_ITEM_SIZE_Y, 0).
+                                        Send(NAME.SOURCE.PREVIEW, NAME.EVENT.CONTROL, level + 3);
                                 }
                             }
                         }
-                    }
-                    if (a_Count < palette.Entries?.Length)
-                    {
-                        context.
-                            Send(NAME.SOURCE.PREVIEW, NAME.EVENT.WARNING, level + 1, "...").
-                            SendPreview(NAME.EVENT.WARNING, url);
                     }
                 }
             }

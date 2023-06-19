@@ -10,9 +10,47 @@ namespace atom
         MP_CLASS CONSTANT
         {
         public:
+            MP_CLASS HMI
+            {
+                MP_CONSTANT_INTEGER(ACTION_FONT_SIZE, 20);
+                MP_CONSTANT_INTEGER(ACTION_FOREGROUND, 0xFF8B0000);
+                MP_CONSTANT_INTEGER(ACTION_MARGIN_Y, 19);
+                MP_CONSTANT_INTEGER(ACTION_SIZE_Y, 64);
+                MP_CONSTANT_INTEGER(ACTION_TRANSPARENCY, 90);
+                MP_CONSTANT_STRING(BUTTON_FONT_NAME, "Arial");
+                MP_CONSTANT_INTEGER(BUTTON_FONT_SIZE, 16);
+                MP_CONSTANT_INTEGER(BUTTON_FOREGROUND, 0xFF000000);
+                MP_CONSTANT_INTEGER(BUTTON_SIZE_X, 250);
+                MP_CONSTANT_INTEGER(BUTTON_SIZE_Y, 30);
+                MP_CONSTANT_INTEGER(DEFAULT_BACKGROUND, 0xFFFFFFFF);
+                MP_CONSTANT_INTEGER(DEFAULT_PADDING, 5);
+                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT, 10);
+                MP_CONSTANT_INTEGER(DEFAULT_TRANSPARENCY, 90);
+                MP_CONSTANT_INTEGER(DELIMITER_MAX_MARGIN_Y, -40);
+                MP_CONSTANT_INTEGER(DELIMITER_MAX_SIZE_Y, 1);
+                MP_CONSTANT_INTEGER(DELIMITER_MIN_MARGIN_Y, 15);
+                MP_CONSTANT_INTEGER(DELIMITER_MIN_SIZE_Y, 1);
+                MP_CONSTANT_STRING(FOOTER_FONT_NAME, "Arial");
+                MP_CONSTANT_INTEGER(FOOTER_FONT_SIZE, 12);
+                MP_CONSTANT_INTEGER(FOOTER_FOREGROUND, 0xFF000000);
+                MP_CONSTANT_INTEGER(FOOTER_SIZE_Y, 30);
+                MP_CONSTANT_INTEGER(FOOTER_TRANSPARENCY, 70);
+                MP_CONSTANT_STRING(HEADER_FONT_NAME, "Arial");
+                MP_CONSTANT_INTEGER(HEADER_FONT_SIZE, 16);
+                MP_CONSTANT_INTEGER(HEADER_FOREGROUND, 0xFF000000);
+                MP_CONSTANT_INTEGER(HEADER_SIZE_Y, 30);
+                MP_CONSTANT_INTEGER(LOGO_SIZE_X, 150);
+                MP_CONSTANT_STRING(MESSAGE_FONT_NAME, "Arial");
+                MP_CONSTANT_INTEGER(MESSAGE_FONT_SIZE, 14);
+                MP_CONSTANT_INTEGER(MESSAGE_FOREGROUND, 0xFF8B0000);
+                MP_CONSTANT_INTEGER(MESSAGE_MARGIN_Y, 10);
+                MP_CONSTANT_INTEGER(MESSAGE_SIZE_Y, 20);
+            };
+        public:
             MP_CLASS OUTPUT
             {
                 MP_CONSTANT_STRING(MUTEX, "urn:metaoutput:mutex:EXECUTE");
+                MP_CONSTANT_STRING(REQUIREMENTS, "https://www.metaoutput.net/requirements");
                 MP_CONSTANT_INTEGER(PREVIEW_FOREGROUND, Trace::NAME::COLOR::ORCHID);
                 MP_CONSTANT_INTEGER(PREVIEW_ITEM_HEIGHT, 19);
                 MP_CONSTANT_INTEGER(PREVIEW_MIN_SIZE, 2);
@@ -22,17 +60,20 @@ namespace atom
                 MP_CONSTANT_INTEGER(MAX_BUFFER_SIZE, 100 * 1024 * 1024);
             };
         public:
-            MP_CLASS PADDING
-            {
-                MP_CONSTANT_INTEGER(DEFAULT, 5);
-            };
-        public:
             MP_CLASS PIPE
             {
+                MP_CONSTANT_STRING(METAOUTPUT, "urn:metaoutput:pipe:DEFAULT");
+                MP_CONSTANT_STRING(DEMO, "urn:metaoutput:pipe:DEMO");
                 MP_CONSTANT_STRING(MUTEX, "urn:metaoutput:mutex:PIPE");
-                MP_CONSTANT_STRING(TERMINATE_REQUEST, "<<<METAOUTPUT.PIPE.TERMINATE>>>");
+                MP_CONSTANT_STRING(TERMINATE_REQUEST, "urn:metaoutput:pipe:<<<CLIENT-TERMINATE>>>");
                 MP_CONSTANT_INTEGER(BUFFER_SIZE, 256 * 1024);
-                MP_CONSTANT_INTEGER(TIMEOUT, 500);
+                MP_CONSTANT_INTEGER(TIMEOUT, 100);
+            };
+        public:
+            MP_CLASS PROGRESS
+            {
+                MP_CONSTANT_INTEGER(INFINITE, 101);
+                MP_CONSTANT_INTEGER(REMOVE, -1);
             };
         public:
             MP_CLASS TML
@@ -55,13 +96,21 @@ namespace atom
         public:
             MP_CLASS ALIGNMENT
             {
-                MP_CONSTANT_STRING(BOTTOM, "BOTTOM");
-                MP_CONSTANT_STRING(CENTER, "CENTER");
-                MP_CONSTANT_STRING(CLIENT, "CLIENT");
-                MP_CONSTANT_STRING(LEFT, "LEFT");
-                MP_CONSTANT_STRING(NONE, "");
-                MP_CONSTANT_STRING(RIGHT, "RIGHT");
-                MP_CONSTANT_STRING(TOP, "TOP");
+                MP_CONSTANT_INTEGER(NONE,          0x00);
+                MP_CONSTANT_INTEGER(BOTTOM,        0x08);
+                MP_CONSTANT_INTEGER(CENTER,        0x10);
+                MP_CONSTANT_INTEGER(LEFT,          0x01);
+                MP_CONSTANT_INTEGER(RIGHT,         0x02);
+                MP_CONSTANT_INTEGER(TOP,           0x04);
+                MP_CONSTANT_INTEGER(CENTER_LEFT,   CENTER | LEFT);
+                MP_CONSTANT_INTEGER(CENTER_TOP,    CENTER | TOP);
+                MP_CONSTANT_INTEGER(CENTER_RIGHT,  CENTER | RIGHT);
+                MP_CONSTANT_INTEGER(CENTER_BOTTOM, CENTER | BOTTOM);
+                MP_CONSTANT_INTEGER(CLIENT,        LEFT | TOP | RIGHT | BOTTOM);
+                MP_CONSTANT_INTEGER(LEFT_BOTTOM,   LEFT | BOTTOM);
+                MP_CONSTANT_INTEGER(LEFT_TOP,      LEFT | TOP);
+                MP_CONSTANT_INTEGER(RIGHT_BOTTOM,  RIGHT | BOTTOM);
+                MP_CONSTANT_INTEGER(RIGHT_TOP,     RIGHT | TOP);
             };
         public:
             MP_CLASS COLOR
@@ -211,37 +260,55 @@ namespace atom
         public:
             MP_CLASS COMMAND
             {
-                MP_CONSTANT_STRING(IMPORT, "IMPORT");
-                MP_CONSTANT_STRING(MESSAGE_APPEND, "MESSAGE.APPEND");
-                MP_CONSTANT_STRING(MESSAGE_BEEP, "MESSAGE.BEEP");
-                MP_CONSTANT_STRING(MESSAGE_CLEAR, "MESSAGE.CLEAR");
-                MP_CONSTANT_STRING(MESSAGE_COLLAPSE, "MESSAGE.COLLAPSE");
-                MP_CONSTANT_STRING(MESSAGE_EXPAND, "MESSAGE.EXPAND");
-                MP_CONSTANT_STRING(MESSAGE_FOCUS, "MESSAGE.FOCUS");
-                MP_CONSTANT_STRING(MESSAGE_HIDE, "MESSAGE.HIDE");
-                MP_CONSTANT_STRING(MESSAGE_LOCK, "MESSAGE.LOCK");
-                MP_CONSTANT_STRING(MESSAGE_MUTE, "MESSAGE.MUTE");
-                MP_CONSTANT_STRING(MESSAGE_PIN, "MESSAGE.PIN");
-                MP_CONSTANT_STRING(MESSAGE_REMOVE, "MESSAGE.REMOVE");
-                MP_CONSTANT_STRING(MESSAGE_RESEND, "MESSAGE.RESEND");
-                MP_CONSTANT_STRING(MESSAGE_SHOW, "MESSAGE.SHOW");
-                MP_CONSTANT_STRING(MESSAGE_SPEAK, "MESSAGE.SPEAK");
-                MP_CONSTANT_STRING(MESSAGE_STACKTRACE, "MESSAGE.STACKTRACE");
-                MP_CONSTANT_STRING(MESSAGE_UNFOCUS, "MESSAGE.UNFOCUS");
-                MP_CONSTANT_STRING(MESSAGE_UNLOCK, "MESSAGE.UNLOCK");
-                MP_CONSTANT_STRING(MESSAGE_UNPIN, "MESSAGE.UNPIN");
-                MP_CONSTANT_STRING(MESSAGE_UPDATE, "MESSAGE.UPDATE");
-                MP_CONSTANT_STRING(SOURCE_APPEND, "SOURCE.APPEND");
-                MP_CONSTANT_STRING(SOURCE_CLEAR, "SOURCE.CLEAR");
-                MP_CONSTANT_STRING(SOURCE_REMOVE, "SOURCE.REMOVE");
-                MP_CONSTANT_STRING(TRANSFORM_APPEND, "TRANSFORM.APPEND");
-                MP_CONSTANT_STRING(TRANSFORM_REMOVE, "TRANSFORM.REMOVE");
-                MP_CONSTANT_STRING(TRANSLATION_APPEND, "TRANSLATION.APPEND");
-                MP_CONSTANT_STRING(TRANSLATION_REMOVE, "TRANSLATION.REMOVE");
-                MP_CONSTANT_STRING(EVENT_APPEND, "EVENT.APPEND");
-                MP_CONSTANT_STRING(EVENT_REMOVE, "EVENT.REMOVE");
-                MP_CONSTANT_STRING(VARIABLE_APPEND, "VARIABLE.APPEND");
-                MP_CONSTANT_STRING(VARIABLE_REMOVE, "VARIABLE.REMOVE");
+            public:
+                MP_CLASS COMMON
+                {
+                    MP_CONSTANT_STRING(EXPORT, "EXPORT");
+                    MP_CONSTANT_STRING(IMPORT, "IMPORT");
+                };
+            public:
+                MP_CLASS SOURCE
+                {
+                    MP_CONSTANT_STRING(APPEND, "SOURCE.APPEND");
+                    MP_CONSTANT_STRING(CLEAR, "SOURCE.CLEAR");
+                    MP_CONSTANT_STRING(REMOVE, "SOURCE.REMOVE");
+                };
+            public:
+                MP_CLASS TERMINAL
+                {
+                    MP_CONSTANT_STRING(APPEND, "TERMINAL.APPEND");
+                    MP_CONSTANT_STRING(REMOVE, "TERMINAL.REMOVE");
+                };
+            public:
+                MP_CLASS TOOL
+                {
+                    MP_CONSTANT_STRING(APPEND, "TOOL.APPEND");
+                    MP_CONSTANT_STRING(REMOVE, "TOOL.REMOVE");
+                };
+            public:
+                MP_CLASS TRANSFORM
+                {
+                    MP_CONSTANT_STRING(APPEND, "TRANSFORM.APPEND");
+                    MP_CONSTANT_STRING(REMOVE, "TRANSFORM.REMOVE");
+                };
+            public:
+                MP_CLASS TRANSLATION
+                {
+                    MP_CONSTANT_STRING(APPEND, "TRANSLATION.APPEND");
+                    MP_CONSTANT_STRING(REMOVE, "TRANSLATION.REMOVE");
+                };
+            public:
+                MP_CLASS EVENT
+                {
+                    MP_CONSTANT_STRING(APPEND, "EVENT.APPEND");
+                    MP_CONSTANT_STRING(REMOVE, "EVENT.REMOVE");
+                };
+            public:
+                MP_CLASS VARIABLE
+                {
+                    MP_CONSTANT_STRING(APPEND, "VARIABLE.APPEND");
+                    MP_CONSTANT_STRING(REMOVE, "VARIABLE.REMOVE");
+                };
             };
         public:
             MP_CLASS CONDITION
@@ -263,19 +330,28 @@ namespace atom
                 MP_CONSTANT_STRING(AUDIO, "AUDIO");
                 MP_CONSTANT_STRING(BROWSER, "BROWSER");
                 MP_CONSTANT_STRING(BUTTON, "BUTTON");
+                MP_CONSTANT_STRING(CANVAS, "CANVAS");
                 MP_CONSTANT_STRING(CHART, "CHART");
                 MP_CONSTANT_STRING(CHECKBOX, "CHECKBOX");
-                MP_CONSTANT_STRING(EDITBOX, "EDITBOX");
                 MP_CONSTANT_STRING(COMBOBOX, "COMBOBOX");
+                MP_CONSTANT_STRING(EDITBOX, "EDITBOX");
+                MP_CONSTANT_STRING(GALLERY, "GALLERY");
+                MP_CONSTANT_STRING(GAUGE, "GAUGE");
+                MP_CONSTANT_STRING(ITEM, "ITEM");
                 MP_CONSTANT_STRING(LABEL, "LABEL");
                 MP_CONSTANT_STRING(PANEL, "PANEL");
                 MP_CONSTANT_STRING(PICTURE, "PICTURE");
+                MP_CONSTANT_STRING(PROGRESSBOX, "PROGRESSBOX");
                 MP_CONSTANT_STRING(RADIOBOX, "RADIOBOX");
                 MP_CONSTANT_STRING(SCROLLBOX, "SCROLLBOX");
+                MP_CONSTANT_STRING(SLIDESHOW, "SLIDESHOW");
+                MP_CONSTANT_STRING(SPLITTER, "SPLITTER");
+                MP_CONSTANT_STRING(TABBOX, "TABBOX");
                 MP_CONSTANT_STRING(TABLE, "TABLE");
-                MP_CONSTANT_STRING(TEXT, "TEXT");
                 MP_CONSTANT_STRING(TEXTBOX, "TEXTBOX");
+                MP_CONSTANT_STRING(TREE, "TREE");
                 MP_CONSTANT_STRING(VIDEO, "VIDEO");
+                MP_CONSTANT_STRING(WINDOW, "WINDOW");
             };
         public:
             MP_CLASS CULTURE
@@ -497,6 +573,7 @@ namespace atom
                 MP_CONSTANT_STRING(CRITICAL, "CRITICAL");
                 MP_CONSTANT_STRING(DEBUG, "DEBUG");
                 MP_CONSTANT_STRING(ERROR, "ERROR");
+                MP_CONSTANT_STRING(EMERGENCY, "EMERGENCY");
                 MP_CONSTANT_STRING(EXCEPTION, "EXCEPTION");
                 MP_CONSTANT_STRING(FILE, "FILE");
                 MP_CONSTANT_STRING(FOLDER, "FOLDER");
@@ -518,38 +595,56 @@ namespace atom
                 MP_CONSTANT_STRING(WARNING, "WARNING");
             };
         public:
-            MP_CLASS FONT_STATE
+            MP_CLASS FONT
             {
-                MP_CONSTANT_STRING(BLINK, "BLINK");
-                MP_CONSTANT_STRING(BOLD, "BOLD");
-                MP_CONSTANT_STRING(ITALIC, "ITALIC");
-                MP_CONSTANT_STRING(NONE, "");
-                MP_CONSTANT_STRING(STRIKEOUT, "STRIKEOUT");
-                MP_CONSTANT_STRING(UNDERSCORE, "UNDERSCORE");
+                MP_CONSTANT_STRING(ARIAL, "Arial");
+                MP_CONSTANT_STRING(COURIER, "Courier");
+                MP_CONSTANT_STRING(COURIER_NEW, "Courier New");
+                MP_CONSTANT_STRING(GEORGIA, "Georgia");
+                MP_CONSTANT_STRING(GARAMOND, "Garamond");
+                MP_CONSTANT_STRING(IMPACT, "Impact");
+                MP_CONSTANT_STRING(LUCIDA, "Lucida");
+                MP_CONSTANT_STRING(SERIF, "Serif");
+                MP_CONSTANT_STRING(SANS_SERIF, "Sans Serif");
+                MP_CONSTANT_STRING(TAHOMA, "Tahoma");
+                MP_CONSTANT_STRING(TIMES_NEW_ROMAN, "Times New Roman");
+                MP_CONSTANT_STRING(VERDANA, "Verdana");
             };
         public:
-            MP_CLASS KEY_EVENT
+            MP_CLASS KEYBOARD
             {
-                MP_CONSTANT_STRING(DOWN_ALT, "KEY.DOWN.ALT");
-                MP_CONSTANT_STRING(DOWN_CONTROL, "KEY.DOWN.CONTROL");
-                MP_CONSTANT_STRING(DOWN_SHIFT, "KEY.DOWN.SHIFT");
-                MP_CONSTANT_STRING(DOWN_WIN, "KEY.DOWN.WIN");
-                MP_CONSTANT_STRING(UP_ALT, "KEY.UP.ALT");
-                MP_CONSTANT_STRING(UP_CONTROL, "KEY.UP.CONTROL");
-                MP_CONSTANT_STRING(UP_SHIFT, "KEY.UP.SHIFT");
-                MP_CONSTANT_STRING(UP_WIN, "KEY.UP.WIN");
+            public:
+                MP_CLASS BUTTON
+                {
+                    MP_CONSTANT_STRING(DOWN_ALT, "KEY.DOWN.ALT");
+                    MP_CONSTANT_STRING(DOWN_CONTROL, "KEY.DOWN.CONTROL");
+                    MP_CONSTANT_STRING(DOWN_SHIFT, "KEY.DOWN.SHIFT");
+                    MP_CONSTANT_STRING(DOWN_WIN, "KEY.DOWN.WIN");
+                    MP_CONSTANT_STRING(UP_ALT, "KEY.UP.ALT");
+                    MP_CONSTANT_STRING(UP_CONTROL, "KEY.UP.CONTROL");
+                    MP_CONSTANT_STRING(UP_SHIFT, "KEY.UP.SHIFT");
+                    MP_CONSTANT_STRING(UP_WIN, "KEY.UP.WIN");
+                };
             };
         public:
-            MP_CLASS MOUSE_EVENT
+            MP_CLASS MOUSE
             {
-                MP_CONSTANT_STRING(DOWN_LEFT, "MOUSE.DOWN.LEFT");
-                MP_CONSTANT_STRING(DOWN_MIDDLE, "MOUSE.DOWN.MIDDLE");
-                MP_CONSTANT_STRING(DOWN_RIGHT, "MOUSE.DOWN.RIGHT");
-                MP_CONSTANT_STRING(MOVE_X, "MOUSE.MOVE.X");
-                MP_CONSTANT_STRING(MOVE_Y, "MOUSE.MOVE.Y");
-                MP_CONSTANT_STRING(UP_LEFT, "MOUSE.UP.LEFT");
-                MP_CONSTANT_STRING(UP_MIDDLE, "MOUSE.UP.MIDDLE");
-                MP_CONSTANT_STRING(UP_RIGHT, "MOUSE.UP.RIGHT");
+            public:
+                MP_CLASS BUTTON
+                {
+                    MP_CONSTANT_STRING(DOWN_LEFT, "MOUSE.DOWN.LEFT");
+                    MP_CONSTANT_STRING(DOWN_MIDDLE, "MOUSE.DOWN.MIDDLE");
+                    MP_CONSTANT_STRING(DOWN_RIGHT, "MOUSE.DOWN.RIGHT");
+                    MP_CONSTANT_STRING(UP_LEFT, "MOUSE.UP.LEFT");
+                    MP_CONSTANT_STRING(UP_MIDDLE, "MOUSE.UP.MIDDLE");
+                    MP_CONSTANT_STRING(UP_RIGHT, "MOUSE.UP.RIGHT");
+                };
+            public:
+                MP_CLASS MOVE
+                {
+                    MP_CONSTANT_STRING(X, "MOUSE.MOVE.X");
+                    MP_CONSTANT_STRING(Y, "MOUSE.MOVE.Y");
+                };
             };
         public:
             MP_CLASS METADATA
@@ -580,12 +675,6 @@ namespace atom
                 MP_CONSTANT_STRING(VERSION, "VERSION");
             };
         public:
-            MP_CLASS PROGRESS
-            {
-                MP_CONSTANT_INTEGER(INFINITE, 101);
-                MP_CONSTANT_INTEGER(REMOVE, -1);
-            };
-        public:
             MP_CLASS PROPERTY
             {
                 MP_CONSTANT_STRING(DEBUGGING_DATA_NESTING, "METAOUTPUT/DEBUGGING/DATA.NESTING");
@@ -595,6 +684,7 @@ namespace atom
                 MP_CONSTANT_STRING(DEBUGGING_STACK_SIZE, "METAOUTPUT/DEBUGGING/STACK.SIZE");
                 MP_CONSTANT_STRING(DEBUGGING_STRING_SIZE, "METAOUTPUT/DEBUGGING/STRING.SIZE");
                 MP_CONSTANT_STRING(PREVIEW_DOCUMENT_SIZE, "METAOUTPUT/PREVIEW/DOCUMENT.SIZE");
+                MP_CONSTANT_STRING(PREVIEW_BROWSER_SIZE, "METAOUTPUT/PREVIEW/BROWSER.SIZE");
                 MP_CONSTANT_STRING(PREVIEW_MEDIA_SIZE, "METAOUTPUT/PREVIEW/MEDIA.SIZE");
                 MP_CONSTANT_STRING(PREVIEW_TABLE_SIZE, "METAOUTPUT/PREVIEW/TABLE.SIZE");
             };
@@ -604,6 +694,7 @@ namespace atom
                 MP_CONSTANT_STRING(UNKNOWN, "UNKNOWN");
                 MP_CONSTANT_STRING(ADVERTISEMENT, "ADVERTISEMENT");
                 MP_CONSTANT_STRING(ADVISE, "ADVISE");
+                MP_CONSTANT_STRING(ALERT, "ALERT");
                 MP_CONSTANT_STRING(ANALYZER, "ANALYZER");
                 MP_CONSTANT_STRING(BREAKPOINT, "BREAKPOINT");
                 MP_CONSTANT_STRING(BUILD, "BUILD");
@@ -620,6 +711,7 @@ namespace atom
                 MP_CONSTANT_STRING(METADATA, "METADATA");
                 MP_CONSTANT_STRING(METAREPORT, "METAREPORT");
                 MP_CONSTANT_STRING(NETWORK, "NETWORK");
+                MP_CONSTANT_STRING(NEWS, "NEWS");
                 MP_CONSTANT_STRING(NOTIFICATION, "NOTIFICATION");
                 MP_CONSTANT_STRING(PERFORMANCE, "PERFORMANCE");
                 MP_CONSTANT_STRING(PREVIEW, "PREVIEW");
@@ -631,130 +723,74 @@ namespace atom
                 MP_CONSTANT_STRING(STATUS, "STATUS");
                 MP_CONSTANT_STRING(TASK, "TASK");
                 MP_CONSTANT_STRING(TEST, "TEST");
+                MP_CONSTANT_STRING(TOOL, "TOOL");
                 MP_CONSTANT_STRING(THREAD, "THREAD");
                 MP_CONSTANT_STRING(VARIABLE, "VARIABLE");
             };
         public:
             MP_CLASS STATE
             {
-                MP_CONSTANT_STRING(CANCEL, "CANCEL");
-                MP_CONSTANT_STRING(EXECUTE, "EXECUTE");
-                MP_CONSTANT_STRING(WAIT, "");
-            };
-        public:
-            MP_CLASS TRANSFORM
-            {
-                MP_CONSTANT_STRING(ALIGNMENT, "ALIGNMENT");
-                MP_CONSTANT_STRING(BACKGROUND, "BACKGROUND");
-                MP_CONSTANT_STRING(BORDER, "BORDER");
-                MP_CONSTANT_STRING(COMMENT, "COMMENT");
-                MP_CONSTANT_STRING(COMMENT_DETECT, "COMMENT.DETECT");
-                MP_CONSTANT_STRING(COMMENT_HINT, "COMMENT.HINT");
-                MP_CONSTANT_STRING(CONTENT, "CONTENT");
-                MP_CONSTANT_STRING(CONTENT_COMMENT_AFTER, "CONTENT.COMMENT.AFTER");
-                MP_CONSTANT_STRING(CONTENT_COMMENT_BEFORE, "CONTENT.COMMENT.BEFORE");
-                MP_CONSTANT_STRING(CONTENT_COMMENT_BEGIN, "CONTENT.COMMENT.BEGIN");
-                MP_CONSTANT_STRING(CONTENT_COMMENT_BETWEEN, "CONTENT.COMMENT.BETWEEN");
-                MP_CONSTANT_STRING(CONTENT_COMMENT_END, "CONTENT.COMMENT.END");
-                MP_CONSTANT_STRING(CONTENT_GROUP, "CONTENT.GROUP");
-                MP_CONSTANT_STRING(CONTENT_GROUP_AFTER, "CONTENT.GROUP.AFTER");
-                MP_CONSTANT_STRING(CONTENT_GROUP_BEFORE, "CONTENT.GROUP.BEFORE");
-                MP_CONSTANT_STRING(CONTENT_GROUP_BETWEEN, "CONTENT.GROUP.BETWEEN");
-                MP_CONSTANT_STRING(CONTENT_GROUP_DETECT, "CONTENT.GROUP.DETECT");
-                MP_CONSTANT_STRING(CONTENT_GROUP_OUTSIDE, "CONTENT.GROUP.OUTSIDE");
-                MP_CONSTANT_STRING(CONTENT_INSERT_AFTER, "CONTENT.INSERT.AFTER");
-                MP_CONSTANT_STRING(CONTENT_INSERT_BEFORE, "CONTENT.INSERT.BEFORE");
-                MP_CONSTANT_STRING(CONTENT_INSERT_BEGIN, "CONTENT.INSERT.BEGIN");
-                MP_CONSTANT_STRING(CONTENT_INSERT_END, "CONTENT.INSERT.END");
-                MP_CONSTANT_STRING(CONTENT_LOWER, "CONTENT.LOWER");
-                MP_CONSTANT_STRING(CONTENT_LOWER_AFTER, "CONTENT.LOWER.AFTER");
-                MP_CONSTANT_STRING(CONTENT_LOWER_ALL, "CONTENT.LOWER.ALL");
-                MP_CONSTANT_STRING(CONTENT_LOWER_BEFORE, "CONTENT.LOWER.BEFORE");
-                MP_CONSTANT_STRING(CONTENT_LOWER_BETWEEN, "CONTENT.LOWER.BETWEEN");
-                MP_CONSTANT_STRING(CONTENT_OPTIMIZE, "CONTENT.OPTIMIZE");
-                MP_CONSTANT_STRING(CONTENT_REMOVE, "CONTENT.REMOVE");
-                MP_CONSTANT_STRING(CONTENT_REMOVE_AFTER, "CONTENT.REMOVE.AFTER");
-                MP_CONSTANT_STRING(CONTENT_REMOVE_ALL, "CONTENT.REMOVE.ALL");
-                MP_CONSTANT_STRING(CONTENT_REMOVE_BEFORE, "CONTENT.REMOVE.BEFORE");
-                MP_CONSTANT_STRING(CONTENT_REMOVE_BEGIN, "CONTENT.REMOVE.BEGIN");
-                MP_CONSTANT_STRING(CONTENT_REMOVE_BETWEEN, "CONTENT.REMOVE.BETWEEN");
-                MP_CONSTANT_STRING(CONTENT_REMOVE_END, "CONTENT.REMOVE.END");
-                MP_CONSTANT_STRING(CONTENT_REPLACE, "CONTENT.REPLACE");
-                MP_CONSTANT_STRING(CONTENT_REPLACE_ALL, "CONTENT.REPLACE.ALL");
-                MP_CONSTANT_STRING(CONTENT_TRIM, "CONTENT.TRIM");
-                MP_CONSTANT_STRING(CONTENT_TRIM_BEGIN, "CONTENT.TRIM.BEGIN");
-                MP_CONSTANT_STRING(CONTENT_TRIM_END, "CONTENT.TRIM.END");
-                MP_CONSTANT_STRING(CONTENT_UPPER, "CONTENT.UPPER");
-                MP_CONSTANT_STRING(CONTENT_UPPER_AFTER, "CONTENT.UPPER.AFTER");
-                MP_CONSTANT_STRING(CONTENT_UPPER_ALL, "CONTENT.UPPER.ALL");
-                MP_CONSTANT_STRING(CONTENT_UPPER_BEFORE, "CONTENT.UPPER.BEFORE");
-                MP_CONSTANT_STRING(CONTENT_UPPER_BETWEEN, "CONTENT.UPPER.BETWEEN");
-                MP_CONSTANT_STRING(CONTENT_VALUE_DETECT, "CONTENT.VALUE.DETECT");
-                MP_CONSTANT_STRING(CONTENT_VALUE_AFTER, "CONTENT.VALUE.AFTER");
-                MP_CONSTANT_STRING(CONTENT_VALUE_BEFORE, "CONTENT.VALUE.BEFORE");
-                MP_CONSTANT_STRING(CONTROL, "CONTROL");
-                MP_CONSTANT_STRING(CONTROL_HINT, "CONTROL.HINT");
-                MP_CONSTANT_STRING(COUNT, "COUNT");
-                MP_CONSTANT_STRING(DATE, "DATE");
-                MP_CONSTANT_STRING(EVENT, "EVENT");
-                MP_CONSTANT_STRING(FIND_COMMENT, "FIND.COMMENT");
-                MP_CONSTANT_STRING(FIND_COMMENT_ABSENT, "FIND.COMMENT.ABSENT");
-                MP_CONSTANT_STRING(FIND_COMMENT_BEGIN, "FIND.COMMENT.BEGIN");
-                MP_CONSTANT_STRING(FIND_COMMENT_END, "FIND.COMMENT.END");
-                MP_CONSTANT_STRING(FIND_COMMENT_EQUAL, "FIND.COMMENT.EQUAL");
-                MP_CONSTANT_STRING(FIND_CONTENT, "FIND.CONTENT");
-                MP_CONSTANT_STRING(FIND_CONTENT_ABSENT, "FIND.CONTENT.ABSENT");
-                MP_CONSTANT_STRING(FIND_CONTENT_BEGIN, "FIND.CONTENT.BEGIN");
-                MP_CONSTANT_STRING(FIND_CONTENT_END, "FIND.CONTENT.END");
-                MP_CONSTANT_STRING(FIND_CONTENT_EQUAL, "FIND.CONTENT.EQUAL");
-                MP_CONSTANT_STRING(FIND_SIGNATURE, "FIND.SIGNATURE");
-                MP_CONSTANT_STRING(FIND_SIGNATURE_ABSENT, "FIND.SIGNATURE.ABSENT");
-                MP_CONSTANT_STRING(FIND_SIGNATURE_BEGIN, "FIND.SIGNATURE.BEGIN");
-                MP_CONSTANT_STRING(FIND_SIGNATURE_END, "FIND.SIGNATURE.END");
-                MP_CONSTANT_STRING(FIND_SIGNATURE_EQUAL, "FIND.SIGNATURE.EQUAL");
-                MP_CONSTANT_STRING(FIND_VALUE, "FIND.VALUE");
-                MP_CONSTANT_STRING(FIND_VALUE_ABSENT, "FIND.VALUE.ABSENT");
-                MP_CONSTANT_STRING(FIND_VALUE_BEGIN, "FIND.VALUE.BEGIN");
-                MP_CONSTANT_STRING(FIND_VALUE_END, "FIND.VALUE.END");
-                MP_CONSTANT_STRING(FIND_VALUE_EQUAL, "FIND.VALUE.EQUAL");
-                MP_CONSTANT_STRING(FONT_NAME, "FONT.NAME");
-                MP_CONSTANT_STRING(FONT_SIZE, "FONT.SIZE");
-                MP_CONSTANT_STRING(FONT_STATE, "FONT.STATE");
-                MP_CONSTANT_STRING(FOREGROUND, "FOREGROUND");
-                MP_CONSTANT_STRING(FUNCTION_DETECT, "FUNCTION.DETECT");
-                MP_CONSTANT_STRING(LEVEL_DETECT, "LEVEL.DETECT");
-                MP_CONSTANT_STRING(LEVEL_NEXT, "LEVEL.NEXT");
-                MP_CONSTANT_STRING(LEVEL_PREV, "LEVEL.PREV");
-                MP_CONSTANT_STRING(LEVEL_ROOT, "LEVEL.ROOT");
-                MP_CONSTANT_STRING(MARGIN_X, "MARGIN.X");
-                MP_CONSTANT_STRING(MARGIN_Y, "MARGIN.Y");
-                MP_CONSTANT_STRING(PADDING, "PADDING");
-                MP_CONSTANT_STRING(PADDING_MAX_X, "PADDING_MAX_X");
-                MP_CONSTANT_STRING(PADDING_MAX_Y, "PADDING_MAX_Y");
-                MP_CONSTANT_STRING(PADDING_MIN_X, "PADDING_MIN_X");
-                MP_CONSTANT_STRING(PADDING_MIN_Y, "PADDING_MIN_Y");
-                MP_CONSTANT_STRING(PIPE, "PIPE");
-                MP_CONSTANT_STRING(PROGRESS, "PROGRESS");
-                MP_CONSTANT_STRING(PROGRESS_DETECT, "PROGRESS.DETECT");
-                MP_CONSTANT_STRING(PROGRESS_HINT, "PROGRESS.HINT");
-                MP_CONSTANT_STRING(SIZE_X, "SIZE.X");
-                MP_CONSTANT_STRING(SIZE_Y, "SIZE.Y");
-                MP_CONSTANT_STRING(SOURCE, "SOURCE");
-                MP_CONSTANT_STRING(TIME, "TIME");
-                MP_CONSTANT_STRING(TIME_DETECT, "TIME.DETECT");
-                MP_CONSTANT_STRING(URL, "URL");
-                MP_CONSTANT_STRING(URL_CHECKSUM, "URL.CHECKSUM");
-                MP_CONSTANT_STRING(URL_DETECT, "URL.DETECT");
-                MP_CONSTANT_STRING(URL_HINT, "URL.HINT");
-                MP_CONSTANT_STRING(URL_INFO, "URL.INFO");
-                MP_CONSTANT_STRING(URL_INFO_DETECT, "URL.INFO.DETECT");
-                MP_CONSTANT_STRING(URL_INFO_HINT, "URL.INFO.HINT");
-                MP_CONSTANT_STRING(URL_PREVIEW, "URL.PREVIEW");
-                MP_CONSTANT_STRING(URL_SAMPLE, "URL.SAMPLE");
-                MP_CONSTANT_STRING(URL_SAMPLE_HINT, "URL.SAMPLE.HINT");
-                MP_CONSTANT_STRING(VALUE, "VALUE");
-                MP_CONSTANT_STRING(VALUE_TYPE, "VALUE.TYPE");
-                MP_CONSTANT_STRING(VALUE_DETECT, "VALUE.DETECT");
+            public:
+                MP_CLASS CHART
+                {
+                    MP_CONSTANT_INTEGER(AREA,       0x00000100);
+                    MP_CONSTANT_INTEGER(BAR,        0x00000200);
+                    MP_CONSTANT_INTEGER(DONUT,      0x00000400);
+                    MP_CONSTANT_INTEGER(DOT,        0x00000800);
+                    MP_CONSTANT_INTEGER(LINE,       0x00001000);
+                    MP_CONSTANT_INTEGER(STACK,      0x00002000);
+                };
+            public:
+                MP_CLASS CONTROL
+                {
+                    MP_CONSTANT_INTEGER(NONE,       0x00000000);
+                    MP_CONSTANT_INTEGER(BLINK,      0x00100000);
+                    MP_CONSTANT_INTEGER(BLUR,       0x00200000);
+                    MP_CONSTANT_INTEGER(DISABLED,   0x00400000);
+                    MP_CONSTANT_INTEGER(INFINITE,   0x00800000);
+                    MP_CONSTANT_INTEGER(MUTE,       0x01000000);
+                };
+            public:
+                MP_CLASS FONT
+                {
+                    MP_CONSTANT_INTEGER(NONE,       0x00000000);
+                    MP_CONSTANT_INTEGER(BOLD,       0x01000000);
+                    MP_CONSTANT_INTEGER(ITALIC,     0x02000000);
+                    MP_CONSTANT_INTEGER(STRIKEOUT,  0x04000000);
+                    MP_CONSTANT_INTEGER(UNDERSCORE, 0x08000000);
+                };
+            public:
+                MP_CLASS TRACE
+                {
+                    MP_CONSTANT_INTEGER(NONE,       0x00000000);
+                    MP_CONSTANT_INTEGER(BEEP,       0x00000001);
+                    MP_CONSTANT_INTEGER(BLINK,      0x00000002);
+                    MP_CONSTANT_INTEGER(CLEAR,      0x00000004);
+                    MP_CONSTANT_INTEGER(COLLAPSE,   0x00000008);
+                    MP_CONSTANT_INTEGER(EXPAND,     0x00000018);
+                    MP_CONSTANT_INTEGER(FIX,        0x00000020);
+                    MP_CONSTANT_INTEGER(FOCUS,      0x00000040);
+                    MP_CONSTANT_INTEGER(HIDE,       0x00000080);
+                    MP_CONSTANT_INTEGER(LOCK,       0x00000100);
+                    MP_CONSTANT_INTEGER(MUTE,       0x00000200);
+                    MP_CONSTANT_INTEGER(PIN,        0x00000400);
+                    MP_CONSTANT_INTEGER(REMOVE,     0x00000800);
+                    MP_CONSTANT_INTEGER(RESEND,     0x00001000);
+                    MP_CONSTANT_INTEGER(SHOW,       0x00002000);
+                    MP_CONSTANT_INTEGER(SPEAK,      0x00004000);
+                    MP_CONSTANT_INTEGER(UNFIX,      0x00008000);
+                    MP_CONSTANT_INTEGER(UNFOCUS,    0x00010000);
+                    MP_CONSTANT_INTEGER(UNLOCK,     0x00020000);
+                    MP_CONSTANT_INTEGER(UNPIN,      0x00040000);
+                    MP_CONSTANT_INTEGER(UPDATE,     0x00080000);
+                };
+            public:
+                MP_CLASS WORK
+                {
+                    MP_CONSTANT_STRING(CANCEL, "CANCEL");
+                    MP_CONSTANT_STRING(EXECUTE, "EXECUTE");
+                    MP_CONSTANT_STRING(WAIT, "");
+                };
             };
         public:
             MP_CLASS TYPE
@@ -800,10 +836,12 @@ namespace atom
         Trace();
     public:
         static MP_PTR(Trace) GetInstance();
-        static MP_STRING GetFailState(MP_STRING applicationName);
+        static MP_STRING GetAttribute(MP_STRING value, MP_STRING name);
+        static MP_STRING GetFirstLine(MP_STRING value, bool isAnyText);
+        static MP_STRING GetMultiLine(MP_STRING value, bool isAnyText);
         static MP_STRING GetUrlFinal(MP_STRING url);
-        static MP_STRING GetUrlPreview(MP_STRING url);
-        static MP_STRING GetUrlPreview(MP_STRING url, MP_STRING extension);
+        static MP_STRING GetUrlTemp(MP_STRING url);
+        static MP_STRING GetUrlTemp(MP_STRING url, MP_STRING extension);
     public:
         MP_PTR(Trace) Clear();
         MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level);
@@ -813,35 +851,30 @@ namespace atom
         MP_PTR(Trace) SendTml(MP_STRING value, MP_STRING source);
         MP_PTR(Trace) SendPreview(MP_STRING event, MP_STRING url);
     public:
-        MP_PTR(Trace) SetAlignment(MP_STRING value);
-        MP_PTR(Trace) SetAlignment(MP_STRING value1, MP_STRING value2);
+        MP_PTR(Trace) SetAlignment(MP_INT value);
         MP_PTR(Trace) SetBackground(MP_INT value);
-        MP_PTR(Trace) SetBorder(MP_INT value);
-        MP_PTR(Trace) SetCommand(MP_STRING name);
         MP_PTR(Trace) SetCommand(MP_STRING name, MP_STRING value);
         MP_PTR(Trace) SetComment(MP_STRING value);
         MP_PTR(Trace) SetComment(MP_STRING value, MP_STRING hint);
-        MP_PTR(Trace) SetCondition(MP_STRING name, MP_STRING variable, MP_STRING value);
+        MP_PTR(Trace) SetCondition(MP_STRING name, MP_STRING value1, MP_STRING value2);
         MP_PTR(Trace) SetContent(MP_STRING value);
         MP_PTR(Trace) SetControl(MP_STRING name);
-        MP_PTR(Trace) SetControl(MP_STRING name, MP_STRING hint);
+        MP_PTR(Trace) SetControl(MP_STRING name, MP_STRING hint, MP_STRING pipe, MP_INT state);
         MP_PTR(Trace) SetCount(MP_INT value);
         MP_PTR(Trace) SetDate(MP_INT year, MP_INT month, MP_INT day);
-        MP_PTR(Trace) SetFontName(MP_STRING value);
-        MP_PTR(Trace) SetFontSize(MP_INT value);
-        MP_PTR(Trace) SetFontState(MP_STRING name);
+        MP_PTR(Trace) SetFont(MP_STRING name, MP_INT size, MP_INT state);
         MP_PTR(Trace) SetForeground(MP_INT value);
         MP_PTR(Trace) SetMargin(MP_INT x, MP_INT y);
         MP_PTR(Trace) SetPadding(MP_INT value);
         MP_PTR(Trace) SetPadding(MP_INT minX, MP_INT minY, MP_INT maxX, MP_INT maxY);
-        MP_PTR(Trace) SetPipe(MP_STRING value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value);
         MP_PTR(Trace) SetProgress(MP_DOUBLE value, MP_STRING hint);
         MP_PTR(Trace) SetSize(MP_INT x, MP_INT y);
-        MP_PTR(Trace) SetTime(MP_INT hour, MP_INT minute, MP_INT second, MP_INT miliSecond);
+        MP_PTR(Trace) SetTime(MP_INT hour, MP_INT minute, MP_INT second, MP_INT milliSecond);
         MP_PTR(Trace) SetTml(MP_STRING value);
-        MP_PTR(Trace) SetTransform(MP_STRING name, MP_STRING value);
+        MP_PTR(Trace) SetTrace(MP_STRING id, MP_INT state);
         MP_PTR(Trace) SetTranslation(MP_STRING culture, MP_STRING value);
+        MP_PTR(Trace) SetTransparency(MP_DOUBLE value);
         MP_PTR(Trace) SetUrl(MP_STRING value);
         MP_PTR(Trace) SetUrl(MP_STRING value, MP_INT line, MP_INT position);
         MP_PTR(Trace) SetUrl(MP_STRING value, MP_STRING hint);
@@ -860,8 +893,6 @@ namespace atom
     private:
         static MP_PTR(MP_THREAD_MUTEX) __GetMutex();
     private:
-        static MP_STRING __GetFirstLine(MP_STRING value, bool isAnyText);
-        static MP_STRING __GetMultiLine(MP_STRING value, bool isAnyText);
         static MP_STRING __GetEvent(MP_STRING value);
         static MP_STRING __GetSource(MP_STRING value);
         static MP_STRING __GetColor(MP_INT value);
@@ -869,6 +900,7 @@ namespace atom
         static MP_STRING __GetTml(MP_STRING value, MP_STRING source);
         static MP_STRING __GetText(MP_STRING value);
         static MP_STRING __GetFileName(MP_STRING url);
+        static MP_STRING __GetStackTrace(MP_STRING source, int level, int skip);
         static MP_STRING __GetProxyFolder();
     private:
         static void MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender);
@@ -878,29 +910,21 @@ namespace atom
         static MP_PTR(MP_THREAD) s_TraceThread;
         static MP_STRING s_TraceBuffer;
     private:
-        MP_STRING m_Alignment;
         MP_STRING m_Background;
-        MP_STRING m_Border;
         MP_STRING m_Command;
         MP_STRING m_Comment;
         MP_STRING m_Condition;
         MP_STRING m_Content;
-        MP_STRING m_ContentHint;
         MP_STRING m_Control;
         MP_STRING m_Count;
         MP_STRING m_Date;
-        MP_STRING m_FontName;
-        MP_STRING m_FontSize;
-        MP_STRING m_FontState;
+        MP_STRING m_Flag;
+        MP_STRING m_Font;
         MP_STRING m_Foreground;
-        MP_STRING m_Margin;
-        MP_STRING m_Padding;
-        MP_STRING m_Pipe;
         MP_STRING m_Progress;
-        MP_STRING m_Size;
-        MP_STRING m_StackTrace;
         MP_STRING m_Time;
         MP_STRING m_Tml;
+        MP_STRING m_Trace;
         MP_STRING m_Url;
         MP_STRING m_UrlInfo;
         MP_STRING m_UrlPreview;

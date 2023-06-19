@@ -11,5 +11,4 @@
 #include "extension/AnyImport.hpp"
 #include "extension/AnyPipe.hpp"
 #include "extension/AnyPreview.hpp"
-#include "extension/AnySource.hpp"
 #endif
