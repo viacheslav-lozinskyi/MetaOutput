@@ -2,6 +2,8 @@
 #include "../All.hpp"
 
 #ifndef MP_PLATFORM_CLI
+MP_PTR(MP_THREAD_MUTEX) extension::AnyPipe::s_Mutex = nullptr;
+MP_PTR(MP_PIPE_WRITESTREAM) extension::AnyPipe::s_Default = nullptr;
 MP_PTR(MP_VECTOR(extension::AnyPipe)) extension::AnyPipe::s_Items = nullptr;
 #endif
 
@@ -55,20 +57,21 @@ bool extension::AnyPipe::Register(MP_STRING name, MP_PTR(AnyPipe) context)
     {
         if ((s_Items != nullptr) && (context != nullptr) && (MP_STRING_EMPTY(name) == false))
         {
+            auto a_Name = (MP_STRING_INDEXOF(name, "urn:") == 0 ? "" : "urn:metaoutput:pipe:") + MP_STRING_LOWER(name);
             {
-                context->m_Name = (MP_STRING_INDEXOF(name, "urn:") == 0 ? "" : "urn:metaoutput:pipe:") + MP_STRING_LOWER(name);
+                context->m_Name = a_Name;
                 context->m_Thread = nullptr;
             }
             for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
             {
-                if (s_Items[i]->m_Name == context->m_Name)
+                if (s_Items[i]->m_Name == a_Name)
                 {
                     return false;
                 }
             }
             {
                 MP_THREAD_INITIALIZE(context->m_Thread, __ThreadExecute);
-                MP_THREAD_NAME_SET(context->m_Thread, context->m_Name);
+                MP_THREAD_NAME_SET(context->m_Thread, a_Name);
                 MP_THREAD_APARTMENT_SET(context->m_Thread, MP_THREAD_APARTMENT_STA);
                 MP_THREAD_START(context->m_Thread, context);
             }
@@ -85,8 +88,33 @@ bool extension::AnyPipe::Register(MP_STRING name, MP_PTR(AnyPipe) context)
     return false;
 }
 
+bool extension::AnyPipe::Unregister(MP_STRING name)
+{
+    try
+    {
+        if ((s_Items != nullptr) && (MP_STRING_EMPTY(name) == false))
+        {
+            auto a_Name = (MP_STRING_INDEXOF(name, "urn:") == 0 ? "" : "urn:metaoutput:pipe:") + MP_STRING_LOWER(name);
+            for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
+            {
+                if (s_Items[i]->m_Name == a_Name)
+                {
+                    MP_VECTOR_DELETE(s_Items, i);
+                    return true;
+                }
+            }
+        }
+    }
+    catch (MP_PTR(MP_EXCEPTION) ex)
+    {
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+    }
+    return false;
+}
+
 bool extension::AnyPipe::Execute(MP_STRING name, MP_STRING value)
 {
+    MP_THREAD_MUTEX_LOCK(__GetMutex());
     try
     {
         auto a_Context1 = (MP_PTR(MP_PIPE_CLIENT))nullptr;
@@ -104,10 +132,12 @@ bool extension::AnyPipe::Execute(MP_STRING name, MP_STRING value)
             MP_PIPE_WRITESTREAM_FINALIZE(a_Context2);
             MP_PIPE_CLIENT_FINALIZE(a_Context1);
         }
+        MP_THREAD_MUTEX_UNLOCK(__GetMutex());
         return true;
     }
     catch (MP_PTR(MP_EXCEPTION) ex)
     {
+        MP_THREAD_MUTEX_UNLOCK(__GetMutex());
         MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
     }
     return false;
@@ -182,6 +212,16 @@ MP_STRING extension::AnyPipe::GetAttribute(MP_STRING value, MP_STRING name)
 // Protected ###########
 void extension::AnyPipe::_Execute(MP_PTR(atom::Trace), MP_STRING, MP_STRING)
 {
+}
+
+// Private #############
+MP_PTR(MP_THREAD_MUTEX) extension::AnyPipe::__GetMutex()
+{
+    if (s_Mutex == nullptr)
+    {
+        MP_THREAD_MUTEX_INITIALIZE(s_Mutex, CONSTANT::PIPE::MUTEX, false);
+    }
+    return s_Mutex;
 }
 
 // Private #############

@@ -22,7 +22,7 @@
     <ProjectGuid>{E8E15705-7808-426B-922D-39DDC6DDF9B3}</ProjectGuid>
     <RootNamespace>metaoutput</RootNamespace>
     <ProjectName>metaoutput.client</ProjectName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <LocalDebuggerCommand>$(DevEnvDir)devenv.exe</LocalDebuggerCommand>

@@ -45,6 +45,8 @@ namespace atom
                 MP_CONSTANT_INTEGER(MESSAGE_FOREGROUND, 0xFF8B0000);
                 MP_CONSTANT_INTEGER(MESSAGE_MARGIN_Y, 10);
                 MP_CONSTANT_INTEGER(MESSAGE_SIZE_Y, 20);
+                MP_CONSTANT_INTEGER(TITLE_SIZE_Y, 24);
+                MP_CONSTANT_INTEGER(TRACE_FOREGROUND, 0xFF008080);
             };
         public:
             MP_CLASS OUTPUT
@@ -339,6 +341,7 @@ namespace atom
                 MP_CONSTANT_STRING(GAUGE, "GAUGE");
                 MP_CONSTANT_STRING(ITEM, "ITEM");
                 MP_CONSTANT_STRING(LABEL, "LABEL");
+                MP_CONSTANT_STRING(LINK, "LINK");
                 MP_CONSTANT_STRING(PANEL, "PANEL");
                 MP_CONSTANT_STRING(PICTURE, "PICTURE");
                 MP_CONSTANT_STRING(PROGRESSBOX, "PROGRESSBOX");
@@ -733,56 +736,56 @@ namespace atom
             public:
                 MP_CLASS CHART
                 {
-                    MP_CONSTANT_INTEGER(AREA,       0x00000100);
-                    MP_CONSTANT_INTEGER(BAR,        0x00000200);
-                    MP_CONSTANT_INTEGER(DONUT,      0x00000400);
-                    MP_CONSTANT_INTEGER(DOT,        0x00000800);
-                    MP_CONSTANT_INTEGER(LINE,       0x00001000);
-                    MP_CONSTANT_INTEGER(STACK,      0x00002000);
+                    MP_CONSTANT_INTEGER(AREA,       0x00000001);
+                    MP_CONSTANT_INTEGER(BAR,        0x00000002);
+                    MP_CONSTANT_INTEGER(DONUT,      0x00000004);
+                    MP_CONSTANT_INTEGER(DOT,        0x00000008);
+                    MP_CONSTANT_INTEGER(LINE,       0x00000010);
+                    MP_CONSTANT_INTEGER(STACK,      0x00000020);
                 };
             public:
                 MP_CLASS CONTROL
                 {
                     MP_CONSTANT_INTEGER(NONE,       0x00000000);
-                    MP_CONSTANT_INTEGER(BLINK,      0x00100000);
-                    MP_CONSTANT_INTEGER(BLUR,       0x00200000);
-                    MP_CONSTANT_INTEGER(DISABLED,   0x00400000);
-                    MP_CONSTANT_INTEGER(INFINITE,   0x00800000);
-                    MP_CONSTANT_INTEGER(MUTE,       0x01000000);
+                    MP_CONSTANT_INTEGER(BLINK,      0x00000001);
+                    MP_CONSTANT_INTEGER(BLUR,       0x00000002);
+                    MP_CONSTANT_INTEGER(DISABLED,   0x00000004);
+                    MP_CONSTANT_INTEGER(INFINITE,   0x00000008);
+                    MP_CONSTANT_INTEGER(MUTE,       0x00000010);
                 };
             public:
                 MP_CLASS FONT
                 {
                     MP_CONSTANT_INTEGER(NONE,       0x00000000);
-                    MP_CONSTANT_INTEGER(BOLD,       0x01000000);
-                    MP_CONSTANT_INTEGER(ITALIC,     0x02000000);
-                    MP_CONSTANT_INTEGER(STRIKEOUT,  0x04000000);
-                    MP_CONSTANT_INTEGER(UNDERSCORE, 0x08000000);
+                    MP_CONSTANT_INTEGER(BOLD,       0x00000020);
+                    MP_CONSTANT_INTEGER(ITALIC,     0x00000040);
+                    MP_CONSTANT_INTEGER(STRIKEOUT,  0x00000080);
+                    MP_CONSTANT_INTEGER(UNDERSCORE, 0x00000100);
                 };
             public:
                 MP_CLASS TRACE
                 {
                     MP_CONSTANT_INTEGER(NONE,       0x00000000);
-                    MP_CONSTANT_INTEGER(BEEP,       0x00000001);
-                    MP_CONSTANT_INTEGER(BLINK,      0x00000002);
-                    MP_CONSTANT_INTEGER(CLEAR,      0x00000004);
-                    MP_CONSTANT_INTEGER(COLLAPSE,   0x00000008);
-                    MP_CONSTANT_INTEGER(EXPAND,     0x00000018);
-                    MP_CONSTANT_INTEGER(FIX,        0x00000020);
-                    MP_CONSTANT_INTEGER(FOCUS,      0x00000040);
-                    MP_CONSTANT_INTEGER(HIDE,       0x00000080);
-                    MP_CONSTANT_INTEGER(LOCK,       0x00000100);
-                    MP_CONSTANT_INTEGER(MUTE,       0x00000200);
-                    MP_CONSTANT_INTEGER(PIN,        0x00000400);
-                    MP_CONSTANT_INTEGER(REMOVE,     0x00000800);
-                    MP_CONSTANT_INTEGER(RESEND,     0x00001000);
-                    MP_CONSTANT_INTEGER(SHOW,       0x00002000);
-                    MP_CONSTANT_INTEGER(SPEAK,      0x00004000);
-                    MP_CONSTANT_INTEGER(UNFIX,      0x00008000);
-                    MP_CONSTANT_INTEGER(UNFOCUS,    0x00010000);
-                    MP_CONSTANT_INTEGER(UNLOCK,     0x00020000);
-                    MP_CONSTANT_INTEGER(UNPIN,      0x00040000);
-                    MP_CONSTANT_INTEGER(UPDATE,     0x00080000);
+                    MP_CONSTANT_INTEGER(BEEP,       0x00000200);
+                    MP_CONSTANT_INTEGER(BLINK,      0x00000400);
+                    MP_CONSTANT_INTEGER(CLEAR,      0x00000800);
+                    MP_CONSTANT_INTEGER(COLLAPSE,   0x00001000);
+                    MP_CONSTANT_INTEGER(EXPAND,     0x00002000);
+                    MP_CONSTANT_INTEGER(FIX,        0x00004000);
+                    MP_CONSTANT_INTEGER(FOCUS,      0x00008000);
+                    MP_CONSTANT_INTEGER(HIDE,       0x00010000);
+                    MP_CONSTANT_INTEGER(LOCK,       0x00020000);
+                    MP_CONSTANT_INTEGER(MUTE,       0x00040000);
+                    MP_CONSTANT_INTEGER(PIN,        0x00080000);
+                    MP_CONSTANT_INTEGER(REMOVE,     0x00100000);
+                    MP_CONSTANT_INTEGER(RESEND,     0x00200000);
+                    MP_CONSTANT_INTEGER(SHOW,       0x00400000);
+                    MP_CONSTANT_INTEGER(SPEAK,      0x00800000);
+                    MP_CONSTANT_INTEGER(UNFIX,      0x01000000);
+                    MP_CONSTANT_INTEGER(UNFOCUS,    0x02000000);
+                    MP_CONSTANT_INTEGER(UNLOCK,     0x04000000);
+                    MP_CONSTANT_INTEGER(UNPIN,      0x08000000);
+                    MP_CONSTANT_INTEGER(UPDATE,     0x10000000);
                 };
             public:
                 MP_CLASS WORK
@@ -796,12 +799,13 @@ namespace atom
             MP_CLASS TYPE
             {
                 MP_CONSTANT_STRING(UNKNOWN, "");
-                MP_CONSTANT_STRING(MSTR, "MSTR");
+                MP_CONSTANT_STRING(MSTR, "<M>");
                 MP_CONSTANT_STRING(AAC, "AAC");
                 MP_CONSTANT_STRING(AVI, "AVI");
                 MP_CONSTANT_STRING(BMP, "BMP");
                 MP_CONSTANT_STRING(CSS, "css");
                 MP_CONSTANT_STRING(CSV, "csv");
+                MP_CONSTANT_STRING(CUR, "CUR");
                 MP_CONSTANT_STRING(DLL, "DLL");
                 MP_CONSTANT_STRING(EXE, "EXE");
                 MP_CONSTANT_STRING(GIF, "GIF");
@@ -844,6 +848,9 @@ namespace atom
         static MP_STRING GetUrlTemp(MP_STRING url, MP_STRING extension);
     public:
         MP_PTR(Trace) Clear();
+        MP_PTR(Trace) BeginTransaction();
+        MP_PTR(Trace) CancelTransaction();
+        MP_PTR(Trace) EndTransaction();
         MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level);
         MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level, MP_STRING content);
         MP_PTR(Trace) Send(MP_STRING source, MP_STRING event, MP_INT level, MP_STRING content, MP_STRING value);
@@ -859,9 +866,11 @@ namespace atom
         MP_PTR(Trace) SetCondition(MP_STRING name, MP_STRING value1, MP_STRING value2);
         MP_PTR(Trace) SetContent(MP_STRING value);
         MP_PTR(Trace) SetControl(MP_STRING name);
+        MP_PTR(Trace) SetControl(MP_STRING name, MP_STRING hint);
         MP_PTR(Trace) SetControl(MP_STRING name, MP_STRING hint, MP_STRING pipe, MP_INT state);
         MP_PTR(Trace) SetCount(MP_INT value);
         MP_PTR(Trace) SetDate(MP_INT year, MP_INT month, MP_INT day);
+        MP_PTR(Trace) SetFont(MP_STRING name, MP_INT size);
         MP_PTR(Trace) SetFont(MP_STRING name, MP_INT size, MP_INT state);
         MP_PTR(Trace) SetForeground(MP_INT value);
         MP_PTR(Trace) SetMargin(MP_INT x, MP_INT y);
@@ -889,8 +898,6 @@ namespace atom
         MP_PTR(Trace) SetValue(MP_STRING value, MP_STRING type);
         MP_PTR(Trace) SetValue(MP_PTR(MP_STREAM) value, MP_STRING type);
     private:
-        MP_PTR(Trace) __SendTml(MP_STRING value);
-    private:
         static MP_PTR(MP_THREAD_MUTEX) __GetMutex();
     private:
         static MP_STRING __GetEvent(MP_STRING value);
@@ -910,6 +917,8 @@ namespace atom
         static MP_PTR(MP_THREAD) s_TraceThread;
         static MP_STRING s_TraceBuffer;
     private:
+        MP_INT m_Transaction;
+        MP_STRING m_Queue;
         MP_STRING m_Background;
         MP_STRING m_Command;
         MP_STRING m_Comment;

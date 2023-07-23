@@ -18,7 +18,7 @@ namespace resource
                 public static int PALETTE_ROW_SIZE = 50;
             }
 
-            protected override void _Execute(atom.Trace context, int level, string url, string file)
+            protected override void _Execute(atom.Trace trace, int level, string url, string file)
             {
                 if (File.Exists(file))
                 {
@@ -29,12 +29,12 @@ namespace resource
                         {
                             var a_Context1 = new Cursor(a_Context);
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", a_Context.Length.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", "Cursor");
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", "CUR");
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", a_Context.Length.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", "Cursor");
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", "CUR");
                                 }
                             }
                             {
@@ -44,7 +44,7 @@ namespace resource
                                     a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
                                 {
-                                    context.
+                                    trace.
                                         SetControl(NAME.CONTROL.PICTURE).
                                         SetForeground(NAME.COLOR.TRANSPARENT).
                                         SetCount(a_Count).
@@ -53,25 +53,25 @@ namespace resource
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, "[[[Size]]]: " + a_Context1.Size.Width.ToString() + " x " + a_Context1.Size.Height.ToString());
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, "[[[Size]]]: " + a_Context1.Size.Width.ToString() + " x " + a_Context1.Size.Height.ToString());
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Codecs]]]");
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Codecs]]]");
                                     {
-                                        context.
+                                        trace.
                                             SetComment("[[[Cursor]]]", "[[[Media Type]]]").
                                             Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FILE, level + 2, "CUR [[[File]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Size]]]");
+                                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Size]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", a_Context1.Size.Width.ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", a_Context1.Size.Height.ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", a_Context1.Size.Width.ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", a_Context1.Size.Height.ToString());
                                             }
                                         }
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Hotspot]]]");
+                                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Hotspot]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "X", ((int)a_Context1.HotSpot.X).ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "Y", ((int)a_Context1.HotSpot.Y).ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "X", ((int)a_Context1.HotSpot.X).ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "Y", ((int)a_Context1.HotSpot.Y).ToString());
                                             }
                                         }
                                     }
@@ -93,12 +93,12 @@ namespace resource
                         try
                         {
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", (new FileInfo(file).Length).ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]");
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", GetImageFormat(a_Context));
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", (new FileInfo(file).Length).ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]");
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", GetImageFormat(a_Context));
                                 }
                             }
                             {
@@ -108,7 +108,7 @@ namespace resource
                                     a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                                 }
                                 {
-                                    context.
+                                    trace.
                                         SetControl(NAME.CONTROL.PICTURE).
                                         SetCount(a_Count).
                                         SetUrlPreview(file).
@@ -116,7 +116,7 @@ namespace resource
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, "[[[Size]]]: " + a_Context.Width.ToString() + " x " + a_Context.Height.ToString());
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, "[[[Size]]]: " + a_Context.Width.ToString() + " x " + a_Context.Height.ToString());
                                 if (a_Context.PropertyItems?.Length > 0)
                                 {
                                     // TODO: Implement it
@@ -127,40 +127,40 @@ namespace resource
                                     //}
                                 }
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Codecs]]]");
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Codecs]]]");
                                     {
-                                        context.
+                                        trace.
                                             SetComment(GetImageFormat(a_Context) == "ICON" ? "[[[Icon]]]" : "[[[Photo]]]", "[[[Media Type]]]").
                                             Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FILE, level + 2, GetImageFormat(a_Context) + " [[[File]]]");
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Header]]]");
+                                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Header]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Pixel Format]]]", GetPixelFormat(a_Context));
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Pixel Format]]]", GetPixelFormat(a_Context));
                                             }
                                         }
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Size]]]");
+                                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Size]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", a_Context.Width.ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", a_Context.Height.ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", a_Context.Width.ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", a_Context.Height.ToString());
                                             }
                                         }
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Physical Size]]]");
+                                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Physical Size]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
                                             }
                                         }
                                         {
-                                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Resolution]]]");
+                                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 3, "[[[Resolution]]]");
                                             {
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
-                                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
+                                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 4, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
                                             }
                                         }
                                         {
-                                            Send(context, a_Context.Palette, level + 3, url);
+                                            Send(trace, a_Context.Palette, level + 3, url);
                                         }
                                     }
                                 }
@@ -178,23 +178,23 @@ namespace resource
                 }
                 else
                 {
-                    context.
+                    trace.
                         Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, "[[[File not found]]]").
                         SendPreview(NAME.EVENT.ERROR, url);
                 }
             }
 
-            public static void Send(atom.Trace context, ColorPalette palette, int level, string url)
+            public static void Send(atom.Trace trace, ColorPalette palette, int level, string url)
             {
                 if ((palette != null) && (palette.Entries != null) && (palette.Entries.Length > 0))
                 {
                     var a_Count = Math.Min(palette.Entries.Length, CONSTANT.PALETTE_ITEM_LIMIT);
                     {
-                        context.
+                        trace.
                             SetComment("[[[Found]]]: " + palette.Entries.Length.ToString(), "").
                             Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Palette]]]");
                         {
-                            context.
+                            trace.
                                 SetControl(NAME.CONTROL.PANEL).
                                 SetAlignment(NAME.ALIGNMENT.CLIENT).
                                 SetCount(Math.Max(a_Count / CONSTANT.PALETTE_ROW_SIZE, 2)).
@@ -203,7 +203,7 @@ namespace resource
                             {
                                 if ((i % CONSTANT.PALETTE_ROW_SIZE) == 0)
                                 {
-                                    context.
+                                    trace.
                                         SetControl(NAME.CONTROL.PANEL).
                                         SetAlignment(NAME.ALIGNMENT.TOP).
                                         SetSize(0, CONSTANT.PALETTE_ITEM_SIZE_Y).
@@ -212,7 +212,7 @@ namespace resource
                                 }
                                 else
                                 {
-                                    context.
+                                    trace.
                                         SetControl(NAME.CONTROL.PANEL, "#" + palette.Entries[i].ToArgb().ToString("X8"), null, atom.Trace.NAME.STATE.CONTROL.NONE).
                                         SetAlignment(NAME.ALIGNMENT.LEFT).
                                         SetBackground(palette.Entries[i].ToArgb()).

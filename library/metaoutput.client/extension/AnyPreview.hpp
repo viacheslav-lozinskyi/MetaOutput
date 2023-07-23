@@ -16,6 +16,7 @@ namespace extension
         static void Connect(MP_STRING application, MP_STRING extension);
         static void Disconnect();
         static bool Register(MP_STRING extension, MP_PTR(AnyPreview) context);
+        static bool Unregister(MP_STRING extension);
         static bool Execute(MP_STRING url);
     public:
         static MP_STRING GetExtension(MP_STRING url);

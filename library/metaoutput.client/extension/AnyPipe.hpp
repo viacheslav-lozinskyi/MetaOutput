@@ -56,6 +56,7 @@ namespace extension
         static void Connect(MP_STRING application, MP_STRING extension);
         static void Disconnect();
         static bool Register(MP_STRING name, MP_PTR(AnyPipe) context);
+        static bool Unregister(MP_STRING name);
         static bool Execute(MP_STRING name, MP_STRING value);
         static void Validate(MP_STRING application, MP_STRING extension);
     public:
@@ -66,11 +67,15 @@ namespace extension
     protected:
         virtual void _Execute(MP_PTR(atom::Trace) trace, MP_STRING pipe, MP_STRING value);
     private:
+        static MP_PTR(MP_THREAD_MUTEX) __GetMutex();
+    private:
         static void MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender);
     private:
         MP_STRING m_Name;
         MP_PTR(MP_THREAD) m_Thread;
     private:
+        static MP_PTR(MP_THREAD_MUTEX) s_Mutex;
+        static MP_PTR(MP_PIPE_WRITESTREAM) s_Default;
         static MP_PTR(MP_VECTOR(AnyPipe)) s_Items;
     };
 }

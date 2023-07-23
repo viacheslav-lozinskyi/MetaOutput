@@ -10,7 +10,7 @@ namespace resource
     {
         public class Taglib : extension.AnyPreview
         {
-            protected override void _Execute(atom.Trace context, int level, string url, string file)
+            protected override void _Execute(atom.Trace trace, int level, string url, string file)
             {
                 if (File.Exists(file))
                 {
@@ -33,17 +33,17 @@ namespace resource
                                 a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", a_Context.FileAbstraction?.ReadStream?.Length.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", a_Context.Properties?.MediaTypes.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", a_Context.MimeType?.ToUpper()?.Replace("TAGLIB/", ""));
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Tag Types]]]", a_Context.TagTypes.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Name]]]", url);
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[File Size]]]", a_Context.FileAbstraction?.ReadStream?.Length.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", a_Context.Properties?.MediaTypes.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Raw Format]]]", a_Context.MimeType?.ToUpper()?.Replace("TAGLIB/", ""));
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Tag Types]]]", a_Context.TagTypes.ToString());
                                 }
                             }
                             {
-                                context.
+                                trace.
                                     SetControl(a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video) ? NAME.CONTROL.VIDEO : NAME.CONTROL.PICTURE).
                                     SetForeground(NAME.COLOR.TRANSPARENT).
                                     SetCount(a_Count).
@@ -66,31 +66,31 @@ namespace resource
                                 }
                                 if (a_Context.PossiblyCorrupt)
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, a_Context1);
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, a_Context1);
                                 }
                                 else
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, a_Context1);
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOOTER, level, a_Context1);
                                 }
                             }
                             if ((a_Context.Tag != null) && (a_Context.Tag?.IsEmpty == false))
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Tags]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level + 1, "[[[Tags]]]");
                                 {
-                                    __Execute(context, a_Context, a_Context.Tag, level + 2);
-                                    __Execute(context, a_Context.Tag?.AlbumArtists, level + 2, "[[[Artists]]]");
-                                    __Execute(context, a_Context.Tag?.Composers, level + 2, "[[[Composers]]]");
-                                    __Execute(context, a_Context.Tag?.Genres, level + 2, "[[[Genres]]]");
-                                    __Execute(context, a_Context.Tag?.Performers, level + 2, "[[[Performers]]]");
-                                    __Execute(context, a_Context, a_Context.Tag?.Pictures, level + 2);
+                                    __Execute(trace, a_Context, a_Context.Tag, level + 2);
+                                    __Execute(trace, a_Context.Tag?.AlbumArtists, level + 2, "[[[Artists]]]");
+                                    __Execute(trace, a_Context.Tag?.Composers, level + 2, "[[[Composers]]]");
+                                    __Execute(trace, a_Context.Tag?.Genres, level + 2, "[[[Genres]]]");
+                                    __Execute(trace, a_Context.Tag?.Performers, level + 2, "[[[Performers]]]");
+                                    __Execute(trace, a_Context, a_Context.Tag?.Pictures, level + 2);
                                 }
                             }
                             {
-                                __Execute(context, a_Context, a_Context.Properties.Codecs, level + 1, url, (a_Context.Properties.MediaTypes == TagLib.MediaTypes.Photo) ? file : "");
+                                __Execute(trace, a_Context, a_Context.Properties.Codecs, level + 1, url, (a_Context.Properties.MediaTypes == TagLib.MediaTypes.Photo) ? file : "");
                             }
                             if (a_Context.PossiblyCorrupt && (a_Context.CorruptionReasons != null))
                             {
-                                __Execute(context, a_Context.CorruptionReasons, level + 1, "[[[Diagnostics]]]", url);
+                                __Execute(trace, a_Context.CorruptionReasons, level + 1, "[[[Diagnostics]]]", url);
                             }
                         }
                     }
@@ -106,7 +106,7 @@ namespace resource
                 }
                 else
                 {
-                    context.
+                    trace.
                         Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, "[[[File not found]]]").
                         SendPreview(NAME.EVENT.ERROR, url);
                 }
@@ -124,25 +124,25 @@ namespace resource
                 return true;
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.Tag node, int level)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.Tag node, int level)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (node.IsEmpty == false))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Common]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Common]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Title]]]", node.Title);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Subtitle]]]", node.Subtitle);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Description]]]", node.Description);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Album]]]", node.Album);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Comment]]]", node.Comment);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Copyright]]]", node.Copyright);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Conductor]]]", node.Conductor);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Publisher]]]", node.Publisher);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Lyrics]]]", node.Lyrics);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Grouping]]]", node.Grouping);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Remixed By]]]", node.RemixedBy);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Initial Key]]]", node.InitialKey);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Title]]]", node.Title);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Subtitle]]]", node.Subtitle);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Description]]]", node.Description);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Album]]]", node.Album);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Comment]]]", node.Comment);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Copyright]]]", node.Copyright);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Conductor]]]", node.Conductor);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Publisher]]]", node.Publisher);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Lyrics]]]", node.Lyrics);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Grouping]]]", node.Grouping);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Remixed By]]]", node.RemixedBy);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Initial Key]]]", node.InitialKey);
                         }
                     }
                     if ((node.Disc != 0) ||
@@ -151,27 +151,27 @@ namespace resource
                         (node.TrackCount != 0) ||
                         (node.Year != 0))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Track]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Track]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc]]]", node.Disc.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc Count]]]", node.DiscCount.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track]]]", node.Track.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track Count]]]", node.TrackCount.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Year]]]", node.Year.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc]]]", node.Disc.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc Count]]]", node.DiscCount.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track]]]", node.Track.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track Count]]]", node.TrackCount.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Year]]]", node.Year.ToString());
                         }
                     }
                     if ((string.IsNullOrEmpty(node.AmazonId) == false))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Amazon Id]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Amazon Id]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Amazon Id]]]", node.AmazonId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Amazon Id]]]", node.AmazonId);
                         }
                     }
                     if ((string.IsNullOrEmpty(node.MusicIpId) == false))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[MusicIp Id]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[MusicIp Id]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[MusicIp Id]]]", node.MusicIpId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[MusicIp Id]]]", node.MusicIpId);
                         }
                     }
                     if ((string.IsNullOrEmpty(node.MusicBrainzReleaseGroupId) == false) ||
@@ -184,32 +184,32 @@ namespace resource
                         (string.IsNullOrEmpty(node.MusicBrainzReleaseId) == false) ||
                         (string.IsNullOrEmpty(node.MusicBrainzArtistId) == false))
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Music Brainz]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, "[[[Music Brainz]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Group Id]]]", node.MusicBrainzReleaseGroupId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Country]]]", node.MusicBrainzReleaseCountry);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Type]]]", node.MusicBrainzReleaseType);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Status]]]", node.MusicBrainzReleaseStatus);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc Id]]]", node.MusicBrainzDiscId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track Id]]]", node.MusicBrainzTrackId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Artist Id]]]", node.MusicBrainzReleaseArtistId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Id]]]", node.MusicBrainzReleaseId);
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Artist Id]]]", node.MusicBrainzArtistId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Group Id]]]", node.MusicBrainzReleaseGroupId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Country]]]", node.MusicBrainzReleaseCountry);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Type]]]", node.MusicBrainzReleaseType);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Status]]]", node.MusicBrainzReleaseStatus);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Disc Id]]]", node.MusicBrainzDiscId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Track Id]]]", node.MusicBrainzTrackId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Artist Id]]]", node.MusicBrainzReleaseArtistId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Release Id]]]", node.MusicBrainzReleaseId);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 2, "[[[Artist Id]]]", node.MusicBrainzArtistId);
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IPicture[] node, int level)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.IPicture[] node, int level)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (node.Length > 0))
                 {
-                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Pictures]]]");
+                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Pictures]]]");
                     for (var i = 0; i < node.Length; i++)
                     {
                         if (node[i] != null)
                         {
-                            context.
+                            trace.
                                 SetComment(__GetString(node[i].Type), "[[[Type]]]").
                                 SetUrl(node[i].Filename).
                                 Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, node[i].Description);
@@ -218,128 +218,128 @@ namespace resource
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, IEnumerable<TagLib.ICodec> node, int level, string url, string file)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, IEnumerable<TagLib.ICodec> node, int level, string url, string file)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (__IsEmpty(node) == false))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level, "[[[Codecs]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FOLDER, level, "[[[Codecs]]]");
                     }
                     foreach (var a_Context in node)
                     {
                         if (a_Context != null)
                         {
-                            context.
+                            trace.
                                 SetComment(a_Context.MediaTypes.ToString(), "[[[Media Types]]]").
                                 Send(NAME.SOURCE.PREVIEW, NAME.EVENT.FILE, level + 1, a_Context.Description);
                             if (a_Context is TagLib.Mpeg.AudioHeader)
                             {
-                                __Execute(context, tagLib, (TagLib.Mpeg.AudioHeader)a_Context, level + 2);
+                                __Execute(trace, tagLib, (TagLib.Mpeg.AudioHeader)a_Context, level + 2);
                                 continue;
                             }
                             if (a_Context is TagLib.Mpeg.VideoHeader)
                             {
-                                __Execute(context, tagLib, (TagLib.Mpeg.VideoHeader)a_Context, level + 2);
+                                __Execute(trace, tagLib, (TagLib.Mpeg.VideoHeader)a_Context, level + 2);
                                 continue;
                             }
                             if (a_Context is TagLib.IAudioCodec)
                             {
-                                __Execute(context, tagLib, (TagLib.IAudioCodec)a_Context, level + 2);
+                                __Execute(trace, tagLib, (TagLib.IAudioCodec)a_Context, level + 2);
                                 continue;
                             }
                             if (a_Context is TagLib.IPhotoCodec)
                             {
-                                __Execute(context, tagLib, (TagLib.IPhotoCodec)a_Context, level + 2, url, file);
+                                __Execute(trace, tagLib, (TagLib.IPhotoCodec)a_Context, level + 2, url, file);
                                 continue;
                             }
                             if (a_Context is TagLib.IVideoCodec)
                             {
-                                __Execute(context, tagLib, (TagLib.IVideoCodec)a_Context, level + 2);
+                                __Execute(trace, tagLib, (TagLib.IVideoCodec)a_Context, level + 2);
                             }
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.Mpeg.AudioHeader node, int level)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.Mpeg.AudioHeader node, int level)
             {
                 if (GetState() != NAME.STATE.WORK.CANCEL)
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channel Mode]]]", node.ChannelMode.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.IsOriginal, "[[[ORIGINAL]]]") + __GetFlag(node.IsCopyrighted, "[[[COPYRIGHTED]]]") + __GetFlag(node.IsPadded, "[[[PADDED]]]") + __GetFlag(node.IsProtected, "[[[PROTECTED]]]"));
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Frame Length]]]", node.AudioFrameLength.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Layer]]]", node.AudioLayer.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Version]]]", node.Version.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channel Mode]]]", node.ChannelMode.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.IsOriginal, "[[[ORIGINAL]]]") + __GetFlag(node.IsCopyrighted, "[[[COPYRIGHTED]]]") + __GetFlag(node.IsPadded, "[[[PADDED]]]") + __GetFlag(node.IsProtected, "[[[PROTECTED]]]"));
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Frame Length]]]", node.AudioFrameLength.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Layer]]]", node.AudioLayer.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Version]]]", node.Version.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "Xing");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "Xing");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.XingHeader.Present, "[[[PRESENT]]]"));
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Frames]]]", node.XingHeader.TotalFrames.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Size]]]", node.XingHeader.TotalSize.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.XingHeader.Present, "[[[PRESENT]]]"));
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Frames]]]", node.XingHeader.TotalFrames.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Size]]]", node.XingHeader.TotalSize.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "VBRI");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "VBRI");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.VBRIHeader.Present, "[[[PRESENT]]]"));
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Frames]]]", node.VBRIHeader.TotalFrames.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Size]]]", node.VBRIHeader.TotalSize.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", __GetFlag(node.VBRIHeader.Present, "[[[PRESENT]]]"));
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Frames]]]", node.VBRIHeader.TotalFrames.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Total Size]]]", node.VBRIHeader.TotalSize.ToString());
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.Mpeg.VideoHeader node, int level)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.Mpeg.VideoHeader node, int level)
             {
                 if (GetState() != NAME.STATE.WORK.CANCEL)
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.VideoBitrate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Frame Rate]]]", node.VideoFrameRate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.VideoBitrate.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Frame Rate]]]", node.VideoFrameRate.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IAudioCodec node, int level)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.IAudioCodec node, int level)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Bitrate]]]", node.AudioBitrate.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Channels]]]", node.AudioChannels.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Sample Rate]]]", node.AudioSampleRate.ToString());
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IPhotoCodec node, int level, string url, string file)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.IPhotoCodec node, int level, string url, string file)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
@@ -349,36 +349,36 @@ namespace resource
                         {
                             var a_Context = Image.FromFile(file);
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Pixel Format]]]", Native.GetPixelFormat(a_Context));
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Pixel Format]]]", Native.GetPixelFormat(a_Context));
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", a_Context.Width.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", a_Context.Height.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", a_Context.Width.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", a_Context.Height.ToString());
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Physical Size]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Physical Size]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", ((int)a_Context.PhysicalDimension.Width).ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", ((int)a_Context.PhysicalDimension.Height).ToString());
                                 }
                             }
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Resolution]]]");
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Resolution]]]");
                                 {
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
-                                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Horizontal]]]", a_Context.HorizontalResolution.ToString());
+                                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Vertical]]]", a_Context.VerticalResolution.ToString());
                                 }
                             }
                             {
-                                Native.Send(context, a_Context.Palette, level, url);
+                                Native.Send(trace, a_Context.Palette, level, url);
                             }
                             return;
                         }
@@ -389,64 +389,64 @@ namespace resource
                     }
                     {
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Quality]]]", tagLib.Properties?.PhotoQuality.ToString());
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
                             }
                         }
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                             {
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.PhotoWidth.ToString());
-                                context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.PhotoHeight.ToString());
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.PhotoWidth.ToString());
+                                trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.PhotoHeight.ToString());
                             }
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, TagLib.File tagLib, TagLib.IVideoCodec node, int level)
+            private static void __Execute(atom.Trace trace, TagLib.File tagLib, TagLib.IVideoCodec node, int level)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Header]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Duration]]]", tagLib.Properties?.Duration.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Media Types]]]", node.MediaTypes.ToString());
                         }
                     }
                     {
-                        context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
+                        trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, "[[[Size]]]");
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Width]]]", node.VideoWidth.ToString());
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.PARAMETER, level + 1, "[[[Height]]]", node.VideoHeight.ToString());
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, string[] node, int level, string group)
+            private static void __Execute(atom.Trace trace, string[] node, int level, string group)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null) && (node.Length > 0))
                 {
-                    context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, group);
+                    trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level, group);
                     for (var i = 0; i < node.Length; i++)
                     {
                         if (node[i] != null)
                         {
-                            context.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, node[i]);
+                            trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.OBJECT, level + 1, node[i]);
                         }
                     }
                 }
             }
 
-            private static void __Execute(atom.Trace context, IEnumerable<string> node, int level, string group, string url)
+            private static void __Execute(atom.Trace trace, IEnumerable<string> node, int level, string group, string url)
             {
                 if ((GetState() != NAME.STATE.WORK.CANCEL) && (node != null))
                 {
-                    context.
+                    trace.
                         SetComment(__GetArraySize(node)).
                         Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level, group).
                         SendPreview(NAME.EVENT.ERROR, url);
@@ -454,7 +454,7 @@ namespace resource
                     {
                         if (a_Context != null)
                         {
-                            context.
+                            trace.
                                 Send(NAME.SOURCE.PREVIEW, NAME.EVENT.ERROR, level + 1, a_Context);
                         }
                     }
@@ -471,14 +471,14 @@ namespace resource
                 return "[[[Found]]]: " + a_Result.ToString();
             }
 
-            private static string __GetFlag(bool context, string name)
+            private static string __GetFlag(bool trace, string name)
             {
-                return context ? (name + ";") : "";
+                return trace ? (name + ";") : "";
             }
 
-            private static string __GetString(TagLib.PictureType context)
+            private static string __GetString(TagLib.PictureType trace)
             {
-                switch (context)
+                switch (trace)
                 {
                     case TagLib.PictureType.Other: return "[[[Other]]]";
                     case TagLib.PictureType.FileIcon: return "[[[File Icon]]]";

@@ -58,21 +58,22 @@ bool extension::AnyExport::Register(MP_STRING extension, MP_PTR(AnyExport) conte
     {
         if ((s_Items != nullptr) && (context != nullptr) && (MP_STRING_EMPTY(extension) == false))
         {
+            auto a_Name = "urn:metaoutput:export:" + MP_STRING_LOWER(extension);
             {
                 context->m_From = "";
-                context->m_Name = "urn:metaoutput:export:" + MP_STRING_LOWER(extension);
+                context->m_Name = a_Name;
                 context->m_Thread = nullptr;
             }
             for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
             {
-                if (s_Items[i]->m_Name == context->m_Name)
+                if (s_Items[i]->m_Name == a_Name)
                 {
                     return false;
                 }
             }
             {
                 MP_THREAD_INITIALIZE(context->m_Thread, __ThreadExecute);
-                MP_THREAD_NAME_SET(context->m_Thread, context->m_Name);
+                MP_THREAD_NAME_SET(context->m_Thread, a_Name);
                 MP_THREAD_APARTMENT_SET(context->m_Thread, MP_THREAD_APARTMENT_STA);
                 MP_THREAD_START(context->m_Thread, context);
             }
@@ -80,6 +81,30 @@ bool extension::AnyExport::Register(MP_STRING extension, MP_PTR(AnyExport) conte
                 MP_VECTOR_APPEND(s_Items, context);
             }
             return true;
+        }
+    }
+    catch (MP_PTR(MP_EXCEPTION) ex)
+    {
+        MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+    }
+    return false;
+}
+
+bool extension::AnyExport::Unregister(MP_STRING extension)
+{
+    try
+    {
+        if ((s_Items != nullptr) && (MP_STRING_EMPTY(extension) == false))
+        {
+            auto a_Name = "urn:metaoutput:export:" + MP_STRING_LOWER(extension);
+            for (auto i = MP_VECTOR_SIZE_GET(s_Items) - 1; i >= 0; i--)
+            {
+                if (s_Items[i]->m_Name == a_Name)
+                {
+                    MP_VECTOR_DELETE(s_Items, i);
+                    return true;
+                }
+            }
         }
     }
     catch (MP_PTR(MP_EXCEPTION) ex)

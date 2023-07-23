@@ -3,14 +3,16 @@
 
 #ifndef MP_PLATFORM_CLI
 MP_PTR(MP_THREAD_MUTEX) atom::Trace::s_Mutex = nullptr;
-MP_PTR(MP_MAP(MP_PTR(atom::Trace))) atom::Trace::s_Instances = nullptr;
+MP_PTR(MP_MAP(MP_PTR(Trace))) atom::Trace::s_Instances = nullptr;
 MP_PTR(MP_THREAD) atom::Trace::s_TraceThread = nullptr;
-MP_STRING atom::Trace::s_TraceBuffer = "";
+MP_STRING atom::Trace::s_TraceBuffer = nullptr;
 #endif
 
 // atom::Trace ################################################################
 atom::Trace::Trace()
 {
+    m_Transaction = 0;
+    m_Queue = "";
     Clear();
 }
 
@@ -228,32 +230,66 @@ MP_PTR(atom::Trace) atom::Trace::Clear()
 {
     if (this != nullptr)
     {
-        try
+        m_Background = "";
+        m_Command = "";
+        m_Comment = "";
+        m_Condition = "";
+        m_Content = "";
+        m_Control = "";
+        m_Count = "";
+        m_Date = "";
+        m_Flag = "";
+        m_Font = "";
+        m_Foreground = "";
+        m_Progress = "";
+        m_Time = "";
+        m_Tml = "";
+        m_Trace = "";
+        m_Url = "";
+        m_UrlInfo = "";
+        m_UrlPreview = "";
+        m_UrlSample = "";
+        m_Value = "";
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::BeginTransaction()
+{
+    if (this != nullptr)
+    {
+        m_Transaction++;
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::CancelTransaction()
+{
+    if (this != nullptr)
+    {
+        m_Transaction = 0;
+        m_Queue = "";
+    }
+    return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::EndTransaction()
+{
+    if (this != nullptr)
+    {
         {
-            m_Background = "";
-            m_Command = "";
-            m_Comment = "";
-            m_Condition = "";
-            m_Content = "";
-            m_Control = "";
-            m_Count = "";
-            m_Date = "";
-            m_Flag = "";
-            m_Font = "";
-            m_Foreground = "";
-            m_Progress = "";
-            m_Time = "";
-            m_Tml = "";
-            m_Trace = "";
-            m_Url = "";
-            m_UrlInfo = "";
-            m_UrlPreview = "";
-            m_UrlSample = "";
-            m_Value = "";
+            m_Transaction--;
         }
-        catch (MP_PTR(MP_EXCEPTION))
+        if (m_Transaction <= 0)
         {
-            // Any exceptions here may be ignored
+            auto a_Context = m_Queue;
+            {
+                m_Transaction = 0;
+                m_Queue = "";
+            }
+            {
+                SendTml(a_Context);
+            }
         }
     }
     return this;
@@ -311,6 +347,9 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT 
             {
                 a_Context += __GetStackTrace(source, level + 1, 2);
             }
+            {
+                m_Queue += a_Context;
+            }
         }
         catch (MP_PTR(MP_EXCEPTION))
         {
@@ -319,9 +358,14 @@ MP_PTR(atom::Trace) atom::Trace::Send(MP_STRING source, MP_STRING event, MP_INT 
         {
             MP_THREAD_MUTEX_UNLOCK(__GetMutex());
         }
+        if (m_Transaction == 0)
         {
             Clear();
-            SendTml(a_Context);
+            EndTransaction();
+        }
+        else
+        {
+            Clear();
         }
     }
     return this;
@@ -354,7 +398,34 @@ MP_PTR(atom::Trace) atom::Trace::SendTml(MP_STRING value)
 {
     if ((this != nullptr) && (value != nullptr))
     {
-        return __SendTml(MP_STRING_TRIMEND(value) + "\n");
+        {
+            MP_THREAD_MUTEX_LOCK(__GetMutex());
+        }
+        try
+        {
+            s_TraceBuffer += value + "\n";
+        }
+        catch (MP_PTR(MP_EXCEPTION))
+        {
+            // Any exceptions here may be ignored
+        }
+        {
+            MP_THREAD_MUTEX_UNLOCK(__GetMutex());
+        }
+        try
+        {
+            if (s_TraceThread == nullptr)
+            {
+                MP_THREAD_INITIALIZE(s_TraceThread, __ThreadExecute);
+                MP_THREAD_NAME_SET(s_TraceThread, "METAOUTPUT.SEND");
+                MP_THREAD_APARTMENT_SET(s_TraceThread, MP_THREAD_APARTMENT_STA);
+                MP_THREAD_START(s_TraceThread, nullptr);
+            }
+        }
+        catch (MP_PTR(MP_EXCEPTION) ex)
+        {
+            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
+        }
     }
     return this;
 }
@@ -363,7 +434,7 @@ MP_PTR(atom::Trace) atom::Trace::SendTml(MP_STRING value, MP_STRING source)
 {
     if ((this != nullptr) && (value != nullptr))
     {
-        return __SendTml(__GetTml(value, source));
+        return atom::Trace::SendTml(__GetTml(value, source));
     }
     return this;
 }
@@ -501,6 +572,11 @@ MP_PTR(atom::Trace) atom::Trace::SetControl(MP_STRING name)
     return SetControl(name, nullptr, nullptr, NAME::STATE::CONTROL::NONE);
 }
 
+MP_PTR(atom::Trace) atom::Trace::SetControl(MP_STRING name, MP_STRING hint)
+{
+    return SetControl(name, hint, nullptr, NAME::STATE::CONTROL::NONE);
+}
+
 MP_PTR(atom::Trace) atom::Trace::SetControl(MP_STRING name, MP_STRING hint, MP_STRING pipe, MP_INT state)
 {
     if ((this != nullptr) && (name != nullptr))
@@ -552,6 +628,11 @@ MP_PTR(atom::Trace) atom::Trace::SetDate(MP_INT year, MP_INT month, MP_INT day)
             MP_CONVERT_STRING_FROM_INT(MP_MAX(0, MP_MIN(day, 31)), 2);
     }
     return this;
+}
+
+MP_PTR(atom::Trace) atom::Trace::SetFont(MP_STRING name, MP_INT size)
+{
+    return SetFont(name, size, NAME::STATE::TRACE::NONE);
 }
 
 MP_PTR(atom::Trace) atom::Trace::SetFont(MP_STRING name, MP_INT size, MP_INT state)
@@ -862,11 +943,11 @@ MP_PTR(atom::Trace) atom::Trace::SetValue(MP_STRING value, MP_STRING type)
     {
         if (MP_STRING_EMPTY(type))
         {
-            m_Value = " @@@VALUE @@BASE64 " + MP_CONVERT_STRING_TO_BASE64(value);
+            m_Value = " @@@VALUE @@BASE64 " + value;
         }
         else
         {
-            m_Value = " @@@VALUE @@TYPE " + type + " @@BASE64 " + MP_CONVERT_STRING_TO_BASE64(value);
+            m_Value = " @@@VALUE @@TYPE " + type + " @@BASE64 " + value;
         }
     }
     return this;
@@ -883,42 +964,6 @@ MP_PTR(atom::Trace) atom::Trace::SetValue(MP_PTR(MP_STREAM) value, MP_STRING typ
         else
         {
             m_Value = " @@@VALUE @@TYPE " + type + " @@BASE64 " + MP_CONVERT_STREAM_TO_BASE64(value);
-        }
-    }
-    return this;
-}
-
-// Private #############
-MP_PTR(atom::Trace) atom::Trace::__SendTml(MP_STRING value)
-{
-    if ((this != nullptr) && (value != nullptr))
-    {
-        {
-            MP_THREAD_MUTEX_LOCK(__GetMutex());
-        }
-        try
-        {
-            s_TraceBuffer += value;
-        }
-        catch (MP_PTR(MP_EXCEPTION))
-        {
-        }
-        {
-            MP_THREAD_MUTEX_UNLOCK(__GetMutex());
-        }
-        try
-        {
-            if (s_TraceThread == nullptr)
-            {
-                MP_THREAD_INITIALIZE(s_TraceThread, __ThreadExecute);
-                MP_THREAD_NAME_SET(s_TraceThread, "METAOUTPUT.SEND");
-                MP_THREAD_APARTMENT_SET(s_TraceThread, MP_THREAD_APARTMENT_STA);
-                MP_THREAD_START(s_TraceThread, nullptr);
-            }
-        }
-        catch (MP_PTR(MP_EXCEPTION) ex)
-        {
-            MP_TRACE_DEBUG(MP_STRING_TRIM(MP_EXCEPTION_MESSAGE_GET(ex)) + " @@@SOURCE DIAGNOSTIC @@@EVENT EXCEPTION");
         }
     }
     return this;
@@ -1328,9 +1373,7 @@ void atom::Trace::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
             auto a_Context = (MP_STRING)"";
             {
                 MP_UNUSED(sender);
-            }
-            {
-                MP_THREAD_SLEEP(50);
+                MP_THREAD_SLEEP(10);
                 MP_THREAD_MUTEX_LOCK(__GetMutex());
             }
             {
@@ -1352,6 +1395,7 @@ void atom::Trace::MP_THREAD_CALLBACK_MAIN(__ThreadExecute, sender)
     }
     catch (MP_PTR(MP_EXCEPTION))
     {
+        // Any exceptions here may be ignored
     }
     {
         s_TraceThread = nullptr;
