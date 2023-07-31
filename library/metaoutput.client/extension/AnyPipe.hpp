@@ -4,7 +4,7 @@ namespace extension
 {
     MP_CLASS_SHARED AnyPipe
     {
-    protected:
+    public:
         MP_CLASS CONSTANT : public atom::Trace::CONSTANT
         {
         };
@@ -12,19 +12,7 @@ namespace extension
         MP_CLASS NAME : public atom::Trace::NAME
         {
         public:
-            MP_CLASS ATTRIBUTE
-            {
-                MP_CONSTANT_STRING(CONTENT, "CONTENT");
-                MP_CONSTANT_STRING(CURSOR_X, "CURSOR.X");
-                MP_CONSTANT_STRING(CURSOR_Y, "CURSOR.Y");
-                MP_CONSTANT_STRING(EVENT, "EVENT");
-                MP_CONSTANT_STRING(ID, "ID");
-                MP_CONSTANT_STRING(KEYBOARD, "KEYBOARD");
-                MP_CONSTANT_STRING(MOUSE, "MOUSE");
-                MP_CONSTANT_STRING(URL, "URL");
-            };
-        public:
-            MP_CLASS EVENT
+            MP_CLASS ACTION
             {
                 MP_CONSTANT_STRING(CHANGE, "CHANGE");
                 MP_CONSTANT_STRING(CLICK, "CLICK");
@@ -34,22 +22,16 @@ namespace extension
                 MP_CONSTANT_STRING(WHEEL, "WHEEL");
             };
         public:
-            MP_CLASS KEYBOARD
+            MP_CLASS ATTRIBUTE
             {
-                MP_CONSTANT_STRING(BUTTON_ALT, "ALT");
-                MP_CONSTANT_STRING(BUTTON_CAPS, "CAPS");
-                MP_CONSTANT_STRING(BUTTON_CONTROL, "CONTROL");
-                MP_CONSTANT_STRING(BUTTON_NUM_LOCK, "NUM.LOCK");
-                MP_CONSTANT_STRING(BUTTON_SCROLL_LOCK, "SCROLL.LOCK");
-                MP_CONSTANT_STRING(BUTTON_SHIFT, "SHIFT");
-                MP_CONSTANT_STRING(BUTTON_WINDOWS, "WINDOWS");
-            };
-        public:
-            MP_CLASS MOUSE
-            {
-                MP_CONSTANT_STRING(BUTTON_CENTER, "CENTER");
-                MP_CONSTANT_STRING(BUTTON_LEFT, "LEFT");
-                MP_CONSTANT_STRING(BUTTON_RIGHT, "RIGHT");
+                MP_CONSTANT_STRING(ACTION, "ACTION");
+                MP_CONSTANT_STRING(CONTENT, "CONTENT");
+                MP_CONSTANT_STRING(CURSOR_X, "CURSOR.X");
+                MP_CONSTANT_STRING(CURSOR_Y, "CURSOR.Y");
+                MP_CONSTANT_STRING(ID, "ID");
+                MP_CONSTANT_STRING(KEYBOARD, "KEYBOARD");
+                MP_CONSTANT_STRING(MOUSE, "MOUSE");
+                MP_CONSTANT_STRING(URL, "URL");
             };
         };
     public:

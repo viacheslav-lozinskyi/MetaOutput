@@ -24,7 +24,9 @@ namespace atom
                 MP_CONSTANT_INTEGER(BUTTON_SIZE_Y, 30);
                 MP_CONSTANT_INTEGER(DEFAULT_BACKGROUND, 0xFFFFFFFF);
                 MP_CONSTANT_INTEGER(DEFAULT_PADDING, 5);
-                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT, 10);
+                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT_MIN, 10);
+                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT_MID, 15);
+                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT_MAX, 20);
                 MP_CONSTANT_INTEGER(DEFAULT_TRANSPARENCY, 90);
                 MP_CONSTANT_INTEGER(DELIMITER_MAX_MARGIN_Y, -40);
                 MP_CONSTANT_INTEGER(DELIMITER_MAX_SIZE_Y, 1);
@@ -45,6 +47,12 @@ namespace atom
                 MP_CONSTANT_INTEGER(MESSAGE_FOREGROUND, 0xFF8B0000);
                 MP_CONSTANT_INTEGER(MESSAGE_MARGIN_Y, 10);
                 MP_CONSTANT_INTEGER(MESSAGE_SIZE_Y, 20);
+                MP_CONSTANT_STRING(TOOL_FONT_NAME, "Arial");
+                MP_CONSTANT_INTEGER(TOOL_FONT_SIZE, 14);
+                MP_CONSTANT_INTEGER(TOOL_FOREGROUND, 0xFF000000);
+                MP_CONSTANT_INTEGER(TOOL_PADDING, 3);
+                MP_CONSTANT_INTEGER(TOOL_SIZE_X, 120);
+                MP_CONSTANT_INTEGER(TOOL_SIZE_Y, 30);
                 MP_CONSTANT_INTEGER(TITLE_SIZE_Y, 24);
                 MP_CONSTANT_INTEGER(TRACE_FOREGROUND, 0xFF008080);
             };
@@ -617,7 +625,18 @@ namespace atom
             MP_CLASS KEYBOARD
             {
             public:
-                MP_CLASS BUTTON
+                MP_CLASS KEY
+                {
+                    MP_CONSTANT_STRING(ALT, "ALT");
+                    MP_CONSTANT_STRING(CAPS, "CAPS");
+                    MP_CONSTANT_STRING(CONTROL, "CONTROL");
+                    MP_CONSTANT_STRING(NUM_LOCK, "NUM.LOCK");
+                    MP_CONSTANT_STRING(SCROLL_LOCK, "SCROLL.LOCK");
+                    MP_CONSTANT_STRING(SHIFT, "SHIFT");
+                    MP_CONSTANT_STRING(WINDOWS, "WINDOWS");
+                };
+            public:
+                MP_CLASS EVENT
                 {
                     MP_CONSTANT_STRING(DOWN_ALT, "KEY.DOWN.ALT");
                     MP_CONSTANT_STRING(DOWN_CONTROL, "KEY.DOWN.CONTROL");
@@ -633,7 +652,14 @@ namespace atom
             MP_CLASS MOUSE
             {
             public:
-                MP_CLASS BUTTON
+                MP_CLASS KEY
+                {
+                    MP_CONSTANT_STRING(CENTER, "CENTER");
+                    MP_CONSTANT_STRING(LEFT, "LEFT");
+                    MP_CONSTANT_STRING(RIGHT, "RIGHT");
+                };
+            public:
+                MP_CLASS EVENT
                 {
                     MP_CONSTANT_STRING(DOWN_LEFT, "MOUSE.DOWN.LEFT");
                     MP_CONSTANT_STRING(DOWN_MIDDLE, "MOUSE.DOWN.MIDDLE");

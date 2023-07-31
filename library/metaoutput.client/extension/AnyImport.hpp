@@ -4,11 +4,11 @@ namespace extension
 {
     MP_CLASS_SHARED AnyImport
     {
-    protected:
+    public:
         MP_CLASS CONSTANT : public atom::Trace::CONSTANT
         {
         };
-    protected:
+    public:
         MP_CLASS NAME : public atom::Trace::NAME
         {
         };
