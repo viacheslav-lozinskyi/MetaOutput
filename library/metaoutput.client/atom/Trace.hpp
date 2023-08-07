@@ -107,7 +107,7 @@ namespace atom
             public:
                 MP_CLASS LOGO
                 {
-                    MP_CONSTANT_INTEGER(SIZE_X, 150);
+                    MP_CONSTANT_INTEGER(SIZE_X, 144);
                     MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
                 };
             public:
