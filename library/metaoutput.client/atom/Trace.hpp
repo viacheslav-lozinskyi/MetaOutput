@@ -10,63 +10,9 @@ namespace atom
         MP_CLASS CONSTANT
         {
         public:
-            MP_CLASS HMI
-            {
-                MP_CONSTANT_INTEGER(ACTION_FONT_SIZE, 20);
-                MP_CONSTANT_INTEGER(ACTION_FOREGROUND, 0xFF8B0000);
-                MP_CONSTANT_INTEGER(ACTION_MARGIN_Y, 19);
-                MP_CONSTANT_INTEGER(ACTION_SIZE_Y, 64);
-                MP_CONSTANT_INTEGER(ACTION_TRANSPARENCY, 90);
-                MP_CONSTANT_STRING(BUTTON_FONT_NAME, "Arial");
-                MP_CONSTANT_INTEGER(BUTTON_FONT_SIZE, 16);
-                MP_CONSTANT_INTEGER(BUTTON_FOREGROUND, 0xFF000000);
-                MP_CONSTANT_INTEGER(BUTTON_SIZE_X, 250);
-                MP_CONSTANT_INTEGER(BUTTON_SIZE_Y, 30);
-                MP_CONSTANT_INTEGER(DEFAULT_BACKGROUND, 0xFFFFFFFF);
-                MP_CONSTANT_INTEGER(DEFAULT_PADDING, 5);
-                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT_MIN, 10);
-                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT_MID, 15);
-                MP_CONSTANT_INTEGER(DEFAULT_ROW_COUNT_MAX, 20);
-                MP_CONSTANT_INTEGER(DEFAULT_TRANSPARENCY, 90);
-                MP_CONSTANT_INTEGER(DELIMITER_MAX_MARGIN_Y, -40);
-                MP_CONSTANT_INTEGER(DELIMITER_MAX_SIZE_Y, 1);
-                MP_CONSTANT_INTEGER(DELIMITER_MIN_MARGIN_Y, 15);
-                MP_CONSTANT_INTEGER(DELIMITER_MIN_SIZE_Y, 1);
-                MP_CONSTANT_STRING(FOOTER_FONT_NAME, "Arial");
-                MP_CONSTANT_INTEGER(FOOTER_FONT_SIZE, 12);
-                MP_CONSTANT_INTEGER(FOOTER_FOREGROUND, 0xFF000000);
-                MP_CONSTANT_INTEGER(FOOTER_SIZE_Y, 30);
-                MP_CONSTANT_INTEGER(FOOTER_TRANSPARENCY, 70);
-                MP_CONSTANT_STRING(HEADER_FONT_NAME, "Arial");
-                MP_CONSTANT_INTEGER(HEADER_FONT_SIZE, 16);
-                MP_CONSTANT_INTEGER(HEADER_FOREGROUND, 0xFF000000);
-                MP_CONSTANT_INTEGER(HEADER_SIZE_Y, 30);
-                MP_CONSTANT_INTEGER(LOGO_SIZE_X, 150);
-                MP_CONSTANT_STRING(MESSAGE_FONT_NAME, "Arial");
-                MP_CONSTANT_INTEGER(MESSAGE_FONT_SIZE, 14);
-                MP_CONSTANT_INTEGER(MESSAGE_FOREGROUND, 0xFF8B0000);
-                MP_CONSTANT_INTEGER(MESSAGE_MARGIN_Y, 10);
-                MP_CONSTANT_INTEGER(MESSAGE_SIZE_Y, 20);
-                MP_CONSTANT_STRING(TOOL_FONT_NAME, "Arial");
-                MP_CONSTANT_INTEGER(TOOL_FONT_SIZE, 14);
-                MP_CONSTANT_INTEGER(TOOL_FOREGROUND, 0xFF000000);
-                MP_CONSTANT_INTEGER(TOOL_PADDING, 3);
-                MP_CONSTANT_INTEGER(TOOL_SIZE_X, 120);
-                MP_CONSTANT_INTEGER(TOOL_SIZE_Y, 30);
-                MP_CONSTANT_INTEGER(TITLE_SIZE_Y, 24);
-                MP_CONSTANT_INTEGER(TRACE_FOREGROUND, 0xFF008080);
-            };
-        public:
             MP_CLASS OUTPUT
             {
                 MP_CONSTANT_STRING(MUTEX, "urn:metaoutput:mutex:EXECUTE");
-                MP_CONSTANT_STRING(REQUIREMENTS, "https://www.metaoutput.net/requirements");
-                MP_CONSTANT_INTEGER(PREVIEW_FOREGROUND, Trace::NAME::COLOR::ORCHID);
-                MP_CONSTANT_INTEGER(PREVIEW_ITEM_HEIGHT, 19);
-                MP_CONSTANT_INTEGER(PREVIEW_MIN_SIZE, 2);
-                MP_CONSTANT_INTEGER(PREVIEW_MIN_WIDTH, 200);
-                MP_CONSTANT_INTEGER(PREVIEW_PAGE_INDENT, 10);
-                MP_CONSTANT_INTEGER(PREVIEW_PAGE_BREAK, 7);
                 MP_CONSTANT_INTEGER(MAX_BUFFER_SIZE, 100 * 1024 * 1024);
             };
         public:
@@ -90,6 +36,8 @@ namespace atom
             {
                 MP_CONSTANT_STRING(ATTRIBUTE, "@@@");
                 MP_CONSTANT_STRING(COMMENT, "/// ");
+                MP_CONSTANT_STRING(FUNCTION_BEGIN, "(((");
+                MP_CONSTANT_STRING(FUNCTION_END, ")))");
                 MP_CONSTANT_STRING(GROUP_BEGIN, "<<<");
                 MP_CONSTANT_STRING(GROUP_END, ">>>");
                 MP_CONSTANT_STRING(NEW_LINE, "|||");
@@ -98,6 +46,119 @@ namespace atom
                 MP_CONSTANT_STRING(TRANSLATE_END, "]]]");
                 MP_CONSTANT_STRING(VARIABLE_BEGIN, "{{{");
                 MP_CONSTANT_STRING(VARIABLE_END, "}}}");
+            };
+        public:
+            MP_CLASS UI
+            {
+            public:
+                MP_CLASS ACTION
+                {
+                    MP_CONSTANT_STRING(FONT_NAME, "Arial");
+                    MP_CONSTANT_INTEGER(FONT_SIZE, 20);
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF8B0000);
+                    MP_CONSTANT_INTEGER(MARGIN_Y, 19);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 64);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 90);
+                };
+            public:
+                MP_CLASS BUTTON
+                {
+                    MP_CONSTANT_STRING(FONT_NAME, "Arial");
+                    MP_CONSTANT_INTEGER(FONT_SIZE, 16);
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF000000);
+                    MP_CONSTANT_INTEGER(SIZE_X, 250);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 30);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS COUNT
+                {
+                    MP_CONSTANT_INTEGER(TINY, 3);
+                    MP_CONSTANT_INTEGER(NORMAL, 10);
+                    MP_CONSTANT_INTEGER(MIDDLE, 15);
+                    MP_CONSTANT_INTEGER(HUGE, 20);
+                };
+            public:
+                MP_CLASS DELIMITER
+                {
+                    MP_CONSTANT_INTEGER(MAX_MARGIN_Y, -40);
+                    MP_CONSTANT_INTEGER(MIN_MARGIN_Y, 15);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 1);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS FOOTER
+                {
+                    MP_CONSTANT_STRING(FONT_NAME, "Arial");
+                    MP_CONSTANT_INTEGER(FONT_SIZE, 12);
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF000000);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 30);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 70);
+                };
+            public:
+                MP_CLASS HEADER
+                {
+                    MP_CONSTANT_STRING(FONT_NAME, "Arial");
+                    MP_CONSTANT_INTEGER(FONT_SIZE, 16);
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF000000);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 30);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS LOGO
+                {
+                    MP_CONSTANT_INTEGER(SIZE_X, 150);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS MESSAGE
+                {
+                    MP_CONSTANT_STRING(FONT_NAME, "Arial");
+                    MP_CONSTANT_INTEGER(FONT_SIZE, 14);
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF8B0000);
+                    MP_CONSTANT_INTEGER(MARGIN_Y, 10);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 20);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS PREVIEW
+                {
+                    MP_CONSTANT_INTEGER(FOREGROUND, Trace::NAME::COLOR::ORCHID);
+                    MP_CONSTANT_INTEGER(ITEM_HEIGHT, 19);
+                    MP_CONSTANT_INTEGER(MIN_SIZE, 2);
+                    MP_CONSTANT_INTEGER(MIN_WIDTH, 200);
+                    MP_CONSTANT_INTEGER(PAGE_INDENT, 10);
+                    MP_CONSTANT_INTEGER(PAGE_BREAK, 7);
+                };
+            public:
+                MP_CLASS TOOL
+                {
+                    MP_CONSTANT_STRING(FONT_NAME, "Arial");
+                    MP_CONSTANT_INTEGER(FONT_SIZE, 14);
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF000000);
+                    MP_CONSTANT_INTEGER(PADDING, 3);
+                    MP_CONSTANT_INTEGER(SIZE_X, 120);
+                    MP_CONSTANT_INTEGER(SIZE_Y, 30);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS TITLE
+                {
+                    MP_CONSTANT_INTEGER(SIZE_Y, 24);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
+            public:
+                MP_CLASS TRACE
+                {
+                    MP_CONSTANT_INTEGER(FOREGROUND, 0xFF008080);
+                };
+            public:
+                MP_CLASS WINDOW
+                {
+                    MP_CONSTANT_INTEGER(BACKGROUND, 0xFFFFFFFF);
+                    MP_CONSTANT_INTEGER(PADDING, 5);
+                    MP_CONSTANT_INTEGER(TRANSPARENCY, 0);
+                };
             };
         };
     public:

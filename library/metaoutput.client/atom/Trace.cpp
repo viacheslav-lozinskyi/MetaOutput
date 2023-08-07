@@ -446,7 +446,7 @@ MP_PTR(atom::Trace) atom::Trace::SendPreview(MP_STRING event, MP_STRING url)
         if (MP_STRING_EMPTY(m_Foreground))
         {
             this->
-                SetForeground(CONSTANT::OUTPUT::PREVIEW_FOREGROUND);
+                SetForeground(CONSTANT::UI::PREVIEW::FOREGROUND);
         }
         {
             this->

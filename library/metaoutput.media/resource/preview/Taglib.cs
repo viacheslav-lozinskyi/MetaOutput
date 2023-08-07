@@ -23,14 +23,14 @@ namespace resource
                             if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Video))
                             {
                                 a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                                a_Count = Math.Min(a_Count, a_Context.Properties.VideoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                a_Count = Math.Min(a_Count, a_Context.Properties.VideoHeight / CONSTANT.UI.PREVIEW.ITEM_HEIGHT);
+                                a_Count = Math.Max(a_Count, CONSTANT.UI.PREVIEW.MIN_SIZE);
                             }
                             if (a_Context.Properties.MediaTypes.HasFlag(TagLib.MediaTypes.Photo))
                             {
                                 a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
-                                a_Count = Math.Min(a_Count, a_Context.Properties.PhotoHeight / CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                a_Count = Math.Max(a_Count, CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                a_Count = Math.Min(a_Count, a_Context.Properties.PhotoHeight / CONSTANT.UI.PREVIEW.ITEM_HEIGHT);
+                                a_Count = Math.Max(a_Count, CONSTANT.UI.PREVIEW.MIN_SIZE);
                             }
                             {
                                 trace.Send(NAME.SOURCE.PREVIEW, NAME.EVENT.HEADER, level, "[[[Info]]]");

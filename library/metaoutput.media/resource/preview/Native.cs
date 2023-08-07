@@ -40,8 +40,8 @@ namespace resource
                             {
                                 var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Count = Math.Min(a_Count, a_Context1.Size.Height / atom.Trace.CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                    a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                    a_Count = Math.Min(a_Count, a_Context1.Size.Height / atom.Trace.CONSTANT.UI.PREVIEW.ITEM_HEIGHT);
+                                    a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.UI.PREVIEW.MIN_SIZE);
                                 }
                                 {
                                     trace.
@@ -104,8 +104,8 @@ namespace resource
                             {
                                 var a_Count = GetProperty(NAME.PROPERTY.PREVIEW_MEDIA_SIZE, true);
                                 {
-                                    a_Count = Math.Min(a_Count, a_Context.Height / atom.Trace.CONSTANT.OUTPUT.PREVIEW_ITEM_HEIGHT);
-                                    a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.OUTPUT.PREVIEW_MIN_SIZE);
+                                    a_Count = Math.Min(a_Count, a_Context.Height / atom.Trace.CONSTANT.UI.PREVIEW.ITEM_HEIGHT);
+                                    a_Count = Math.Max(a_Count, atom.Trace.CONSTANT.UI.PREVIEW.MIN_SIZE);
                                 }
                                 {
                                     trace.

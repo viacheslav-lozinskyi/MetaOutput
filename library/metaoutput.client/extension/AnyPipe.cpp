@@ -155,7 +155,7 @@ void extension::AnyPipe::Validate(MP_STRING application, MP_STRING extension)
             }
             if (MP_STRING_EMPTY(MP_REGISTRY_GET(a_Context, "USER.ID", "")))
             {
-                MP_FILE_EXECUTE(CONSTANT::OUTPUT::REQUIREMENTS + "?application=" + application + "&extension=" + extension);
+                MP_FILE_EXECUTE("https://www.metaoutput.net/requirements?application=" + application + "&extension=" + extension);
             }
             {
                 MP_REGISTRY_FINALIZE(a_Context);
