@@ -149,7 +149,7 @@ MP_STRING extension::AnyPreview::GetExtension(MP_STRING url)
         auto a_Index = MP_STRING_LASTINDEXOF(url, ".");
         if (a_Index > 0)
         {
-            return MP_STRING_LOWER(MP_STRING_SUBSTRINGEND(url, a_Index));
+            return MP_STRING_LOWER(MP_STRING_SUBSTRING(url, a_Index, MP_STRING_SIZE_GET(url)));
         }
     }
     return MP_STRING_LOWER(url);

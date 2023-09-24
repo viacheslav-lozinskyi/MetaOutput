@@ -1885,7 +1885,7 @@ MP_STRING atom::Trace::GetFirstLine(MP_STRING value, bool isAnyText)
             auto a_Index2 = MP_STRING_INDEXOF(value, '\r');
             if ((a_Index1 >= 0) || (a_Index2 >= 0))
             {
-                a_Result = MP_STRING_SUBSTRINGBEGIN(value, MP_MIN(a_Index1, a_Index2));
+                a_Result = MP_STRING_SUBSTRING(value, 0, MP_MIN(a_Index1, a_Index2));
             }
         }
         if (isAnyText)
