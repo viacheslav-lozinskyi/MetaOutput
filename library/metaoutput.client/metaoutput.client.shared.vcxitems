@@ -17,16 +17,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)atom\Trace.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyExport.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyImport.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPreview.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyPipe.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)extension\AnyTool.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)pattern\data\Color.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Alignment.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Color.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Control.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Culture.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Cursor.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Event.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Font.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Keyboard.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Message.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Metadata.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Mouse.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pattern\data\Source.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)atom\Trace.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyExport.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyImport.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPreview.hpp" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyPipe.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)extension\AnyTool.hpp" />
   </ItemGroup>
 </Project>

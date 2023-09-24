@@ -29,8 +29,6 @@
     <ClCompile Include="resource\assembly\AssemblyInfo.cpp">
       <Filter>resource\assembly</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="All.hpp" />
+    <ClCompile Include="All.hpp" />
   </ItemGroup>
 </Project>
