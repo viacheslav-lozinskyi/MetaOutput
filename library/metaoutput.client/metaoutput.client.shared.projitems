@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2EC394EE-D45A-402E-B55D-C2176B739DBC</SharedGUID>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)atom/*.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)basic/*.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)extension/*.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)pattern/data/*.cs" />
+  </ItemGroup>
+</Project>

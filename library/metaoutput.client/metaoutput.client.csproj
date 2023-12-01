@@ -1,0 +1,57 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <BaseOutputPath>$(USERPROFILE)/.metaoutput/build/bin</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(USERPROFILE)/.metaoutput/build/obj/metaoutput.client</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
+
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(Configuration)' == 'Release'">net5.0;net6.0;net7.0;net8.0;net35;net45;net46;net47;net48;netcoreapp3.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Configuration)' != 'Release'">net48</TargetFrameworks>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <Version>3.0.0.200</Version>
+    <Authors>Viacheslav Lozinskyi</Authors>
+    <Company>Viacheslav Lozinskyi</Company>
+    <Owners>Viacheslav Lozinskyi</Owners>
+    <Title>MetaOutput.Client</Title>
+    <Description>Small and simple client for MetaOutput</Description>
+    <Product>MetaOutput</Product>
+    <Copyright>Copyright (c) 2017-2023 by Viacheslav Lozinskyi</Copyright>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <IncludeSource>False</IncludeSource>
+    <IncludeBuildOutput>True</IncludeBuildOutput>
+    <ContentTargetFolders>resource</ContentTargetFolders>
+    <NeutralLanguage>en</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/viacheslav-lozinskyi/MetaOutput</RepositoryUrl>
+    <!--<DocumentationFile>../../build/doc</DocumentationFile>-->
+    <!--<GenerateDocumentationFile>True</GenerateDocumentationFile>-->
+    <!--<SignAssembly>False</SignAssembly>-->
+    <WarningLevel>9999</WarningLevel>
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.projitems</DefaultItemExcludes>
+    <PublishReadyToRun>True</PublishReadyToRun>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>resource/document/LICENSE.md</PackageLicenseFile>
+    <PackageReadmeFile>resource/document/README.md</PackageReadmeFile>
+    <PackageIcon>resource/picture/logo/icon.png</PackageIcon>
+    <PackageIconUrl>https://www.metaoutput.net/_functions/watch?source=NUGET&amp;project=MetaOutput.Client&amp;action=VIEW&amp;size=128x128&amp;url=https://www.nuget.org/packages/MetaOutput.Client</PackageIconUrl>
+    <PackageTags>metaoutput;client;tml;trace;</PackageTags>
+    <PackageOutputPath>$(BaseOutputPath)/../../package</PackageOutputPath>
+    <PackageProjectUrl>https://www.metaoutput.net</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../resource/document/LICENSE.md" Pack="True" PackagePath="resource/document/LICENSE.md" Link="resource/document/LICENSE.md" />
+    <None Include="../../resource/document/README.md" Pack="True" PackagePath="resource/document/README.md" Link="resource/document/README.md" />
+    <None Include="../../resource/picture/logo/icon.png" Pack="True" PackagePath="resource/picture/logo/icon.png" Link="resource/picture/logo/icon.png" />
+  </ItemGroup>
+
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
+
+</Project>

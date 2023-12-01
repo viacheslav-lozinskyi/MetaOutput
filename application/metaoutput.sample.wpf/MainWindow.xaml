@@ -1,0 +1,17 @@
+﻿<Window x:Class="metaoutput.sample.wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:metaoutput.sample.wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1400">
+    <Grid>
+        <DockPanel x:Name="MetaOutputParent" LastChildFill="False" Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" Margin="0,130,0,0" SizeChanged="MetaOutputParent_SizeChanged"/>
+        <TextBox x:Name="RequestTextBox" AcceptsReturn="True" Margin="0,26,100,0" TextWrapping="Wrap" Text="TextBox" Height="80" VerticalAlignment="Top"/>
+        <Label Content="MetaOutput" Margin="0,106,0,0" Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Height="24" Grid.RowSpan="1" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label Content="TML Request" Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Height="26" Grid.RowSpan="1" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Button x:Name="SendButton" Content="SEND" HorizontalAlignment="Right" Margin="0,26,0,0" VerticalAlignment="Top" Height="80" Width="100" FontSize="22" FontWeight="Bold" Click="SendButton_Click"/>
+
+    </Grid>
+</Window>
